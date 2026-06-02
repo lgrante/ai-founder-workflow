@@ -28,6 +28,8 @@ Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat 
 - `test-<feature>` : session **fraîche**, écrit les **e2e** depuis le **spec** au jalon + **revue à œil neuf**.
 - Puis **gate humain** : validation de la tranche au jalon.
 
+**Une feature = une branche git.** L'axe build est rattaché à une branche : les trois sessions build d'une feature (`spec-`, `code-`, `test-`) travaillent toutes sur **cette même** branche dédiée (ex. `feature/<feature>`). On ne mélange jamais deux features sur une branche. Pour traiter plusieurs features en parallèle → **worktrees git séparés** (une branche chacune). Les sessions de **découverte** (`market-research-`, `user-feedback-`), elles, ne sont rattachées à aucune branche.
+
 ## Session vs subagent
 - **Session séparée** si le relais est un artefact durable (spec, code, tests).
 - **Subagent** si le relais est éphémère (investigation, écarts d'une revue) et revient dans le travail courant.

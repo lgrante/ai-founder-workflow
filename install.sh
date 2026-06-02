@@ -34,7 +34,7 @@ touch "$TARGET/.gitignore"
 grep -qxF '.cc-scratch/' "$TARGET/.gitignore" || echo '.cc-scratch/' >> "$TARGET/.gitignore"
 grep -qxF 'CLAUDE.local.md' "$TARGET/.gitignore" || echo 'CLAUDE.local.md' >> "$TARGET/.gitignore"
 
-chmod +x "$TARGET/.claude/hooks/test-gate.sh" 2>/dev/null || true
+chmod +x "$TARGET/.claude/hooks/"*.sh "$TARGET/.claude/statusline.sh" 2>/dev/null || true
 
 echo
 echo "✓ Fichiers en place. Étapes suivantes :"

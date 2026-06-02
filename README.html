@@ -270,6 +270,7 @@
     <p class="sh">le pipeline</p>
     <h2>Le cycle d'une feature</h2>
     <p><code>spec</code> définit le quoi → <code>code</code> construit avec son filet rapide → <code>test</code> valide indépendamment → tu signes le jalon.</p>
+    <div class="note"><b>Une feature = une branche git.</b> Les trois sessions build (<code>spec-</code>, <code>code-</code>, <code>test-</code>) travaillent toutes sur la même branche dédiée (ex. <code>feature/&lt;feature&gt;</code>) — jamais deux features mélangées. Plusieurs features en parallèle → worktrees git séparés. La découverte n'est rattachée à aucune branche.</div>
     <figure>
       <p class="figtitle">spec → code → test → toi</p>
       <svg viewBox="0 0 660 614" role="img" xmlns="http://www.w3.org/2000/svg">
@@ -386,10 +387,13 @@
       <div class="code-bar"><span class="d" style="background:#E0855B"></span><span class="d" style="background:#E6B45E"></span><span class="d" style="background:#5EE0A0"></span><span class="t">ai-dev-workflow/</span></div>
 <pre><span class="g">├──</span> <span class="f">README.md</span> · <span class="f">README.html</span>     <span class="c"># le guide</span>
 <span class="g">├──</span> <span class="f">DEPLOY.md</span>                  <span class="c"># brief à donner à une session CC (repo cible)</span>
+<span class="g">├──</span> <span class="f">CONTRIBUTING.md</span> · <span class="f">LICENSE</span>   <span class="c"># contribuer (PR, doctrine) · MIT</span>
 <span class="g">├──</span> <span class="d">templates/</span>                 <span class="c"># ce qui s'installe</span>
 <span class="g">│   ├──</span> <span class="f">CLAUDE.md</span>  ·  <span class="d">docs/</span><span class="f">WORKFLOW.md</span>
-<span class="g">│   └──</span> <span class="d">.claude/</span>{<span class="f">settings.json</span>, <span class="d">hooks/</span>, <span class="d">skills/</span>{spec,code,test,research,feedback}}
+<span class="g">│   └──</span> <span class="d">.claude/</span>{<span class="f">settings.json</span>, <span class="d">hooks/</span><span class="f">test-gate.sh</span>, <span class="d">skills/</span>{spec,code,test,research,feedback}}
+<span class="g">│        </span>  <span class="c"># + opt-in non activés : hooks/context-{handoff,restore}.sh, statusline.sh</span>
 <span class="g">├──</span> <span class="d">scaffold/</span>                  <span class="c"># arbo vide : knowledge/, features/, .cc-scratch/</span>
+<span class="g">├──</span> <span class="d">examples/</span><span class="f">checkout-flow/</span>     <span class="c"># exemple travaillé : SPEC.md + PLAN.md</span>
 <span class="g">└──</span> <span class="f">install.sh</span></pre>
     </div>
     <h3>Ce que le kit déploie dans ton repo</h3>

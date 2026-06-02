@@ -58,6 +58,8 @@ Trois sessions, dans l'ordre. Chacune laisse un fichier que la suivante lit.
 
 Puis **un humain valide le jalon** avant d'enchaîner.
 
+**Une feature = une branche git.** L'axe build est rattaché à une branche : les trois sessions d'une feature (`spec-`, `code-`, `test-`) travaillent toutes sur **cette même** branche dédiée (ex. `feature/<feature>`) — jamais deux features mélangées sur une branche. Plusieurs features en parallèle → **worktrees git séparés** (une branche chacune). Les sessions de **découverte** ne sont rattachées à aucune branche.
+
 ```
   spec-<feature>            écrit SPEC.md (quoi + critères + jalons)
         │
@@ -184,20 +186,28 @@ Le kit fournit un brief (`DEPLOY.md`) qu'on donne à une session Claude Code dan
 
 ```
 ai-dev-workflow/              # le repo à partager
-├── README.md                 # ce guide
+├── README.md · README.html   # ce guide (markdown + version web)
 ├── DEPLOY.md                 # brief à donner à une session CC dans le repo cible
+├── CONTRIBUTING.md           # comment l'équipe contribue (PR, doctrine, tests)
+├── LICENSE                   # MIT
 ├── templates/                # fichiers à installer
 │   ├── CLAUDE.md             # squelette (commandes/conventions à remplir)
 │   ├── docs/WORKFLOW.md      # la doctrine, copiée telle quelle
 │   └── .claude/
 │       ├── settings.json     # hooks — placeholders de commandes de test
-│       ├── hooks/test-gate.sh
+│       ├── statusline.sh     # OPTIONNEL (opt-in) — % de contexte
+│       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
+│       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
+│       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
 │       └── skills/{spec,code,test,research,feedback}/SKILL.md
 ├── scaffold/                 # arborescence vide (knowledge/, features/, .cc-scratch/)
+├── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 └── install.sh                # copie templates+scaffold dans le repo courant + .gitignore
 ```
 
-Mises à jour : `git pull` côté kit, puis re-run de l'install (ou un simple diff manuel). Contributions de l'équipe : par PR sur ce repo.
+> Les fichiers marqués **OPTIONNEL** sont livrés mais **non activés** : ils ne sont pas branchés dans `settings.json`. Voir `templates/docs/WORKFLOW.md` (§ Optionnel) pour les activer.
+
+Mises à jour : `git pull` côté kit, puis re-run de l'install (ou un simple diff manuel). Contributions de l'équipe : par PR sur ce repo (voir `CONTRIBUTING.md`).
 
 ---
 
