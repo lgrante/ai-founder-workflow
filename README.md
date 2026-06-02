@@ -149,15 +149,25 @@ C'est un **point de départ**, pas un dogme : chaque dev l'adapte à son repo (n
 │   ├── market/               # recherche marché
 │   ├── insights.md           # agrégat des retours → idées de features
 │   └── crm/contacts/         # données perso — repo privé séparé OU gitignored
-├── features/                 # AXE BUILD (par feature) — tout co-localisé
-│   └── <feature>/{SPEC.md, PLAN.md}
+├── features/                 # AXE BUILD (par feature) — structure standard pour CHAQUE feature
+│   └── <feature>/            # racine = la VERSION ACTIVE
+│       ├── README.md         # statut + liens
+│       ├── SPEC.md / SPEC.html   # le quoi (possédé par spec-x)
+│       ├── PLAN.md / PLAN.html   # le comment (possédé par code-x)
+│       ├── sub-features/<sub>/   # composants/pages atomiques (même structure récursive)
+│       ├── prototypes/           # mockups, design exploratoire
+│       ├── qa/sprint-{N}-{slug}/ # captures par sprint
+│       ├── plans/                # roadmap, plans de release
+│       └── archives/v{N}/        # versions périmées (refonte majeure → racine actuelle bascule ici)
 ├── .cc-scratch/              # gitignored — résultats de tests TRANSITOIRES
 └── <code applicatif>         # INCHANGÉ
 ```
 
 **Ce qui doit survivre, peu importe les noms :**
 - Découverte (`knowledge/`) et build (`features/`) **physiquement séparés**.
-- Pour une feature, **SPEC et PLAN au même endroit**.
+- Pour une feature, **SPEC et PLAN au même endroit**, dans une **structure standard reproductible** (sub-features / prototypes / qa / plans / archives) que TOUTES les features partagent. Le LLM connaît alors immédiatement où chercher l'historique du produit et où ranger un nouvel artefact.
+- **Versionnage par dossier** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (la doctrine appelle « refonte majeure » : on bascule la racine entière, on n'édite pas in-place). L'historique du produit est ainsi lisible par le LLM à la lecture du dossier.
+- **Sub-features récursives** : un composant atomique d'une version active vit dans `sub-features/<sub>/` avec la même structure (SPEC, PLAN, archives, etc.).
 - Commandes + savoir de domaine dans `.claude/skills/` (chargés à la demande), pas dans un `CLAUDE.md` obèse.
 - Le **statut** d'avancement à **un seul endroit** (les cases du PLAN) ; les résultats de tests sont du **scratch** gitignored, pas un second statut.
 - Le `CLAUDE.md` reste **court** : pour chaque ligne, « la retirer ferait-elle faire une erreur à Claude ? » Sinon, on la coupe.

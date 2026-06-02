@@ -9,8 +9,12 @@ Tu décides le **quoi**, jamais le **comment**. La sortie est un artefact durabl
 
 1. Rappelle à l'utilisateur de nommer cette session `spec-$ARGUMENTS` (via `/rename`) si ce n'est pas déjà fait. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
 2. Reste en mode SPEC : tu n'écris **pas** de code, tu ne crées pas de plan technique (ça, c'est `code-`).
-3. Si pertinents, lis `knowledge/insights.md` et `knowledge/market/` — la découverte alimente le spec. Cite la source d'une demande quand elle vient d'un retour utilisateur.
-4. Produis / mets à jour `features/$ARGUMENTS/SPEC.md` avec :
+3. **Structure de la feature** — applique la convention standard (cf. `docs/WORKFLOW.md` § Convention par-feature) :
+   - **Si `features/$ARGUMENTS/` n'existe pas** : scaffold la structure standard. Crée le dossier + `README.md` court (statut + liens) + `SPEC.md` (à remplir) + `SPEC.html` placeholder + les sous-dossiers vides `sub-features/ prototypes/ qa/ plans/ archives/`. C'est le contrat de structure que TOUTES les features du repo partagent.
+   - **Si `features/$ARGUMENTS/SPEC.md` existe DÉJÀ** : lis-le d'abord. Demande à l'utilisateur si c'est une **itération sur la version active** (édition in-place) ou une **refonte majeure** (alors propose d'archiver la racine actuelle dans `features/$ARGUMENTS/archives/v{N}/` avant d'écrire la nouvelle SPEC à la racine). Ne tranche pas seul.
+   - **Sub-feature** (composant atomique d'une feature existante) : range-la dans `features/<parent>/sub-features/$ARGUMENTS/` avec la même structure récursive (SPEC, PLAN, archives…).
+4. Si pertinents, lis `knowledge/insights.md` et `knowledge/market/` — la découverte alimente le spec. Cite la source d'une demande quand elle vient d'un retour utilisateur. Lis aussi les `archives/v{N}/SPEC.md` éventuels pour avoir l'historique de la feature (utile pour ne pas réinventer ou contredire silencieusement).
+5. Produis / mets à jour `features/$ARGUMENTS/SPEC.md` avec :
    - une **description** courte : le problème, l'utilisateur visé, ce qui est explicitement **hors périmètre** ;
    - les **critères d'acceptation** = la définition de « fini ». Dérive-les AVANT le code. Chacun doit être **observable et vérifiable** sans connaître l'implémentation (formule-les en Étant donné / Quand / Alors). Numérote-les (C1, C2…) : `code-` rattachera ses étapes à ces numéros, `test-` en dérivera les e2e.
    - les **jalons** : les tranches user-facing successives, chacune livrable et démontrable. Chaque jalon = un point de contrôle e2e + un gate humain. Associe chaque critère à un jalon.

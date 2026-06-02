@@ -70,6 +70,33 @@ Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit 
 4. **`/test checkout-flow`** — session **fraîche** `test-checkout-flow`, au jalon J2. Dérive les e2e **du spec** (pas du code), trouve que le panier est vidé sur refus (≠ C3) → consigne l'écart. La correction repart en `code-`.
 5. **Gate humain** — une fois J2 vert et l'écart corrigé, **tu** valides la tranche avant d'enchaîner sur le jalon suivant.
 
+## Convention par-feature (structure standard)
+
+**Principe** : chaque feature dans `features/` suit la **même structure** — un LLM (ou un humain) qui ouvre un dossier feature sait *immédiatement* où chercher la spec courante, l'historique, les prototypes, les captures QA.
+
+La **racine** du dossier feature représente toujours la **version active**. Les versions périmées vont dans `archives/v{N}/`. Les composants atomiques de la version active vont dans `sub-features/`.
+
+```
+features/<slug>/
+├── README.md              # statut, vue d'ensemble, liens
+├── SPEC.md / SPEC.html    # spec de la version ACTIVE (le quoi, possédé par spec-x)
+├── PLAN.md / PLAN.html    # plan d'implémentation (le comment, possédé par code-x)
+├── sub-features/<slug>/   # composants/pages atomiques de la version active (même structure récursive)
+├── prototypes/            # mockups HTML pour la version active
+├── qa/sprint-{N}-{slug}/  # captures par sprint
+├── plans/                 # roadmap, plans de release
+└── archives/v{N}/         # une version périmée = un sous-dossier (SPEC, PLAN, prototypes, etc.)
+```
+
+**Règles** :
+- **Refonte majeure** (ex. UX v2 d'une feature) → déplacer la racine actuelle dans `archives/v{N}/`, écrire la nouvelle racine. On ne mélange pas deux versions à la racine.
+- **Itération sur la version active** → édition in-place de la racine (pas d'archive).
+- **Composant atomique** de la version active → `sub-features/<sub-slug>/` (même structure récursive : son propre SPEC, PLAN, archives, etc.).
+- **Obsolètes globaux** (non liés à une version d'une feature) → `_archive/` à la racine du repo, jamais de delete direct.
+- **`/spec <feature>` scaffold la structure** quand le dossier n'existe pas. Et propose l'archivage quand `SPEC.md` existe déjà et qu'on annonce une refonte majeure.
+
+**Pourquoi cette uniformité** : un dossier prévisible = un LLM qui retrouve l'historique sans chercher. Et un onboarding humain à 0 effort.
+
 ## Optionnel : hooks de contexte & statusline
 Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.
 
