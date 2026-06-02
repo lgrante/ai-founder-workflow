@@ -45,4 +45,34 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 - Le **moment** du clear/compact est un geste humain ; ce qui s'automatise via hooks, c'est ce qui **survit**.
 
 ## Hook
-`Stop` hook (`.claude/hooks/test-gate.sh`) : lance les tests rapides, bloque la fin du tour via `{"decision":"block","reason":...}` tant que rouge. Garde anti-boucle `stop_hook_active` obligatoire.
+`Stop` hook (`.claude/hooks/test-gate.sh`) : lance les tests rapides, bloque la fin du tour via `{"decision":"block","reason":...}` (sortie sur stdout, `exit 0`) tant que rouge. Garde anti-boucle `stop_hook_active` obligatoire.
+
+## Mini-glossaire
+- **Session** — un fil Claude Code, jetable. Porte un préfixe par type (`spec-`, `code-`, `test-`, `market-research-`, `user-feedback-`). Ce qui survit n'est pas la session mais son **artefact**.
+- **Subagent** — un sous-fil lancé *dans* une session pour une tâche bornée (fouiller, écrire le filet rapide, lister des écarts). Son contexte ne pollue pas la session ; il rend une synthèse.
+- **Artefact durable** — un fichier qui sert de relais entre sessions : `SPEC.md`, code commité, suite de tests. C'est lui le relais, jamais « la conversation ».
+- **Critère d'acceptation** — une assertion observable issue du spec (« Étant donné… Quand… Alors… »), numérotée (C1, C2…). Définit « fini » et sert de référence à **tous** les tests.
+- **Jalon** — une tranche user-facing livrable, regroupant des critères. Point de contrôle e2e + **gate humain**.
+- **Filet rapide** — unitaires + intégration rapide, écrits par un subagent depuis les **critères de l'étape**, lancés par le hook à chaque étape de `code-`. Régression, pas validation finale.
+- **Validation indépendante** — e2e + acceptation, écrits depuis le **spec** par `test-`, session fraîche qui n'a pas codé. Vraie validation à œil neuf.
+- **Découverte** — sessions continues, jamais par feature, qui alimentent les futurs specs : `market-research-` (extérieur/marché) et `user-feedback-` (intérieur/personnes), deux types distincts.
+- **Gate humain** — la décision de valider une tranche au jalon. Reste humaine ; l'automatisation porte sur la régression, pas sur le jugement.
+- **Disjoncteur** — après 2-3 rouges persistants sur une étape, on arrête : le spec ou l'approche est en cause.
+
+## Exemple de cycle de bout en bout
+Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit `examples/checkout-flow/`).
+
+1. **Découverte (en amont, continue)** — `user-feedback-marie` note « panier perdu quand le paiement est refusé » ; l'agrégat `knowledge/insights.md` voit ce motif sur 3 contacts.
+2. **`/spec checkout-flow`** — session `spec-checkout-flow`. Écrit `features/checkout-flow/SPEC.md` : critères C1 (panier → commande, stock décrémenté), C2 (paiement refusé → message clair, panier conservé)… ; jalons J1 « panier→commande » (C1, C4), J2 « paiement » (C2, C3). → artefact : `SPEC.md`.
+3. **`/code checkout-flow`** — session `code-checkout-flow`. Plan mode → `PLAN.md` (étapes ↔ critères), validé. Étape 1 (C1) : code la création de commande ; un subagent écrit les unitaires **depuis C1** ; le hook tourne, **rouge** (stock non décrémenté) → lit `.cc-scratch/test-gate.last.txt`, corrige la cause, relance, **vert** → commit + coche l'étape. Idem étape par étape. `/compact` aux points verts.
+4. **`/test checkout-flow`** — session **fraîche** `test-checkout-flow`, au jalon J2. Dérive les e2e **du spec** (pas du code), trouve que le panier est vidé sur refus (≠ C3) → consigne l'écart. La correction repart en `code-`.
+5. **Gate humain** — une fois J2 vert et l'écart corrigé, **tu** valides la tranche avant d'enchaîner sur le jalon suivant.
+
+## Optionnel : hooks de contexte & statusline
+Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.
+
+- **`hooks/context-handoff.sh`** (événement `PreCompact`) — `PreCompact` est **notification-only** : il ne peut **pas** préserver le contexte lui-même. Le script se contente d'écrire un filet (`.cc-scratch/handoff.md` + sauvegarde du transcript) avant la compaction.
+- **`hooks/context-restore.sh`** (événement `SessionStart`, matchers `compact`/`resume`) — réinjecte un rappel via `hookSpecificOutput.additionalContext` : « relis `PLAN.md`, le SPEC et `.cc-scratch/handoff.md` ».
+- **`statusline.sh`** (clé `statusLine`, type `command`) — affiche le % de contexte utilisé (lu depuis le JSON passé au statusLine ; parsing défensif avec repli selon la version de Claude Code).
+
+Pour activer : ajoute les blocs `PreCompact`, `SessionStart` et `statusLine` à `settings.json` (exemples en tête de chaque script). Tu peux aussi abaisser le seuil d'auto-compact (~0,85). Vérifie les noms de champs JSON contre `code.claude.com/docs` pour ta version.
