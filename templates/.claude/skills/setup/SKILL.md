@@ -10,7 +10,7 @@ Tu connais ce repo (après l'inventaire), pas l'inverse. Ton job : poser l'archi
 ## Règles d'or
 
 1. **Lecture seule d'abord.** Reste en plan mode jusqu'à la validation du paquet Phase 0. Ne crée / déplace / modifie / supprime RIEN avant.
-2. **État propre exigé.** Si `git status` n'est pas clean, propose à l'utilisateur de commit/stash. Liste les fichiers modifiés/untracked, propose un commit minimal cohérent, **attends l'OK explicite**. Ne crée la branche `setup-workflow` qu'à partir d'un état propre.
+2. **État propre exigé + branche source explicite.** Si `git status` n'est pas clean, propose à l'utilisateur de commit/stash. Liste les fichiers modifiés/untracked, propose un commit minimal cohérent, **attends l'OK explicite**. Demande aussi **depuis quelle branche** créer `setup-workflow` (default proposé : `main` si la branche courante n'est pas main) — ne suppose jamais que la branche courante est la bonne base. Le but : ne pas casser une branche feature en cours, ne pas opérer directement sur une branche sensible.
 3. **Garantie anti-perte.** Chaque fichier impacté figure dans une carte de migration (`move` / `merge` / `keep` / `archive` / `delete`+raison). `git mv` partout (préserve l'historique). Obsolètes → `_archive/`, jamais supprimés directement. Toute opération destructive demande une autorisation explicite.
 4. **Autorisation par batch logique**, pas par fichier : annonce le groupe d'opérations cohérent (ex. « je vais faire 12 git mv pour structurer knowledge/ »), un OK = tout le batch passe. Sauf si un fichier de ce batch est sensible : alors traite-le séparément.
 5. **Validation phase par phase.** Commit dédié + court compte-rendu à chaque phase, **attente de l'OK utilisateur entre chaque phase**.
@@ -58,7 +58,11 @@ Détail complet : `templates/docs/WORKFLOW.md` du kit (Convention par-feature + 
 
 ## Pipeline
 
-1. **Pré-Phase 1 — État propre** : `git status` → si pas clean, propose un commit minimal cohérent OU `git stash` (selon ce que l'utilisateur veut faire des changes). Attends l'OK explicite. Puis `git checkout -b setup-workflow` à partir de l'état propre.
+1. **Pré-Phase 1 — État propre + branche source** :
+   - `git status` → si pas clean, propose un commit minimal cohérent OU `git stash` (selon ce que l'utilisateur veut faire des changes). Attends l'OK explicite.
+   - **Demande à l'utilisateur depuis quelle branche créer `setup-workflow`** via `AskUserQuestion` : (a) la branche courante (affiche son nom), (b) `main`, (c) une autre branche qu'il précise. Default proposé : `main` si la branche courante n'est pas `main` (sinon : current). Ne fais pas d'hypothèse silencieuse — le but est de ne pas casser une branche feature en cours ni d'opérer sur une branche sensible.
+   - Si la branche source ≠ branche courante : `git checkout <branche-source>`. Si elle suit un remote, demande à l'utilisateur s'il veut `git pull` avant de brancher (recommandé).
+   - Puis `git checkout -b setup-workflow` depuis cette branche source.
 
 2. **Phase 0 — Inventaire & plan (lecture seule)** :
    - Inventorie : arborescence, code applicatif (stack), `.claude/` existant, `CLAUDE.md`, hooks/skills présents, **setup de test** (frameworks unit/e2e, commandes exactes), sous-repos / submodules, axe par-rôle résiduel, entanglements code↔orchestration, contenu marketing/audience préexistant (drafts, posts, articles, brand book) à intégrer dans `content/` et `knowledge/content/`, **système de support en place** (Jira, Zendesk, Linear…) à intégrer dans `knowledge/support/`.
