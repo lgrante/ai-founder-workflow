@@ -73,7 +73,7 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 
 ## Pipeline de build
 - `spec-<feature>` : écrit `SPEC.md` (description + **critères d'acceptation** dérivés AVANT le code + **jalons**).
-- `code-<feature>` : écrit `PLAN.md` en plan mode, implémente étape par étape (front + back ensemble). À chaque étape, un **subagent** écrit le filet rapide depuis les **critères de l'étape**, le hook le lance.
+- `code-<feature>` : écrit `PLAN.md` en plan mode → **validation utilisateur (porte 1)**. Si régime **full** (≥3 étapes OU ≥2 jalons) → écrit aussi `ARCHITECTURE.md` + `.html` (vue d'ensemble, diagrammes Mermaid, choix architecturaux, application SOLID + GRASP, risques) → **validation utilisateur (porte 2)**. Si régime **light** (≤2 étapes ET ≤1 jalon), section *Architecture* courte intégrée à PLAN.md, pas de 2ᵉ porte. Puis implémente étape par étape (front + back ensemble). À chaque étape, un **subagent** écrit le filet rapide depuis les **critères de l'étape**, le hook le lance.
 - `test-<feature>` : session **fraîche**, écrit les **e2e** depuis le **spec** au jalon + **revue à œil neuf**.
 - Puis **gate humain** : validation de la tranche au jalon.
 
@@ -112,6 +112,9 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 - **Ticket de bug** — `bugs/<slug>/TICKET.md`, mini-spec à 1-2 critères, déposé par `/test` ou `/support` quand un bug net est trouvé. Lu par `/code <slug>` comme une SPEC. Distinct du *pain point* qui, lui, reste agrégé dans `knowledge/support/insights.md`.
 - **Stats (audience)** — raw dump horodaté du MCP réseau dans `content/<network>/stats/<date>-snapshot.<ext>`. Preuve brute, append-only, sert de traçabilité aux insights.
 - **Insight (audience)** — rapport synthétisé par `/report` dans `content/<network>/insights/<date>-report.md` (+ .html). Source actionnable lue par `/post`, `/article`, `/newsletter` pour informer leurs drafts.
+- **Architecture (artefact)** — `ARCHITECTURE.md` + `ARCHITECTURE.html` produits par `/code` en régime full (entre porte 1 et porte 2). Vue d'ensemble + diagrammes Mermaid + choix architecturaux + application SOLID/GRASP + risques. Validé par l'utilisateur avant la 1ʳᵉ ligne de code.
+- **Régime light / full** — `/code` classifie chaque feature à la fin de PLAN.md : **light** (≤2 étapes ET ≤1 jalon → section Architecture courte intégrée à PLAN.md, 1 porte de validation) ou **full** (≥3 étapes OU ≥2 jalons → ARCHITECTURE.md séparé, 2 portes). L'utilisateur peut overrider verbalement.
+- **Porte de validation** — point d'arrêt explicite où `/code` demande à l'utilisateur via `AskUserQuestion` (validé / à améliorer / stop) avant de continuer. Porte 1 = PLAN.md. Porte 2 = ARCHITECTURE.md (régime full). Chaque validation = un commit `docs(plan):` ou `docs(arch):`.
 
 ## Exemple de cycle de bout en bout
 Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit `examples/checkout-flow/`).
@@ -130,14 +133,15 @@ La **racine** du dossier feature représente toujours la **version active**. Les
 
 ```
 features/<slug>/
-├── README.md              # statut, vue d'ensemble, liens
-├── SPEC.md / SPEC.html    # spec de la version ACTIVE (le quoi, possédé par spec-x)
-├── PLAN.md / PLAN.html    # plan d'implémentation (le comment, possédé par code-x)
-├── sub-features/<slug>/   # composants/pages atomiques de la version active (même structure récursive)
-├── prototypes/            # mockups HTML pour la version active
-├── qa/sprint-{N}-{slug}/  # captures par sprint
-├── plans/                 # roadmap, plans de release
-└── archives/v{N}/         # une version périmée = un sous-dossier (SPEC, PLAN, prototypes, etc.)
+├── README.md                          # statut, vue d'ensemble, liens
+├── SPEC.md / SPEC.html                # spec de la version ACTIVE (le quoi, possédé par spec-x)
+├── PLAN.md / PLAN.html                # plan d'implémentation (le comment, possédé par code-x)
+├── ARCHITECTURE.md / ARCHITECTURE.html # architecture (Mermaid + SOLID/GRASP), régime full uniquement
+├── sub-features/<slug>/               # composants/pages atomiques de la version active (même structure récursive)
+├── prototypes/                        # mockups HTML pour la version active
+├── qa/sprint-{N}-{slug}/              # captures par sprint
+├── plans/                             # roadmap, plans de release
+└── archives/v{N}/                     # une version périmée = un sous-dossier (SPEC, PLAN, ARCHITECTURE, etc.)
 ```
 
 **Règles** :
@@ -283,6 +287,51 @@ bugs/<slug>/
 **Différence pain point vs bug** :
 - *Pain point* (motif support récurrent) → `knowledge/support/insights.md`, émerge en feature plus tard via `/spec`.
 - *Bug net* (problème ponctuel, reproductible, gravité claire) → `bugs/<slug>/TICKET.md`, fixé via `/code` directement.
+
+## SOLID & GRASP — grille de lecture pour l'architecture
+
+Le skill `/code` te fait passer cette grille à l'étape **Architecture** (ARCHITECTURE.md § *Application SOLID + GRASP*, en régime full). Le but n'est **pas** la conformité dogmatique — c'est de **réfléchir explicitement** au couplage, à la cohésion, et à l'attribution des responsabilités avant de coder. Une **violation consciente** documentée (YAGNI, simplicité, perf, dette acceptée) compte plus qu'une application aveugle. Trois lignes similaires valent mieux qu'une abstraction prématurée.
+
+### SOLID (5 principes — couplage et extensibilité)
+
+| Principe | Question à se poser |
+|---|---|
+| **S**ingle Responsibility | Cette classe / ce module a-t-il **une seule raison de changer** ? |
+| **O**pen / Closed | Ouvert à l'extension, fermé à la modification — mais **pas avant le 3ᵉ cas concret** (YAGNI bat OCP prématuré). |
+| **L**iskov Substitution | Un sous-type peut-il remplacer son parent **sans surprise** pour l'appelant ? |
+| **I**nterface Segregation | Les interfaces sont-elles **minimales et ciblées**, pas des « god interfaces » ? |
+| **D**ependency Inversion | Dépend-on d'**abstractions** plutôt que d'implémentations concrètes (aux frontières des modules) ? |
+
+### GRASP (9 patterns — attribution des responsabilités)
+
+| Pattern | À quoi ça sert |
+|---|---|
+| **Information Expert** | Donner la responsabilité à celui qui a **l'info nécessaire** pour l'assumer. |
+| **Creator** | Qui crée X ? Celui qui le contient, l'agrège, ou en a une instance étroitement liée. |
+| **Controller** | Un **point d'entrée unique** pour orchestrer un cas d'usage (use-case controller). |
+| **Low Coupling** | Minimiser les dépendances entre modules. |
+| **High Cohesion** | Maximiser la cohérence interne d'un module (faire **une chose** bien). |
+| **Polymorphism** | Au lieu d'un `switch` sur type, **dispatch via interface / polymorphisme**. |
+| **Pure Fabrication** | Un module artificiel pour préserver cohésion + couplage (ex. repository, service). |
+| **Indirection** | Un intermédiaire pour **découpler** (médiateur, adapter, façade). |
+| **Protected Variations** | Encapsuler les **points de variation** derrière une interface stable. |
+
+### Violations conscientes — exemples acceptables
+
+Note-les dans ARCHITECTURE.md § *Application SOLID + GRASP* avec la raison :
+- **YAGNI > Open/Closed prématuré** : on ne va pas extraire une stratégie pour 1 seul cas, on attend le 3ᵉ.
+- **Simplicité > Pure Fabrication** : pas de repository pour une lecture triviale, on tape l'ORM directement.
+- **Perf > Indirection** : appel direct mesuré 10× plus rapide qu'un médiateur — on tranche par mesure, pas par principe.
+- **Pragmatisme > Interface Segregation** : 1 interface un peu large reste OK tant qu'elle a 1 seul implémenteur dans le scope visible.
+
+### Anti-patterns à refuser
+
+- Une `Factory` pour 1 seul implémenteur.
+- Une `IUserRepository` pour 1 seul use case.
+- Un médiateur sans alternative à découpler.
+- Trois couches d'abstraction pour un CRUD.
+
+Ces signaux = sur-design. Préfère la **violation consciente** notée à la cathédrale d'abstractions.
 
 ## Optionnel : hooks de contexte & statusline
 Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.
