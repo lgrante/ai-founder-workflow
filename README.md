@@ -1,4 +1,4 @@
-# ai-dev-workflow — kit de déploiement d'un workflow de dev assisté par IA
+# ai-founder-workflow — kit de déploiement d'un workflow de dev assisté par IA
 
 Un modèle de sessions **répétable** pour développer avec Claude Code : par feature, avec une **vérification automatisée** et un **contexte qui reste propre**. Conçu pour être **déployé sur n'importe quel repo**.
 
@@ -184,13 +184,13 @@ Le kit fournit un script `install.sh` avec deux modes. La voie recommandée pour
 ### Étape 1 — Récupérer le kit
 
 ```bash
-gh repo clone lgrante/ai-dev-workflow ~/ai-dev-workflow
+gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ```
 
 ### Étape 2 — Installer les skills globalement
 
 ```bash
-~/ai-dev-workflow/install.sh --global
+~/ai-founder-workflow/install.sh --global
 ```
 
 Les skills `/setup /spec /code /test /research /feedback` sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
@@ -216,7 +216,7 @@ Pour versionner les skills + hooks avec le repo lui-même (au lieu de les charge
 
 ```bash
 cd /chemin/vers/le/repo
-~/ai-dev-workflow/install.sh
+~/ai-founder-workflow/install.sh
 ```
 
 Copie `templates/` + `scaffold/` dans le repo. Ensuite, `/setup` pilote le déploiement comme ci-dessus.
@@ -253,7 +253,7 @@ Le skill `/setup` applique les règles suivantes — quel que soit le repo :
 ## 9. Le repo kit lui-même
 
 ```
-ai-dev-workflow/              # le repo à partager
+ai-founder-workflow/              # le repo à partager
 ├── README.md · README.html   # ce guide (markdown + version web)
 ├── CONTRIBUTING.md           # comment l'équipe contribue (PR, doctrine, tests)
 ├── LICENSE                   # MIT

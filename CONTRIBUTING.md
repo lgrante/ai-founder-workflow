@@ -1,4 +1,4 @@
-# Contribuer au kit ai-dev-workflow
+# Contribuer au kit ai-founder-workflow
 
 Ce repo est un **kit partagé** : il déploie un workflow de dev sur n'importe quel repo. Les contributions de l'équipe passent par **PR**. Ce guide dit comment proposer un changement **sans casser la doctrine**.
 

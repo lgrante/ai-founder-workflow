@@ -1,6 +1,6 @@
 # SPEC — checkout-flow
 
-> Exemple travaillé (issu du repo kit `ai-dev-workflow`). Montre à quoi ressemble un `SPEC.md` réel.
+> Exemple travaillé (issu du repo kit `ai-founder-workflow`). Montre à quoi ressemble un `SPEC.md` réel.
 > Produit par une session `spec-checkout-flow`. Lu ensuite par `code-checkout-flow` puis `test-checkout-flow`.
 
 ## Description

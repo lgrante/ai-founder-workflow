@@ -1,6 +1,6 @@
 # WORKFLOW — workflow de dev assisté par IA (référence in-repo)
 
-> Référence courte vivant dans le repo. Le guide complet est dans le repo kit `ai-dev-workflow`.
+> Référence courte vivant dans le repo. Le guide complet est dans le repo kit `ai-founder-workflow`.
 
 ## Principe central
 La mémoire persistante vit dans des **fichiers**, pas dans les sessions. Les sessions sont **jetables**.

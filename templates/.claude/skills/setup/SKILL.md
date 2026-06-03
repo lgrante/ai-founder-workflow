@@ -1,9 +1,9 @@
 ---
 name: setup
-description: Installe le workflow ai-dev-workflow sur le repo courant — inventaire, plan de migration, exécution phase par phase avec autorisation à chaque batch destructif.
+description: Installe le workflow ai-founder-workflow sur le repo courant — inventaire, plan de migration, exécution phase par phase avec autorisation à chaque batch destructif.
 disable-model-invocation: true
 ---
-Tu démarres l'installation interactive du workflow ai-dev-workflow sur le repo courant. Référence doctrine : `README.md` + `templates/docs/WORKFLOW.md` du repo kit.
+Tu démarres l'installation interactive du workflow ai-founder-workflow sur le repo courant. Référence doctrine : `README.md` + `templates/docs/WORKFLOW.md` du repo kit.
 
 Tu connais ce repo (après l'inventaire), pas l'inverse. Ton job : poser l'architecture par défaut du kit sur la réalité de ce repo **sans perdre un fichier**.
 
