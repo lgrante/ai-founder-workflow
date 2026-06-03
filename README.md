@@ -176,7 +176,27 @@ C'est un **point de départ**, pas un dogme : chaque dev l'adapte à son repo (n
 
 ## 7. Déployer sur ton repo
 
-Deux voies — la doctrine est la même, la différence est qui pilote :
+### Installation en une commande
+
+**Option 1 — Skills globaux** (recommandé pour démarrer) :
+```bash
+gh repo clone lgrante/ai-dev-workflow ~/ai-dev-workflow
+~/ai-dev-workflow/install.sh --global
+```
+Les skills `/setup /spec /code /test /research /feedback` sont maintenant dispo dans **toutes** tes sessions Claude Code, sur n'importe quel repo. Pour installer le workflow dans un repo cible : ouvre Claude Code dedans et tape `/setup`.
+
+**Option 2 — Per-repo** :
+```bash
+cd /chemin/vers/ton/repo
+~/ai-dev-workflow/install.sh
+```
+Copie templates + scaffold dans le repo. Le workflow est versionné avec le repo.
+
+---
+
+### Comment ça marche dessous — deux voies de déploiement
+
+La doctrine est la même, la différence est qui pilote :
 
 ### Voie A — Skill `/setup` (recommandée)
 
