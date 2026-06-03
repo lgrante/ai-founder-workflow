@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ai-founder-workflow — un workflow Claude Code pour fondateurs</title>
+<meta name="description" content="Un kit open source pour piloter Claude Code par feature (build), par sujet (découverte) et par output (audience). Déployable sur n'importe quel repo en deux commandes.">
+<meta property="og:title" content="ai-founder-workflow">
+<meta property="og:description" content="Un workflow Claude Code prêt à l'emploi. Sessions jetables, mémoire dans les fichiers, vérification automatisée.">
+<meta property="og:type" content="website">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0e14;
+    --bg-elev: #11161c;
+    --bg-soft: #161b22;
+    --border: #1f2630;
+    --border-strong: #2a323e;
+    --text: #e6edf3;
+    --text-soft: #9aa6b2;
+    --text-muted: #6b7785;
+    --accent: #7ee787;
+    --accent-soft: rgba(126, 231, 135, 0.12);
+    --blue: #79c0ff;
+    --pink: #ff7b72;
+    --yellow: #e3b341;
+    --purple: #d2a8ff;
+    --gradient: linear-gradient(135deg, #7ee787 0%, #79c0ff 100%);
+    --shadow: 0 30px 80px -20px rgba(126, 231, 135, 0.12);
+    --max: 1180px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    line-height: 1.6;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(ellipse 1000px 600px at 50% -200px, rgba(126, 231, 135, 0.06), transparent 60%),
+      radial-gradient(ellipse 800px 500px at 80% 30%, rgba(121, 192, 255, 0.04), transparent 60%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace; }
+
+  .container { max-width: var(--max); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+
+  /* ─── NAV ─────────────────────────────── */
+  nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(16px) saturate(140%);
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    background: rgba(10, 14, 20, 0.7);
+    border-bottom: 1px solid var(--border);
+  }
+  .nav-inner {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .nav-brand {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    color: var(--text);
+    text-decoration: none;
+    letter-spacing: -0.01em;
+  }
+  .nav-brand .slash { color: var(--accent); }
+  .nav-links { display: flex; gap: 28px; align-items: center; }
+  .nav-links a {
+    color: var(--text-soft);
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: color 0.15s;
+  }
+  .nav-links a:hover { color: var(--text); }
+  .nav-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    background: var(--bg-elev);
+    color: var(--text) !important;
+    font-size: 13px;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .nav-github:hover { border-color: var(--accent); background: var(--accent-soft); }
+  .nav-github svg { width: 16px; height: 16px; fill: currentColor; }
+  @media (max-width: 720px) {
+    .nav-links a:not(.nav-github) { display: none; }
+  }
+
+  /* ─── HERO ─────────────────────────────── */
+  .hero {
+    padding: 80px 0 100px;
+    position: relative;
+  }
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+  }
+  @media (max-width: 980px) {
+    .hero-grid { grid-template-columns: 1fr; gap: 48px; }
+    .hero { padding: 48px 0 60px; }
+  }
+
+  .badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid var(--border-strong);
+    border-radius: 999px;
+    background: var(--bg-elev);
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-soft);
+    margin-bottom: 24px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .badge .pulse {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 0 var(--accent);
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(126,231,135,0.6); }
+    70% { box-shadow: 0 0 0 8px rgba(126,231,135,0); }
+    100% { box-shadow: 0 0 0 0 rgba(126,231,135,0); }
+  }
+
+  .hero h1 {
+    font-size: clamp(36px, 5.5vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.03em;
+    margin-bottom: 20px;
+  }
+  .hero h1 .grad {
+    background: var(--gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .hero .tagline {
+    font-size: clamp(16px, 1.4vw, 19px);
+    color: var(--text-soft);
+    margin-bottom: 36px;
+    max-width: 520px;
+    line-height: 1.55;
+  }
+
+  .cta {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 13px 22px;
+    border-radius: 10px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 14.5px;
+    text-decoration: none;
+    transition: transform 0.12s, box-shadow 0.2s, background 0.15s, border-color 0.15s;
+    cursor: pointer;
+    border: 1px solid transparent;
+  }
+  .btn:active { transform: translateY(1px); }
+  .btn-primary {
+    background: var(--accent);
+    color: #0a0e14;
+    box-shadow: 0 8px 28px -8px rgba(126, 231, 135, 0.4);
+  }
+  .btn-primary:hover { background: #92ee99; box-shadow: 0 12px 32px -8px rgba(126, 231, 135, 0.55); }
+  .btn-secondary {
+    background: var(--bg-elev);
+    color: var(--text);
+    border-color: var(--border-strong);
+  }
+  .btn-secondary:hover { border-color: var(--text-soft); background: var(--bg-soft); }
+  .btn svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .hero-meta {
+    margin-top: 32px;
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .hero-meta span { display: inline-flex; align-items: center; gap: 8px; }
+  .hero-meta strong { color: var(--accent); font-weight: 600; }
+
+  /* ─── TERMINAL ─────────────────────────── */
+  .terminal-wrap {
+    position: relative;
+  }
+  .terminal-wrap::before {
+    content: '';
+    position: absolute;
+    inset: -40px;
+    background: radial-gradient(ellipse at center, rgba(126,231,135,0.18) 0%, transparent 60%);
+    filter: blur(40px);
+    pointer-events: none;
+    z-index: 0;
+  }
+  .terminal {
+    position: relative;
+    background: #0d1117;
+    border-radius: 14px;
+    border: 1px solid var(--border-strong);
+    box-shadow: var(--shadow), 0 50px 100px -30px rgba(0,0,0,0.6);
+    overflow: hidden;
+    z-index: 1;
+  }
+  .terminal-header {
+    background: linear-gradient(180deg, #181f28 0%, #141a22 100%);
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .dot { width: 12px; height: 12px; border-radius: 50%; }
+  .dot.red { background: #ff5f57; }
+  .dot.yellow { background: #febc2e; }
+  .dot.green { background: #28c840; }
+  .terminal-title {
+    flex: 1;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 50px;
+  }
+  .terminal-body {
+    padding: 18px 22px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.65;
+    min-height: 440px;
+    max-height: 440px;
+    overflow-y: auto;
+    color: var(--text);
+  }
+  .terminal-body::-webkit-scrollbar { width: 8px; }
+  .terminal-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+  .tl-line { white-space: pre-wrap; word-break: break-word; }
+  .tl-blank { height: 1em; }
+  .tl-prompt-cmd { color: #58a6ff; font-weight: 600; user-select: none; }
+  .tl-prompt-claude { color: var(--accent); font-weight: 600; user-select: none; }
+  .tl-arrow { color: var(--text-muted); }
+  .tl-ok { color: var(--accent); }
+  .tl-warn { color: var(--yellow); }
+  .tl-out { color: var(--text-soft); }
+  .tl-path { color: var(--blue); }
+  .tl-emph { color: var(--purple); font-weight: 500; }
+  .tl-comment { color: var(--text-muted); font-style: italic; }
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1.1em;
+    background: var(--accent);
+    vertical-align: text-bottom;
+    margin-left: 2px;
+    animation: blink 1s steps(1) infinite;
+  }
+  @keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+  }
+
+  .terminal-replay {
+    position: absolute;
+    top: 12px;
+    right: 16px;
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    padding: 4px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s, background 0.15s;
+    z-index: 2;
+  }
+  .terminal-replay:hover { color: var(--text); border-color: var(--border-strong); background: var(--bg-soft); }
+
+  /* ─── SECTIONS ─────────────────────────── */
+  section { padding: 90px 0; position: relative; }
+  @media (max-width: 720px) { section { padding: 64px 0; } }
+
+  .eyebrow {
+    display: inline-block;
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+  }
+  h2 {
+    font-size: clamp(28px, 3.4vw, 40px);
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    line-height: 1.15;
+    margin-bottom: 16px;
+    max-width: 720px;
+  }
+  h2 .grad { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+  .lede {
+    color: var(--text-soft);
+    font-size: 17px;
+    max-width: 640px;
+    margin-bottom: 48px;
+    line-height: 1.6;
+  }
+
+  /* ─── PROBLEM ──────────────────────────── */
+  .problem .quote {
+    border-left: 3px solid var(--accent);
+    padding: 12px 0 12px 28px;
+    font-size: clamp(20px, 2.2vw, 28px);
+    line-height: 1.4;
+    font-weight: 500;
+    color: var(--text);
+    max-width: 760px;
+    margin-bottom: 20px;
+  }
+  .problem .quote em { color: var(--accent); font-style: normal; font-weight: 600; }
+  .problem .src { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 13px; }
+
+  /* ─── AXES ─────────────────────────────── */
+  .axe-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  @media (max-width: 880px) {
+    .axe-grid { grid-template-columns: 1fr; }
+  }
+  .axe {
+    padding: 32px 28px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--bg-elev) 0%, var(--bg) 100%);
+    transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .axe:hover {
+    transform: translateY(-4px);
+    border-color: var(--border-strong);
+    box-shadow: 0 20px 50px -15px rgba(0,0,0,0.5);
+  }
+  .axe-icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 22px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-strong);
+  }
+  .axe-icon svg { width: 20px; height: 20px; }
+  .axe-discover .axe-icon { background: rgba(121, 192, 255, 0.08); border-color: rgba(121, 192, 255, 0.25); }
+  .axe-discover .axe-icon svg { stroke: var(--blue); }
+  .axe-build .axe-icon { background: rgba(126, 231, 135, 0.08); border-color: rgba(126, 231, 135, 0.25); }
+  .axe-build .axe-icon svg { stroke: var(--accent); }
+  .axe-broadcast .axe-icon { background: rgba(210, 168, 255, 0.08); border-color: rgba(210, 168, 255, 0.25); }
+  .axe-broadcast .axe-icon svg { stroke: var(--purple); }
+
+  .axe h3 {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    letter-spacing: -0.01em;
+  }
+  .axe .desc {
+    color: var(--text-soft);
+    font-size: 14.5px;
+    margin-bottom: 22px;
+  }
+  .axe ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+  .axe li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-soft);
+    font-size: 13.5px;
+  }
+  .axe li code {
+    color: var(--text);
+    background: var(--bg-soft);
+    padding: 2px 8px;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+  }
+  .axe .dest {
+    padding-top: 18px;
+    border-top: 1px dashed var(--border);
+    color: var(--text-muted);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+  }
+  .axe .dest code { color: var(--accent); }
+
+  /* ─── PIPELINE ─────────────────────────── */
+  .pipeline-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr auto 1fr;
+    gap: 16px;
+    align-items: stretch;
+    margin-bottom: 28px;
+  }
+  @media (max-width: 880px) {
+    .pipeline-flow { grid-template-columns: 1fr; }
+    .pipeline-flow .arrow { transform: rotate(90deg); justify-self: center; }
+  }
+  .step {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 26px 24px;
+    position: relative;
+  }
+  .step-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+    display: block;
+  }
+  .step h4 {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--accent);
+    font-size: 17px;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+  .step p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .arrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    font-size: 24px;
+    user-select: none;
+  }
+  .gate {
+    margin-top: 12px;
+    color: var(--text-soft);
+    font-size: 14.5px;
+    padding: 14px 18px;
+    border-radius: 10px;
+    background: var(--bg-elev);
+    border: 1px dashed var(--border-strong);
+    display: inline-block;
+  }
+  .gate strong { color: var(--accent); }
+
+  /* ─── SKILLS ───────────────────────────── */
+  .skill-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  @media (max-width: 720px) { .skill-grid { grid-template-columns: 1fr; } }
+  .skill {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+    gap: 18px;
+    padding: 18px 22px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: var(--bg-elev);
+    align-items: center;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .skill:hover { border-color: var(--border-strong); background: #141a22; }
+  .skill .cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 14px;
+    color: var(--accent);
+  }
+  .skill .desc {
+    color: var(--text-soft);
+    font-size: 13.5px;
+    line-height: 1.5;
+  }
+  .skill .tag {
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
+    letter-spacing: 0.04em;
+  }
+  @media (max-width: 720px) { .skill { grid-template-columns: 1fr; gap: 8px; } }
+
+  /* ─── SAFETY ───────────────────────────── */
+  .safety {
+    background:
+      linear-gradient(180deg, transparent 0%, rgba(126,231,135,0.025) 50%, transparent 100%);
+  }
+  .safety-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 720px) { .safety-grid { grid-template-columns: 1fr; } }
+  .safety-item {
+    padding: 24px 26px;
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 10px;
+  }
+  .safety-item h4 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .safety-item h4 svg { width: 16px; height: 16px; fill: var(--accent); flex-shrink: 0; }
+  .safety-item p {
+    color: var(--text-soft);
+    font-size: 14px;
+    line-height: 1.55;
+  }
+  .safety-item p code {
+    background: var(--bg-soft);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--text);
+    font-size: 12.5px;
+    border: 1px solid var(--border);
+  }
+
+  /* ─── INSTALL ──────────────────────────── */
+  .install-block {
+    background: var(--bg-elev);
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    padding: 8px;
+    position: relative;
+    max-width: 760px;
+  }
+  .install-tabs {
+    display: flex;
+    padding: 6px 10px 0;
+    gap: 4px;
+  }
+  .install-tab {
+    padding: 8px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-muted);
+    border-radius: 6px 6px 0 0;
+    background: transparent;
+    border: 1px solid transparent;
+    border-bottom: none;
+    cursor: pointer;
+  }
+  .install-tab.active {
+    color: var(--text);
+    background: #0d1117;
+    border-color: var(--border-strong);
+  }
+  .install-code {
+    background: #0d1117;
+    border: 1px solid var(--border-strong);
+    border-radius: 10px;
+    padding: 22px 24px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 1.85;
+    color: var(--text);
+    overflow-x: auto;
+    position: relative;
+  }
+  .install-code .prompt { color: var(--blue); user-select: none; }
+  .install-code .comment { color: var(--text-muted); font-style: italic; }
+  .install-code .cmdline { color: var(--text); }
+  .install-code .ok { color: var(--accent); }
+  .copy-btn {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    background: var(--bg-soft);
+    border: 1px solid var(--border-strong);
+    color: var(--text-soft);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: color 0.15s, border-color 0.15s;
+  }
+  .copy-btn:hover { color: var(--text); border-color: var(--accent); }
+  .copy-btn.copied { color: var(--accent); border-color: var(--accent); }
+
+  .install-next {
+    margin-top: 22px;
+    color: var(--text-soft);
+    font-size: 15px;
+    max-width: 760px;
+  }
+  .install-next code {
+    background: var(--bg-elev);
+    padding: 3px 10px;
+    border-radius: 5px;
+    border: 1px solid var(--border-strong);
+    color: var(--accent);
+    font-size: 13px;
+  }
+
+  /* ─── FOOTER ───────────────────────────── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 40px 0;
+    margin-top: 20px;
+  }
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+    color: var(--text-muted);
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .footer-links { display: flex; gap: 24px; }
+  .footer-links a { color: var(--text-soft); text-decoration: none; transition: color 0.15s; }
+  .footer-links a:hover { color: var(--text); }
+
+  /* fade-in on scroll */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.in { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-inner">
+    <a href="#" class="nav-brand"><span class="slash">/</span>ai-founder-workflow</a>
+    <div class="nav-links">
+      <a href="#axes">Axes</a>
+      <a href="#pipeline">Pipeline</a>
+      <a href="#skills">Skills</a>
+      <a href="#install">Install</a>
+      <a href="https://github.com/lgrante/ai-founder-workflow" class="nav-github" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39.99 0 1.98.13 2.9.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.78-.01 3.16 0 .31.21.67.8.56C20.21 21.38 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+        GitHub
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ HERO ═══════════════ -->
+<header class="hero">
+  <div class="container hero-grid">
+    <div>
+      <div class="badge"><span class="pulse"></span>Open source · MIT · Conçu pour Claude Code</div>
+      <h1>Un workflow Claude Code pour <span class="grad">fondateurs qui font tout</span>.</h1>
+      <p class="tagline">
+        Discover · Build · Broadcast. Sessions jetables, mémoire dans les fichiers, vérification automatisée. Déployable sur n'importe quel repo en deux commandes.
+      </p>
+      <div class="cta">
+        <a href="https://github.com/lgrante/ai-founder-workflow" class="btn btn-primary" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39.99 0 1.98.13 2.9.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.78-.01 3.16 0 .31.21.67.8.56C20.21 21.38 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+          Star on GitHub
+        </a>
+        <a href="#install" class="btn btn-secondary">
+          Comment ça marche
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+      <div class="hero-meta">
+        <span><strong>10</strong> skills</span>
+        <span><strong>3</strong> axes</span>
+        <span><strong>2</strong> commandes pour démarrer</span>
+      </div>
+    </div>
+
+    <div class="terminal-wrap">
+      <div class="terminal">
+        <div class="terminal-header">
+          <span class="dot red"></span>
+          <span class="dot yellow"></span>
+          <span class="dot green"></span>
+          <span class="terminal-title">~/my-project — claude</span>
+        </div>
+        <button class="terminal-replay" id="replay-btn" title="Rejouer">↻ replay</button>
+        <div class="terminal-body" id="terminal"></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════ PROBLEM ═══════════════ -->
+<section class="problem reveal">
+  <div class="container">
+    <div class="eyebrow">Le problème</div>
+    <h2 style="margin-bottom: 32px;">Tout part d'une contrainte unique.</h2>
+    <p class="quote">La fenêtre de contexte se remplit vite. <em>La qualité chute avec elle.</em> Tout le reste en découle.</p>
+    <p class="src">— Doctrine §1</p>
+  </div>
+</section>
+
+<!-- ═══════════════ AXES ═══════════════ -->
+<section id="axes" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Architecture</div>
+    <h2>Trois axes, trois <span class="grad">logiques</span>.</h2>
+    <p class="lede">
+      Organiser par feature, par sujet et par output — jamais par rôle. Les rôles (relire, investiguer) deviennent des subagents <em>dans</em> une session, pas des sessions à part.
+    </p>
+
+    <div class="axe-grid">
+      <div class="axe axe-discover">
+        <div class="axe-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="7"/>
+            <path d="M21 21l-4.3-4.3"/>
+          </svg>
+        </div>
+        <h3>Découverte</h3>
+        <p class="desc">Market · User · Support. Ce qui alimente le build ET l'audience.</p>
+        <ul>
+          <li><code>/research</code>recherche marché</li>
+          <li><code>/feedback</code>échanges 1-à-1</li>
+          <li><code>/support</code>sift des tickets clients</li>
+        </ul>
+        <div class="dest">→ <code>knowledge/</code></div>
+      </div>
+
+      <div class="axe axe-build">
+        <div class="axe-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
+          </svg>
+        </div>
+        <h3>Build</h3>
+        <p class="desc">Spec → Code → Test. Par feature, en pipeline, avec gate humain au jalon.</p>
+        <ul>
+          <li><code>/spec</code>le quoi + critères</li>
+          <li><code>/code</code>le comment, étape par étape</li>
+          <li><code>/test</code>e2e à œil neuf</li>
+        </ul>
+        <div class="dest">→ <code>features/</code></div>
+      </div>
+
+      <div class="axe axe-broadcast">
+        <div class="axe-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 11l18-5v12L3 14v-3z"/>
+            <path d="M11.6 16.8a3 3 0 1 1-5.8-1.6"/>
+          </svg>
+        </div>
+        <h3>Audience</h3>
+        <p class="desc">Post · Article · Newsletter. Brand book partagé, drafts → review → posted.</p>
+        <ul>
+          <li><code>/post</code>format court (LinkedIn, X)</li>
+          <li><code>/article</code>long form (blog)</li>
+          <li><code>/newsletter</code>édition périodique</li>
+        </ul>
+        <div class="dest">→ <code>content/</code></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ PIPELINE ═══════════════ -->
+<section id="pipeline" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Pipeline build</div>
+    <h2>Trois sessions, dans <span class="grad">l'ordre</span>.</h2>
+    <p class="lede">
+      Chacune laisse un fichier que la suivante lit. Les tests s'ancrent sur l'intention (le spec), jamais sur le code qu'on vient d'écrire.
+    </p>
+
+    <div class="pipeline-flow">
+      <div class="step">
+        <span class="step-num">01</span>
+        <h4>/spec &lt;feature&gt;</h4>
+        <p>Décide le <strong style="color:var(--text)">quoi</strong>. Critères d'acceptation numérotés (C1, C2…) + jalons user-facing. Validés <em>avant</em> le code.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <span class="step-num">02</span>
+        <h4>/code &lt;feature&gt;</h4>
+        <p>Construit étape par étape. Un subagent écrit le filet rapide depuis les critères. Un hook le lance et bloque tant que rouge.</p>
+      </div>
+      <div class="arrow">→</div>
+      <div class="step">
+        <span class="step-num">03</span>
+        <h4>/test &lt;feature&gt;</h4>
+        <p>Session fraîche qui n'a pas écrit le code. Écrit l'e2e depuis le spec et fait la revue à œil neuf.</p>
+      </div>
+    </div>
+    <p class="gate">Puis <strong>un humain valide le jalon</strong> avant d'enchaîner. L'automatisation porte sur la régression — pas sur le jugement.</p>
+  </div>
+</section>
+
+<!-- ═══════════════ SKILLS ═══════════════ -->
+<section id="skills" class="reveal">
+  <div class="container">
+    <div class="eyebrow">10 commandes</div>
+    <h2>Toutes les sessions, <span class="grad">prêtes à l'emploi</span>.</h2>
+    <p class="lede">
+      Chaque commande déclenche une session typée. Le préfixe garde la trace : <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13px;">spec-checkout-flow</code>, <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13px;">support-acme</code>…
+    </p>
+
+    <div class="skill-grid">
+      <div class="skill"><div><div class="cmd">/setup</div><div class="tag">SETUP</div></div><div class="desc">Déploie le workflow sur le repo, en interactif. Une seule fois.</div></div>
+      <div class="skill"><div><div class="cmd">/spec &lt;feature&gt;</div><div class="tag">BUILD · 01</div></div><div class="desc">Écrit le spec — critères d'acceptation et jalons. Pas de code.</div></div>
+      <div class="skill"><div><div class="cmd">/code &lt;feature&gt;</div><div class="tag">BUILD · 02</div></div><div class="desc">Plan détaillé puis implémentation étape par étape, avec filet rapide.</div></div>
+      <div class="skill"><div><div class="cmd">/test &lt;feature&gt;</div><div class="tag">BUILD · 03</div></div><div class="desc">Session fraîche : e2e depuis le spec + revue à œil neuf.</div></div>
+      <div class="skill"><div><div class="cmd">/research &lt;sujet&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Recherche marché : concurrents, tendances, paysage.</div></div>
+      <div class="skill"><div><div class="cmd">/feedback &lt;qui&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Échange 1-à-1 avec un utilisateur. Notes structurées.</div></div>
+      <div class="skill"><div><div class="cmd">/support &lt;client&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Sift de tickets — Jira via MCP Atlassian Rovo, ou API token.</div></div>
+      <div class="skill"><div><div class="cmd">/post &lt;channel&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Post court. Invoque ton skill de copywriting si dispo.</div></div>
+      <div class="skill"><div><div class="cmd">/article &lt;sujet&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Long form : plan validé → wip → section par section.</div></div>
+      <div class="skill"><div><div class="cmd">/newsletter</div><div class="tag">AUDIENCE</div></div><div class="desc">Édition assemblée depuis le reste. Brand book partagé.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ SAFETY ═══════════════ -->
+<section class="safety reveal">
+  <div class="container">
+    <div class="eyebrow">Anti-perte</div>
+    <h2>Hyper prudent <span class="grad">par défaut</span>.</h2>
+    <p class="lede">
+      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13.5px;">/setup</code> ne modifie jamais ton repo sans ta validation explicite. Quatre filets, sur tous les chemins.
+    </p>
+
+    <div class="safety-grid">
+      <div class="safety-item">
+        <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Rollback en un commit</h4>
+        <p>Un tag <code>pre-setup-&lt;timestamp&gt;</code> est posé avant toute action. Si quelque chose te gêne, un <code>git reset</code> ramène l'état d'origine.</p>
+      </div>
+      <div class="safety-item">
+        <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Aucun fichier orphelin</h4>
+        <p>Carte de migration <code>old → new</code> validée avant exécution. Les obsolètes vont dans <code>_archive/</code>, jamais en <code>rm</code> direct.</p>
+      </div>
+      <div class="safety-item">
+        <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Code applicatif intact</h4>
+        <p>Par défaut, <code>git diff</code> reste vide sur les chemins applicatifs. Seul le workflow autour évolue, sauf décision explicite de ta part.</p>
+      </div>
+      <div class="safety-item">
+        <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Jamais de push auto</h4>
+        <p>Tu décides toi-même quand tout est OK pour pousser. Les branches sensibles (<code>main</code>, <code>production</code>) demandent une double confirmation.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════ INSTALL ═══════════════ -->
+<section id="install" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Install</div>
+    <h2>Deux commandes. <span class="grad">C'est tout.</span></h2>
+    <p class="lede">Les skills sont chargés globalement dans <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13.5px;">~/.claude/skills/</code> et deviennent disponibles dans toutes tes sessions Claude Code.</p>
+
+    <div class="install-block">
+      <div class="install-tabs">
+        <button class="install-tab active">terminal</button>
+      </div>
+      <div class="install-code">
+        <button class="copy-btn" id="copy-btn">copy</button>
+<span class="comment"># 1. récupérer le kit</span>
+<span class="prompt">$</span> <span class="cmdline">gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow</span>
+
+<span class="comment"># 2. installer les skills globalement</span>
+<span class="prompt">$</span> <span class="cmdline">~/ai-founder-workflow/install.sh --global</span>
+<span class="ok">✓ Skills installés : setup spec code test research feedback support post article newsletter</span>
+      </div>
+    </div>
+
+    <p class="install-next">Puis dans ton repo cible, ouvre Claude Code et tape <code>/setup</code>. Le skill pilote le déploiement, phase par phase, avec ton OK à chaque étape destructive.</p>
+
+    <div class="cta" style="margin-top:32px;">
+      <a href="https://github.com/lgrante/ai-founder-workflow" class="btn btn-primary" target="_blank" rel="noopener">
+        <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39.99 0 1.98.13 2.9.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.78-.01 3.16 0 .31.21.67.8.56C20.21 21.38 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
+        Voir le repo
+      </a>
+      <a href="https://github.com/lgrante/ai-founder-workflow#readme" class="btn btn-secondary" target="_blank" rel="noopener">
+        Lire la doctrine complète
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="container footer-inner">
+    <div>MIT · Built for Claude Code · 2026</div>
+    <div class="footer-links">
+      <a href="https://github.com/lgrante/ai-founder-workflow" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://github.com/lgrante/ai-founder-workflow#readme" target="_blank" rel="noopener">README</a>
+      <a href="https://github.com/lgrante/ai-founder-workflow/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener">Contribuer</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // ─── Terminal animation ───────────────────────────────
+  const SCRIPT = [
+    { kind: 'cmd', text: 'gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow' },
+    { kind: 'out', text: "Cloning into '~/ai-founder-workflow'...", pre: 280 },
+    { kind: 'ok',  text: '✓ done.', pre: 320 },
+    { kind: 'blank' },
+    { kind: 'cmd', text: '~/ai-founder-workflow/install.sh --global' },
+    { kind: 'out', text: '→ Installation GLOBALE des skills dans : ~/.claude/skills', pre: 220, html: '<span class="tl-arrow">→</span> Installation GLOBALE des skills dans : <span class="tl-path">~/.claude/skills</span>' },
+    { kind: 'blank' },
+    { kind: 'ok',  text: '✓ Skills installés globalement :', pre: 250 },
+    { kind: 'out', text: '  setup  spec  code  test  research', pre: 80 },
+    { kind: 'out', text: '  feedback  support  post  article  newsletter', pre: 60 },
+    { kind: 'blank' },
+    { kind: 'cmd', text: 'cd ~/my-project && claude' },
+    { kind: 'blank' },
+    { kind: 'claude-cmd', text: '/setup' },
+    { kind: 'out', pre: 350, html: '<span class="tl-arrow">→</span> Lecture mémoire <span class="tl-path">(~/.claude/projects/my-project/memory/)</span>' },
+    { kind: 'out', pre: 400, html: '<span class="tl-arrow">→</span> Inventaire de <span class="tl-emph">47 sessions</span> Claude' },
+    { kind: 'out', pre: 500, html: '<span class="tl-arrow">→</span> <span class="tl-emph">3 posts LinkedIn</span> récupérés depuis tes anciennes sessions' },
+    { kind: 'blank' },
+    { kind: 'out', pre: 300, html: '<span class="tl-comment">  Structure proposée :</span>' },
+    { kind: 'out', pre: 100, html: '    <span class="tl-path">features/</span>  <span class="tl-path">knowledge/</span>  <span class="tl-path">content/</span>  <span class="tl-path">.claude/</span>' },
+    { kind: 'blank' },
+    { kind: 'out', pre: 350, html: '<span class="tl-arrow">→</span> Branche <span class="tl-emph">setup-workflow</span> créée' },
+    { kind: 'out', pre: 250, html: '<span class="tl-arrow">→</span> 18 fichiers déplacés (git mv, historique préservé)' },
+    { kind: 'ok',  text: '✓ Workflow opérationnel.', pre: 300 },
+    { kind: 'blank' },
+    { kind: 'claude-cmd', text: '/spec checkout-flow' },
+    { kind: 'out', pre: 300, html: '<span class="tl-arrow">→</span> Création <span class="tl-path">features/checkout-flow/</span>' },
+    { kind: 'ok',  text: '✓ SPEC.md prêt — 4 critères · 2 jalons', pre: 280 },
+  ];
+
+  const term = document.getElementById('terminal');
+  const replayBtn = document.getElementById('replay-btn');
+  let running = false;
+  let cancelled = false;
+
+  const sleep = (ms) => new Promise(r => setTimeout(r, ms));
+
+  async function typeInto(span, text, cps = 55) {
+    const baseDelay = 1000 / cps;
+    for (const ch of text) {
+      if (cancelled) return;
+      span.appendChild(document.createTextNode(ch));
+      const jitter = (Math.random() - 0.5) * 30;
+      await sleep(Math.max(8, baseDelay + jitter));
+    }
+  }
+
+  function addCursor(line) {
+    const c = document.createElement('span');
+    c.className = 'cursor';
+    line.appendChild(c);
+    return c;
+  }
+
+  function removeCursors() {
+    term.querySelectorAll('.cursor').forEach(c => c.remove());
+  }
+
+  async function playScript() {
+    if (running) return;
+    running = true;
+    cancelled = false;
+    term.innerHTML = '';
+
+    for (const step of SCRIPT) {
+      if (cancelled) break;
+
+      if (step.kind === 'blank') {
+        const d = document.createElement('div');
+        d.className = 'tl-blank';
+        d.innerHTML = '&nbsp;';
+        term.appendChild(d);
+        term.scrollTop = term.scrollHeight;
+        await sleep(80);
+        continue;
+      }
+
+      removeCursors();
+      const line = document.createElement('div');
+      line.className = 'tl-line';
+
+      if (step.kind === 'cmd') {
+        const p = document.createElement('span');
+        p.className = 'tl-prompt-cmd';
+        p.textContent = '$ ';
+        line.appendChild(p);
+        const t = document.createElement('span');
+        line.appendChild(t);
+        term.appendChild(line);
+        const cursor = addCursor(line);
+        term.scrollTop = term.scrollHeight;
+        await typeInto(t, step.text, 65);
+        await sleep(300);
+        cursor.remove();
+      } else if (step.kind === 'claude-cmd') {
+        const p = document.createElement('span');
+        p.className = 'tl-prompt-claude';
+        p.textContent = '> ';
+        line.appendChild(p);
+        const t = document.createElement('span');
+        t.className = 'tl-emph';
+        line.appendChild(t);
+        term.appendChild(line);
+        const cursor = addCursor(line);
+        term.scrollTop = term.scrollHeight;
+        await sleep(400);
+        await typeInto(t, step.text, 50);
+        await sleep(350);
+        cursor.remove();
+      } else {
+        // output line: appears after pre-delay
+        await sleep(step.pre || 200);
+        if (step.kind === 'ok') line.classList.add('tl-ok');
+        else if (step.kind === 'warn') line.classList.add('tl-warn');
+        else line.classList.add('tl-out');
+        if (step.html) line.innerHTML = step.html;
+        else line.textContent = step.text;
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+      }
+    }
+
+    if (!cancelled) {
+      // final cursor at the end
+      const finalCursor = document.createElement('div');
+      finalCursor.className = 'tl-line';
+      const p = document.createElement('span');
+      p.className = 'tl-prompt-claude';
+      p.textContent = '> ';
+      finalCursor.appendChild(p);
+      addCursor(finalCursor);
+      term.appendChild(finalCursor);
+      term.scrollTop = term.scrollHeight;
+    }
+
+    running = false;
+
+    // auto-restart after 12s
+    if (!cancelled) {
+      await sleep(12000);
+      if (!cancelled && !running) playScript();
+    }
+  }
+
+  replayBtn.addEventListener('click', () => {
+    cancelled = true;
+    setTimeout(() => {
+      cancelled = false;
+      running = false;
+      playScript();
+    }, 50);
+  });
+
+  // start when terminal becomes visible
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting && !running) {
+        playScript();
+        io.disconnect();
+      }
+    });
+  }, { threshold: 0.2 });
+  io.observe(term);
+
+  // ─── Reveal on scroll ────────────────────────────────
+  const revealIo = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('in');
+        revealIo.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  document.querySelectorAll('.reveal').forEach(el => revealIo.observe(el));
+
+  // ─── Copy install command ────────────────────────────
+  const copyBtn = document.getElementById('copy-btn');
+  copyBtn.addEventListener('click', async () => {
+    const text = `gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow\n~/ai-founder-workflow/install.sh --global`;
+    try {
+      await navigator.clipboard.writeText(text);
+      copyBtn.textContent = '✓ copied';
+      copyBtn.classList.add('copied');
+      setTimeout(() => {
+        copyBtn.textContent = 'copy';
+        copyBtn.classList.remove('copied');
+      }, 1800);
+    } catch (e) {
+      copyBtn.textContent = 'error';
+      setTimeout(() => copyBtn.textContent = 'copy', 1500);
+    }
+  });
+</script>
+
+</body>
+</html>
