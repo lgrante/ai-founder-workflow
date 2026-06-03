@@ -8,6 +8,9 @@ Tu démarres une session USER FEEDBACK avec « $ARGUMENTS ». Référence : `doc
 C'est de la **découverte tournée vers l'intérieur** : une **personne précise** et concrète (pas le marché abstrait — ça, c'est `/research`). Découverte **continue**, **jamais rattachée à une feature**.
 
 1. Rappelle à l'utilisateur de nommer cette session `user-feedback-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `feedback/$ARGUMENTS` — une branche par contact (reprise à chaque nouvel échange avec la même personne). `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b feedback/$ARGUMENTS`, sinon → `git checkout feedback/$ARGUMENTS`. **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. Charge la fiche `knowledge/crm/contacts/$ARGUMENTS.md` si elle existe (relis l'historique pour ne pas répéter les questions déjà posées) ; sinon, propose de la créer depuis `knowledge/crm/contacts/_template.md`.
 3. Aide à préparer / dérouler l'échange : pars de « Ce que je veux apprendre de cette personne » dans la fiche. Cherche les **problèmes vécus** et les **faits** (« la dernière fois que… »), pas les souhaits de fonctionnalités hypothétiques. Note les **verbatims** marquants.
 4. Après l'échange, mets à jour **deux endroits** :

@@ -16,9 +16,14 @@
 <!-- Seulement ce que Claude ne devine pas : style imposé, patterns maison, pièges du repo. -->
 
 ## Étiquette repo
-- Branches :       # ex : feature/<nom> — une feature = une branche (worktree si parallèle)
-- Commits :        # ex : conventionnels
-- Une feature à la fois, sauf worktrees git séparés.
+- Branches : voir `docs/WORKFLOW.md` § Étiquette git pour la convention complète. Résumé :
+  - **Build** : `feat/<feature>` (partagée spec/code/test) · `fix/<bug-slug>` (mode bug)
+  - **Découverte** : `research/<topic>` · `feedback/<person>` · `support/<client>` (une branche par sujet/contact/client, reprise à chaque session)
+  - **Audience** : `post/<channel>/<slug>` · `article/<slug>` · `newsletter/<edition>` · `report/<network>/<date>` (une branche par pièce / par rapport daté)
+- Stage **par chemin explicite uniquement** (jamais `git add -A`) — multi-agents potentiels sur le même checkout.
+- Pas de push automatique ; chaque session sur sa branche, merge à toi.
+- Commits : conventionnels (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
+- Worktrees git séparés pour features parallèles.
 
 ## Workflow
 Ce repo suit le workflow décrit dans `docs/WORKFLOW.md` :

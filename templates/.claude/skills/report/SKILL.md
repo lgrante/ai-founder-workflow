@@ -11,6 +11,8 @@ C'est une session d'**analyse**, pas de création — sœur de `/support` côté
 
 1. Rappelle à l'utilisateur de nommer cette session `report-$ARGUMENTS` (via `/rename`). *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
 
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `report/$ARGUMENTS/<YYYY-MM-DD>` (date du jour) — un rapport = une branche datée, pas de réutilisation entre rapports successifs (chaque diff = ce nouveau rapport). `git status` clean (commit/stash sinon) ; `git checkout -b report/$ARGUMENTS/<YYYY-MM-DD>` depuis `main`. **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. **Détecte la source de stats** dans cet ordre :
    - **Priorité 1 — MCP du réseau** : vérifie les outils MCP disponibles selon le préfixe :
      - LinkedIn → `mcp__linkedin__*` (ex. linkedin-scraper-mcp)

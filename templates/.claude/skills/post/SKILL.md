@@ -11,6 +11,9 @@ C'est de l'**AUDIENCE** — output produit pour les réseaux. La session est jet
 
 1. Parse `$ARGUMENTS` pour extraire `<channel>` et `<sujet>`. Si ambigu ou manquant, demande à l'utilisateur.
 2. Rappelle à l'utilisateur de nommer cette session `post-<channel>-<slug>` (via `/rename`). *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `post/<channel>/<slug>` (composé depuis le `<channel>` et `<slug>` parsés en étape 1) — une branche par post, vit du draft au posted. `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b post/<channel>/<slug>`, sinon → `git checkout post/<channel>/<slug>` (reprise si itération sur le même draft). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 3. Charge le contexte :
    - `knowledge/insights.md` (les pain points / verbatims / motifs récurrents)
    - `knowledge/content/brand-book.md` ou équivalent (tonalité, style, voice)

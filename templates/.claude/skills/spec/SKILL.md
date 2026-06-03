@@ -8,6 +8,9 @@ Tu démarres la phase SPEC de la feature « $ARGUMENTS ». Référence : `docs/W
 Tu décides le **quoi**, jamais le **comment**. La sortie est un artefact durable (`SPEC.md`) que `code-$ARGUMENTS` puis `test-$ARGUMENTS` liront. Ce que tu écris ici devient la **référence de tous les tests** — si un critère est flou, les tests seront flous.
 
 1. Rappelle à l'utilisateur de nommer cette session `spec-$ARGUMENTS` (via `/rename`) si ce n'est pas déjà fait. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `feat/$ARGUMENTS` — branche partagée avec `code-` et `test-` de cette même feature. Vérifie `git status` clean (commit/stash sinon) ; si tu es sur `main` → `git checkout -b feat/$ARGUMENTS`, sinon → `git checkout feat/$ARGUMENTS` (reprise si déjà créée par une session antérieure). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels sur le même checkout).
+
 2. Reste en mode SPEC : tu n'écris **pas** de code, tu ne crées pas de plan technique (ça, c'est `code-`).
 3. **Structure de la feature** — applique la convention standard (cf. `docs/WORKFLOW.md` § Convention par-feature) :
    - **Si `features/$ARGUMENTS/` n'existe pas** : scaffold la structure standard. Crée le dossier + `README.md` court (statut + liens) + `SPEC.md` (à remplir) + `SPEC.html` placeholder + les sous-dossiers vides `sub-features/ prototypes/ qa/ plans/ archives/`. C'est le contrat de structure que TOUTES les features du repo partagent.

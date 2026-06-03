@@ -8,6 +8,9 @@ Tu démarres une session newsletter pour l'édition « $ARGUMENTS ». Référenc
 C'est de l'**AUDIENCE** — assemblage périodique de ce qui a été produit / vécu / appris.
 
 1. Rappelle à l'utilisateur de nommer cette session `newsletter-<edition>` (via `/rename`). Format edition libre : `2026-06`, `vol-12`, `q2-2026`, etc.
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `newsletter/$ARGUMENTS` — une branche par édition. `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b newsletter/$ARGUMENTS`, sinon → `git checkout newsletter/$ARGUMENTS` (reprise si itération). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. Charge le contexte (matière première) :
    - `content/blog/published/` (articles récents depuis la dernière édition)
    - `content/linkedin/posted/` + `content/twitter-x/posted/` (posts marquants)

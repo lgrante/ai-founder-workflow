@@ -66,7 +66,17 @@ Trois sessions, dans l'ordre. Chacune laisse un fichier que la suivante lit.
 
 Puis **un humain valide le jalon** avant d'enchaîner.
 
-**Une feature = une branche git.** L'axe build est rattaché à une branche : les trois sessions d'une feature (`spec-`, `code-`, `test-`) travaillent toutes sur **cette même** branche dédiée (ex. `feature/<feature>`) — jamais deux features mélangées sur une branche. Plusieurs features en parallèle → **worktrees git séparés** (une branche chacune). Les sessions de **découverte** et d'**audience** ne sont rattachées à aucune branche.
+**Une session = une branche git** (sauf build où spec/code/test partagent la branche de leur feature). Le détail dans `templates/docs/WORKFLOW.md` § Étiquette git. Résumé :
+
+| Axe | Branche | Multiplicité |
+|---|---|---|
+| Build feature | `feat/<feature>` (partagée spec/code/test) | 1 par feature |
+| Build bug | `fix/<bug-slug>` | 1 par ticket |
+| Discovery | `research/<topic>` · `feedback/<person>` · `support/<client>` | 1 par sujet/contact/client, reprise |
+| Audience | `post/<channel>/<slug>` · `article/<slug>` · `newsletter/<edition>` | 1 par pièce |
+| Report | `report/<network>/<YYYY-MM-DD>` | 1 par rapport daté |
+
+**Pourquoi cette rigueur** : plusieurs agents Claude peuvent partager le même checkout (un terminal pour `/spec checkout-flow`, un autre pour `/article inherited-org`, un troisième pour `/report linkedin`). Sans branches dédiées, ils s'écraseraient mutuellement. Avec, chacun a son scope, et tu reviews un diff = une session = un artefact cohérent. **Stage par chemin explicite uniquement** (jamais `git add -A` — sweeperait le travail d'un autre agent). Plusieurs features en parallèle → **worktrees git séparés** (une branche chacune).
 
 ```mermaid
 flowchart TD

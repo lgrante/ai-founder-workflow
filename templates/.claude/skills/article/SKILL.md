@@ -8,6 +8,9 @@ Tu démarres une session de rédaction d'article long pour « $ARGUMENTS ». Ré
 C'est de l'**AUDIENCE** — long form (blog, content marketing). Plus profond qu'un post réseau social, plus lent à produire, plus durable.
 
 1. Rappelle à l'utilisateur de nommer cette session `article-<slug>` (via `/rename`).
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `article/$ARGUMENTS` — une branche par article, vit du wip au published. `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b article/$ARGUMENTS`, sinon → `git checkout article/$ARGUMENTS` (reprise si itération). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. Charge le contexte :
    - `knowledge/insights.md` (les pain points / motifs)
    - `knowledge/content/brand-book.md` ou équivalent

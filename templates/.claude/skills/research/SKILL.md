@@ -8,6 +8,9 @@ Tu démarres une session de RECHERCHE MARCHÉ sur « $ARGUMENTS ». Référence 
 C'est de la **découverte tournée vers l'extérieur** : le marché, les concurrents, les tendances — abstrait, pas une personne précise (ça, c'est `/feedback`). La découverte est **continue** et **jamais rattachée à une feature** : tu alimentes la source qui nourrira les futurs `spec-`.
 
 1. Rappelle à l'utilisateur de nommer cette session `market-research-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `research/$ARGUMENTS` — une branche par sujet de recherche (reprise à chaque nouvelle session sur le même sujet). `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b research/$ARGUMENTS`, sinon → `git checkout research/$ARGUMENTS`. **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. Cadre la question avec l'utilisateur (que cherche-t-on à décider ?), puis **délègue les recherches lourdes à un subagent** : il fouille, lit les sources, et te rend une **synthèse**. Tu gardes ton contexte principal propre — ne ramène pas les pages brutes, seulement les conclusions sourcées.
 3. Sortie = un fichier de notes **daté et sourcé** dans `knowledge/market/` (ex. `knowledge/market/2026-06-02-paiement-mobile.md`). Chaque affirmation porte sa source (lien + date de consultation). Distingue **fait** (sourcé) et **hypothèse**.
 4. Si une trouvaille a une **implication produit**, ajoute une ligne à `knowledge/insights.md` (section « Pistes de features ») — c'est l'agrégat d'où émergent les idées.

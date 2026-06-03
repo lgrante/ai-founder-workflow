@@ -8,22 +8,26 @@ Tu démarres la phase CODE pour « $ARGUMENTS ». Référence : `docs/WORKFLOW.m
 Tu décides le **comment** et tu construis. Ta référence d'intention reste l'artefact d'entrée (SPEC pour une feature, TICKET pour un bug) ; ton journal d'avancement est `PLAN.md` (les cases cochées = le seul statut). Front et back d'une même feature vont dans **cette** session : ils partagent le contrat d'API.
 
 1. Rappelle à l'utilisateur de nommer cette session `code-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
-2. **Détecte le type d'artefact d'entrée et son dossier** :
-   - Si `$ARGUMENTS` commence par `bugs/` (ex. `/code bugs/safari-cancel-crash`) → mode **bug**. Dossier d'artefact = `$ARGUMENTS/`. Lis `$ARGUMENTS/TICKET.md` (repro + comportement attendu + critère « ne se reproduit plus »). Cf. `docs/WORKFLOW.md` § Convention par-bug.
-   - Sinon → mode **feature**. Dossier d'artefact = `features/$ARGUMENTS/`. Lis `features/$ARGUMENTS/SPEC.md` (description + critères C1, C2… + jalons).
-   - Si l'artefact est absent ou trop flou pour planifier : **stoppe** et renvoie vers `/spec` (mode feature) ou vers la session qui a ouvert le ticket (mode bug).
-3. En **plan mode**, explore le codebase (conventions, modules concernés, setup de test réel) **avant** d'écrire le plan. Puis écris `<dossier-artefact>/PLAN.md` :
+2. **Détecte le mode + branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) :
+   - Mode **bug** si `$ARGUMENTS` commence par `bugs/` (ex. `/code bugs/safari-cancel-crash`) → dossier d'artefact = `$ARGUMENTS/`. **Branche : `fix/<bug-slug>`** (slug = `$ARGUMENTS` après le préfixe `bugs/`).
+   - Sinon mode **feature** → dossier d'artefact = `features/$ARGUMENTS/`. **Branche : `feat/$ARGUMENTS`** (partagée avec `spec-` et `test-` ; existe déjà si `spec-` t'a précédé).
+   - `git status` clean obligatoire (commit/stash sinon) ; `git checkout -b <branch>` si sur `main`, OU `git checkout <branch>` si reprise. **Stage par chemin explicite uniquement** (jamais `git add -A` — multi-agents).
+3. **Lis l'artefact d'entrée** :
+   - Mode bug → `$ARGUMENTS/TICKET.md` (repro + comportement attendu + critère « ne se reproduit plus »). Cf. `docs/WORKFLOW.md` § Convention par-bug.
+   - Mode feature → `features/$ARGUMENTS/SPEC.md` (description + critères C1, C2… + jalons).
+   - Si absent ou trop flou pour planifier → **stoppe** et renvoie vers `/spec` (mode feature) ou vers la session qui a ouvert le ticket (mode bug).
+4. En **plan mode**, explore le codebase (conventions, modules concernés, setup de test réel) **avant** d'écrire le plan. Puis écris `<dossier-artefact>/PLAN.md` :
    - étapes techniques ordonnées, fichiers touchés, dépendances entre étapes ;
    - **chaque étape rattachée à un ou plusieurs critères** de l'artefact (référence par numéro : « Étape 3 → C2 ») ;
    - en mode feature : regroupe les étapes par jalon. En mode bug : pas de jalon (le fix est sa propre tranche), mais distingue **fix** et **test de régression** comme deux étapes minimum.
    - **Fais valider le plan** avant d'implémenter. N'écris aucun code en plan mode.
-4. Implémente **une étape à la fois** (front + back ensemble). À chaque étape :
+5. Implémente **une étape à la fois** (front + back ensemble). À chaque étape :
    - écris le code de l'étape ;
    - délègue à un **subagent** l'écriture du **filet rapide** (unitaires + intégration rapide), dérivé des **critères de l'étape**, JAMAIS du code que tu viens d'écrire. Le subagent reçoit les critères, pas l'implémentation, sinon les tests ratifieraient les bugs. **Granularité** : étape simple → des unitaires suffisent ; étape qui câble deux modules ou tape une API → ajoute un test d'intégration rapide.
    - le `Stop` hook (`.claude/hooks/test-gate.sh`) lance ces tests et **bloque la fin du tour** tant que ce n'est pas vert. Lis `.cc-scratch/test-gate.last.txt` (la sortie des tests = la preuve), corrige la **cause**, relance toi-même ;
    - au vert : commit, coche l'étape dans `PLAN.md`, passe à la suivante.
-5. **Compacte aux points verts** (`/compact`) : préserve l'état du PLAN, les fichiers touchés, les critères ; jette le bruit des échecs résolus. Geste humain — propose-le, ne l'impose pas.
-6. **Disjoncteur** : après 2-3 échecs persistants sur une même étape, ARRÊTE et signale à l'utilisateur. Un rouge qui s'entête = signal que l'**artefact d'entrée** (SPEC ou TICKET) ou l'**approche** est en cause, pas qu'il faut s'acharner. (Le `Stop` hook s'auto-désactive après ~8 blocages ; ne compte pas dessus.)
+6. **Compacte aux points verts** (`/compact`) : préserve l'état du PLAN, les fichiers touchés, les critères ; jette le bruit des échecs résolus. Geste humain — propose-le, ne l'impose pas.
+7. **Disjoncteur** : après 2-3 échecs persistants sur une même étape, ARRÊTE et signale à l'utilisateur. Un rouge qui s'entête = signal que l'**artefact d'entrée** (SPEC ou TICKET) ou l'**approche** est en cause, pas qu'il faut s'acharner. (Le `Stop` hook s'auto-désactive après ~8 blocages ; ne compte pas dessus.)
 
 Cas limites :
 - **Hook rouge pour une raison hors étape** (env, dépendance manquante, test pré-existant cassé) : ne maquille pas le test ; corrige la cause réelle ou signale-le.

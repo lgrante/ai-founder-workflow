@@ -13,6 +13,8 @@ Format attendu : `/support <client-slug>` (par client) ou `/support <sujet>` (an
 
 1. Rappelle à l'utilisateur de nommer cette session `support-<slug>` via `/rename`. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
 
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `support/$ARGUMENTS` — une branche par client (reprise à chaque sift). `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b support/$ARGUMENTS`, sinon → `git checkout support/$ARGUMENTS`. **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. **Détecte la source de tickets** dans cet ordre :
    - **Priorité 1 — MCP Atlassian Rovo** (officiel, GA février 2026). Vérifie si un serveur MCP `atlassian` est configuré (cherche dans la liste des outils MCP disponibles : noms commençant par `mcp__atlassian__`). Si oui, utilise-le directement — l'auth OAuth est gérée par le MCP.
    - **Priorité 2 — API token Jira** (fallback). Si pas de MCP, demande à l'utilisateur :

@@ -106,6 +106,58 @@ features/<slug>/
 
 **Pourquoi cette uniformité** : un dossier prévisible = un LLM qui retrouve l'historique sans chercher. Et un onboarding humain à 0 effort.
 
+## Étiquette git (multi-agents concurrents)
+
+**Principe** : chaque session bosse sur **sa propre branche** dédiée. Cette discipline permet à plusieurs agents Claude qui partagent le même checkout de travailler en parallèle sans se marcher dessus, et donne à chaque artefact un diff reviewable correspondant exactement au scope d'une session.
+
+### Convention de nommage par axe
+
+| Axe | Préfixe de branche | Exemple |
+|---|---|---|
+| **Build (feature)** | `feat/<feature>` | `feat/checkout-flow` |
+| **Build (bug fix)** | `fix/<bug-slug>` | `fix/safari-cancel-crash` |
+| **Découverte (market)** | `research/<topic>` | `research/agentforce-monitoring` |
+| **Découverte (user feedback)** | `feedback/<person>` | `feedback/laurent` |
+| **Découverte (support sift)** | `support/<client>` | `support/acme-corp` |
+| **Audience (post)** | `post/<channel>/<slug>` | `post/linkedin/churn-paradox` |
+| **Audience (article)** | `article/<slug>` | `article/inherited-org-monitoring` |
+| **Audience (newsletter)** | `newsletter/<edition>` | `newsletter/2026-06` |
+| **Audience (report)** | `report/<network>/<YYYY-MM-DD>` | `report/linkedin/2026-06-03` |
+
+Le format exact (séparateur `-` vs `_`, casse) est une préférence d'équipe ; seul le **préfixe par axe** compte pour la lecture rapide de `git branch`. La cohérence importe plus que la forme.
+
+### Exceptions au pattern « une session = une branche »
+
+- **`spec-`, `code-`, `test-` d'une même feature** partagent la **même branche** `feat/<feature>` — elles écrivent ensemble dans le même dossier `features/<feature>/`. La première à ouvrir crée la branche ; les suivantes la rejoignent.
+- **`/setup`** utilise une branche dédiée `setup-workflow` (créée depuis main), mergée après validation complète.
+- **Ré-itération sur un artefact mergé** (ex. édition v2 d'un post déjà posté) → nouvelle branche `<prefix>/<slug>-v2`. Si l'artefact d'origine n'est pas encore mergé, reste sur la branche d'origine.
+
+### Protocole d'ouverture de session
+
+Chaque skill applique **avant toute écriture** :
+
+1. **`git status`** : si le working tree n'est pas clean, propose à l'utilisateur un commit / stash. **Stoppe** si pas de réponse claire — ne crée jamais de branche par-dessus des changes pendants.
+2. **`git branch --show-current`** :
+   - Tu es déjà sur la branche cible → continue (reprise de session, normal).
+   - Tu es sur `main` (ou la base configurée) → crée la branche : `git checkout -b <prefix>/<slug>`.
+   - Tu es sur une autre branche dédiée → demande à l'utilisateur (mélange volontaire ou erreur ?).
+3. **Branche déjà existante** (locale OU remote `origin/<prefix>/<slug>`) : `git checkout <prefix>/<slug>` (+ `git pull` si remote), pas de re-création.
+4. **Stage par chemin explicite uniquement** : `git add features/<feature>/SPEC.md`, **jamais `git add -A`** — un autre agent concurrent peut être en train d'écrire ailleurs, et `-A` sweeperait son travail (et les artefacts gitignore-ables qui auraient leaké).
+
+### Merge strategy (au choix de l'équipe)
+
+Le kit ne tranche pas — chacun choisit selon son contexte :
+- **PR review** (recommandé build/article) : `git push -u origin <branch>` → ouvrir PR → review → squash merge.
+- **Direct merge** sur la base (acceptable audience court / discovery rapide) : `git checkout main && git merge --no-ff <branch>` après validation locale.
+- **Pas de push automatique** : aucun skill ne push tout seul. Le push reste un geste humain explicite.
+
+### Pourquoi cette rigueur
+
+- **Multi-agent concurrence sûre** : 3 agents Claude sur le même checkout, chacun sur sa branche → zéro conflit accidentel.
+- **Reviewabilité** : un diff = le scope d'une session = un artefact cohérent.
+- **Rollback granulaire** : reverter une feature ou un post sans impacter le reste.
+- **Historique propre** : `git log --graph --oneline --all` raconte ce qui s'est passé par axe.
+
 ## Convention par-channel audience (stats + insights + assets)
 
 **Principe** : chaque channel d'audience (`linkedin`, `twitter-x`, `blog`, `newsletter`…) suit la même structure — `/post`, `/article`, `/newsletter` écrivent les drafts et publications ; `/report` mesure et synthétise.

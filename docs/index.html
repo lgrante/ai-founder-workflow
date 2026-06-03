@@ -1644,7 +1644,7 @@
     <div class="eyebrow">Anti-perte</div>
     <h2>Hyper prudent <span class="grad">par défaut</span>.</h2>
     <p class="lede">
-      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13.5px;">/setup</code> ne modifie jamais ton repo sans ta validation explicite. Quatre filets, sur tous les chemins.
+      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:4px;border:1px solid var(--border);font-size:13.5px;">/setup</code> ne modifie jamais ton repo sans ta validation explicite. Cinq filets, sur tous les chemins.
     </p>
 
     <div class="safety-grid">
@@ -1663,6 +1663,10 @@
       <div class="safety-item">
         <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Jamais de push auto</h4>
         <p>Tu décides toi-même quand tout est OK pour pousser. Les branches sensibles (<code>main</code>, <code>production</code>) demandent une double confirmation.</p>
+      </div>
+      <div class="safety-item">
+        <h4><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Branche dédiée par session</h4>
+        <p>Chaque skill bosse sur sa propre branche (<code>feat/&lt;feature&gt;</code>, <code>research/&lt;topic&gt;</code>, <code>post/&lt;channel&gt;/&lt;slug&gt;</code>, …). 3 agents Claude sur le même checkout = zéro conflit. Stage par chemin explicite, jamais <code>git add -A</code>.</p>
       </div>
     </div>
   </div>

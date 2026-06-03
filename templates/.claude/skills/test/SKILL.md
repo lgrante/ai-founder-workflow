@@ -8,6 +8,9 @@ Tu démarres la phase TEST de la feature « $ARGUMENTS », en session **fraîche
 Tu es le **critique qui juge l'assiette face au menu**, pas le cuisinier. Ta valeur vient de ton **étanchéité** : tu n'as pas écrit le code, donc tu ne partages pas ses angles morts. Ta référence est le **SPEC**, jamais l'implémentation.
 
 1. Rappelle à l'utilisateur de nommer cette session `test-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
+
+> **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `feat/$ARGUMENTS` — branche partagée avec `spec-` et `code-`, déjà existante car ces sessions t'ont précédée. `git checkout feat/$ARGUMENTS` pour la rejoindre (working tree clean obligatoire — commit/stash sinon). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
+
 2. **IMPORTANT — étanchéité** : commence par lire `features/$ARGUMENTS/SPEC.md` (critères C1, C2… + jalons) et dérive tes tests **du spec**. Ne lis le code applicatif **qu'après** avoir cadré ce que les critères exigent — et seulement pour câbler les tests (sélecteurs, points d'entrée, fixtures), jamais pour décider *quoi* vérifier. Si tu te surprends à tester « ce que le code fait », reviens au critère.
 3. Écris / maintiens la **suite e2e (+ acceptation)** qui vérifie, du point de vue utilisateur, que la feature tient les promesses du spec. Couvre chaque critère du jalon courant, y compris les **chemins d'échec** et **cas limites** nommés dans le spec (paiement refusé, entrée invalide, état vide…).
 4. Fais une **revue à œil neuf** du code par rapport au spec : écarts (critère non tenu), cas limites manqués, dette, incohérences avec les conventions du repo. Restitue une **liste d'écarts** priorisée — c'est un relais éphémère (utilise un subagent pour fouiller si besoin), pas un nouvel artefact de statut.
