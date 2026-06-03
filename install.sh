@@ -70,13 +70,46 @@ if [ "$MODE" = "global" ]; then
   echo
   echo "✓ Skills installés globalement :"
   ls "$TARGET_SKILLS/"
+
+  # ── Pre-flight guard hook (déterministe, bloque les skills sur repos non-setup) ──
+  TARGET_HOOKS="$HOME/.claude/hooks"
+  TARGET_SETTINGS="$HOME/.claude/settings.json"
+  mkdir -p "$TARGET_HOOKS"
+  cp "$KIT_DIR/templates/.claude/hooks/preflight-guard.py" "$TARGET_HOOKS/preflight-guard.py"
+  chmod +x "$TARGET_HOOKS/preflight-guard.py"
+  echo
+  echo "→ Installation du garde-fou pre-flight (script déterministe)…"
+  echo "  ✓ Hook copié : $TARGET_HOOKS/preflight-guard.py"
+
+  if command -v python3 >/dev/null 2>&1; then
+    python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+      "$TARGET_SETTINGS" \
+      "UserPromptSubmit" \
+      "$TARGET_HOOKS/preflight-guard.py" \
+      5
+  else
+    echo "  ⚠ python3 absent — ajoute manuellement cette entrée à $TARGET_SETTINGS :"
+    cat <<EOF
+  {
+    "hooks": {
+      "UserPromptSubmit": [
+        { "hooks": [
+            { "type": "command", "command": "$TARGET_HOOKS/preflight-guard.py", "timeout": 5 }
+        ]}
+      ]
+    }
+  }
+EOF
+  fi
+
   echo
   echo "Étapes suivantes :"
   echo "  1. Ouvre une session Claude Code dans n'importe quel repo et tape /setup."
-  echo "  2. Le skill /setup pose le workflow complet (CLAUDE.md, docs/WORKFLOW.md, hooks)."
+  echo "  2. Le skill /setup pose le workflow complet (CLAUDE.md, docs/WORKFLOW.md,"
+  echo "     hooks per-repo dont test-gate.sh et preflight-guard.py local)."
   echo
-  echo "Note : ce mode n'installe PAS les hooks (test-gate.sh) ni settings.json — ces"
-  echo "fichiers sont par-repo. Le skill /setup s'en charge dans chaque repo cible."
+  echo "Garde-fou actif : si tu tapes /spec /code … sur un repo sans docs/WORKFLOW.md,"
+  echo "le hook global bloque et te demande de lancer /setup d'abord."
   exit 0
 fi
 

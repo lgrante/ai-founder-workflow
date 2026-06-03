@@ -7,6 +7,48 @@ La mémoire persistante vit dans des **fichiers**, pas dans les sessions. Les se
 Le relais entre deux étapes = un **artefact durable** (spec, code commité, fichier de tests).
 Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat une longue session encombrée.
 
+## Pre-flight (garde-fou à l'entrée des skills non-`/setup`)
+
+**Principe** : tous les skills sauf `/setup` doivent **refuser de s'exécuter** si le workflow ai-founder-workflow n'est pas installé sur le repo courant. Sinon ils écriraient dans une arborescence inexistante (ex. `features/<feature>/SPEC.md` sans dossier `features/`), pollueraient le repo de l'utilisateur, ou perdraient des artefacts.
+
+**Détection canonique** : présence de `docs/WORKFLOW.md` à la racine du repo. C'est le fichier installé par `/setup` Phase 2 — son absence = workflow non déployé.
+
+### Couche 1 — Hook Python déterministe (garde-fou primaire)
+
+Le vrai garde-fou est un **script Python** branché en `UserPromptSubmit` hook. Quand l'utilisateur tape `/spec`, `/code`, `/test`, `/research`, `/feedback`, `/support`, `/post`, `/article`, `/newsletter`, ou `/report`, le hook s'exécute **avant** que Claude ne lise le SKILL.md — et bloque déterministiquement si `docs/WORKFLOW.md` est absent du repo. Réponse au format `{"decision":"block","reason":"…"}`.
+
+Fichier : `.claude/hooks/preflight-guard.py` (per-repo après `/setup`) **et/ou** `~/.claude/hooks/preflight-guard.py` (global après `install.sh --global`). Enregistré dans `settings.json` via le helper `register-hook.py` (idempotent, backup auto).
+
+Le hook fait :
+1. Lit le payload JSON sur stdin (clé `prompt`).
+2. Si la commande n'est pas une des 10 skills gardées, ou si c'est `/setup` → passe (exit 0 silencieux).
+3. Trouve la racine git (`git rev-parse --show-toplevel`) ; teste si `docs/WORKFLOW.md` existe.
+4. Si présent → passe. Si absent → bloque avec un message clair indiquant de lancer `/setup`.
+
+**Pourquoi déterministe** : un LLM peut « oublier » de vérifier ou être convaincu de passer outre par un prompt rusé. Un script Python ne peut pas être contourné par persuasion.
+
+### Couche 2 — Instructions LLM (fallback dans chaque SKILL.md)
+
+Chaque SKILL.md non-`/setup` contient aussi un bloc « Pre-flight obligatoire » qui répète le même check côté LLM. C'est un **filet de secours** au cas où :
+- Le hook n'est pas (encore) installé (ex. premier `install.sh --global` partiel, ou config utilisateur sans `UserPromptSubmit` activé).
+- Claude invoque un skill via le `Skill` tool dans un sous-flux (le hook `UserPromptSubmit` ne fire que sur les prompts utilisateur, pas sur les appels internes).
+
+Le LLM Read `docs/WORKFLOW.md` ; si absent, répond exactement :
+> « Je ne peux pas exécuter cette commande : le workflow ai-founder-workflow n'est pas installé sur ce repo (pas de `docs/WORKFLOW.md` trouvé). Veux-tu lancer `/setup` maintenant ? »
+
+Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
+
+### Exceptions
+
+- **`/setup`** est exempté par définition (il installe le workflow). Il a sa propre logique de détection en Phase 0 (« déjà setup ? mise à jour ou ré-install ? »).
+- Sous-répertoire du repo → le hook utilise `git rev-parse --show-toplevel` pour remonter à la racine, donc fonctionne depuis n'importe où.
+
+### Pourquoi un seul fichier comme signal
+
+- **Lisible** : 1 check, pas une cascade de présences/absences à corréler.
+- **Reproductible** : le fichier est canonique et créé par `/setup` Phase 2.
+- **Réversible** : l'utilisateur peut le supprimer pour « désactiver » temporairement les skills sur un fork qui n'a pas adopté le workflow.
+
 ## Trois axes de sessions
 - **Découverte** — continu, jamais par feature. Sort dans `knowledge/`.
 - **Build** — par feature, en pipeline `spec → code → test`. Sort dans `features/`.

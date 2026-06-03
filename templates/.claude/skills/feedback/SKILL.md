@@ -7,6 +7,22 @@ Tu démarres une session USER FEEDBACK avec « $ARGUMENTS ». Référence : `doc
 
 C'est de la **découverte tournée vers l'intérieur** : une **personne précise** et concrète (pas le marché abstrait — ça, c'est `/research`). Découverte **continue**, **jamais rattachée à une feature**.
 
+**Pre-flight obligatoire — STOP avant toute autre action.**
+
+Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine du repo courant (`Read docs/WORKFLOW.md`).
+
+- **Si absent** → le workflow ai-founder-workflow n'est pas installé sur ce repo. Tu ne peux PAS exécuter ce skill. Réponds exactement :
+  > « Je ne peux pas exécuter cette commande : le workflow ai-founder-workflow n'est pas installé sur ce repo (pas de `docs/WORKFLOW.md` trouvé). Veux-tu lancer `/setup` maintenant ? »
+
+  Puis `AskUserQuestion` avec deux options :
+  - **Oui, lance `/setup`** → invoque le skill `/setup` puis **STOP ton propre flux** (aucune étape ci-dessous).
+  - **Non, arrête ici** → réponds « Compris, je m'arrête. Relance la commande quand le workflow sera installé. » et **STOP immédiatement**.
+
+  Cf. `docs/WORKFLOW.md` § Pre-flight pour la doctrine complète.
+- **Si présent** → poursuis avec la pipeline ci-dessous.
+
+---
+
 1. Rappelle à l'utilisateur de nommer cette session `user-feedback-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
 
 > **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `feedback/$ARGUMENTS` — une branche par contact (reprise à chaque nouvel échange avec la même personne). `git status` clean (commit/stash sinon) ; si sur `main` → `git checkout -b feedback/$ARGUMENTS`, sinon → `git checkout feedback/$ARGUMENTS`. **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).

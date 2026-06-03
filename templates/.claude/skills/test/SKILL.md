@@ -7,6 +7,22 @@ Tu démarres la phase TEST de la feature « $ARGUMENTS », en session **fraîche
 
 Tu es le **critique qui juge l'assiette face au menu**, pas le cuisinier. Ta valeur vient de ton **étanchéité** : tu n'as pas écrit le code, donc tu ne partages pas ses angles morts. Ta référence est le **SPEC**, jamais l'implémentation.
 
+**Pre-flight obligatoire — STOP avant toute autre action.**
+
+Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine du repo courant (`Read docs/WORKFLOW.md`).
+
+- **Si absent** → le workflow ai-founder-workflow n'est pas installé sur ce repo. Tu ne peux PAS exécuter ce skill. Réponds exactement :
+  > « Je ne peux pas exécuter cette commande : le workflow ai-founder-workflow n'est pas installé sur ce repo (pas de `docs/WORKFLOW.md` trouvé). Veux-tu lancer `/setup` maintenant ? »
+
+  Puis `AskUserQuestion` avec deux options :
+  - **Oui, lance `/setup`** → invoque le skill `/setup` puis **STOP ton propre flux** (aucune étape ci-dessous).
+  - **Non, arrête ici** → réponds « Compris, je m'arrête. Relance la commande quand le workflow sera installé. » et **STOP immédiatement**.
+
+  Cf. `docs/WORKFLOW.md` § Pre-flight pour la doctrine complète.
+- **Si présent** → poursuis avec la pipeline ci-dessous.
+
+---
+
 1. Rappelle à l'utilisateur de nommer cette session `test-$ARGUMENTS` (via `/rename`) si besoin. *(Tu ne peux pas renommer toi-même — c'est un rappel.)*
 
 > **Branche dédiée** (cf. `docs/WORKFLOW.md` § Étiquette git) : `feat/$ARGUMENTS` — branche partagée avec `spec-` et `code-`, déjà existante car ces sessions t'ont précédée. `git checkout feat/$ARGUMENTS` pour la rejoindre (working tree clean obligatoire — commit/stash sinon). **Stage par chemin explicite uniquement** — jamais `git add -A` (multi-agents potentiels).
