@@ -688,6 +688,236 @@
   .footer-links a { color: var(--text-soft); text-decoration: none; transition: color 0.15s; }
   .footer-links a:hover { color: var(--text); }
 
+  /* ─── CONTEXT (founder + one repo) ─────── */
+  .context { padding: 80px 0 100px; }
+  .context-grid {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: 56px;
+    align-items: center;
+  }
+  @media (max-width: 980px) {
+    .context-grid { grid-template-columns: 1fr; gap: 40px; }
+    .context { padding: 60px 0 70px; }
+  }
+  .context h2 { margin-bottom: 20px; }
+  .context .lede { max-width: 480px; margin-bottom: 18px; }
+  .context .lede:last-child { margin-bottom: 0; }
+  .context .underline {
+    text-decoration: underline;
+    text-decoration-color: var(--accent);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 4px;
+  }
+
+  .repo-tree {
+    background: #0d1117;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    box-shadow: 0 30px 80px -25px rgba(0,0,0,0.6), 0 0 0 1px rgba(126,231,135,0.05);
+    overflow: hidden;
+    position: relative;
+  }
+  .repo-tree::before {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(ellipse at 60% 50%, rgba(121,192,255,0.12) 0%, transparent 60%);
+    filter: blur(40px);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .repo-tree-header {
+    background: linear-gradient(180deg, #181f28 0%, #141a22 100%);
+    padding: 11px 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .repo-tree-title {
+    flex: 1;
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    margin-right: 50px;
+  }
+  .repo-tree-body {
+    padding: 22px 24px 26px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    line-height: 1.85;
+    color: var(--text);
+    overflow-x: auto;
+  }
+  .repo-tree-body::-webkit-scrollbar { height: 8px; }
+  .repo-tree-body::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+  .tree-line {
+    display: block;
+    white-space: pre;
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  .context.in .tree-line {
+    animation: tree-in 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+  @keyframes tree-in {
+    from { opacity: 0; transform: translateX(-6px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+
+  .tree-branch { color: #4a5663; }
+  .tree-root   { color: var(--accent); font-weight: 600; }
+  .tree-folder { color: var(--blue); }
+  .tree-folder-build { color: var(--accent); }
+  .tree-folder-content { color: var(--purple); }
+  .tree-folder-claude { color: var(--yellow); }
+  .tree-file   { color: var(--text); }
+  .tree-cmt    { color: var(--text-muted); font-style: italic; }
+
+  .context-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 24px;
+  }
+  .ctx-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 11px;
+    border-radius: 999px;
+    border: 1px solid var(--border-strong);
+    background: var(--bg-elev);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-soft);
+  }
+  .ctx-tag::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+  .ctx-tag.blue::before { background: var(--blue); }
+  .ctx-tag.purple::before { background: var(--purple); }
+  .ctx-tag.yellow::before { background: var(--yellow); }
+
+  /* ─── DAY-IN-LIFE ──────────────────────── */
+  .day-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+  }
+  @media (max-width: 980px) { .day-grid { grid-template-columns: 1fr; } }
+  .scene {
+    padding: 28px 26px 26px;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    background: linear-gradient(180deg, var(--bg-elev) 0%, var(--bg) 100%);
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.2s, border-color 0.2s;
+  }
+  .scene:hover { transform: translateY(-4px); border-color: var(--border-strong); }
+  .scene-time {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .scene-time::before {
+    content: '';
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 12px var(--accent);
+  }
+  .scene.blue .scene-time::before { background: var(--blue); box-shadow: 0 0 12px var(--blue); }
+  .scene.purple .scene-time::before { background: var(--purple); box-shadow: 0 0 12px var(--purple); }
+  .scene h3 {
+    font-size: 17px;
+    font-weight: 700;
+    margin-bottom: 8px;
+    line-height: 1.3;
+  }
+  .scene p {
+    color: var(--text-soft);
+    font-size: 14px;
+    margin-bottom: 18px;
+    line-height: 1.55;
+  }
+  .scene-cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    padding: 10px 14px;
+    background: #0d1117;
+    border: 1px solid var(--border-strong);
+    border-radius: 8px;
+    color: var(--text-soft);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .scene-cmd .prompt { color: var(--accent); user-select: none; }
+  .scene.blue .scene-cmd .prompt { color: var(--blue); }
+  .scene.purple .scene-cmd .prompt { color: var(--purple); }
+  .scene-cmd .cmd { color: var(--text); font-weight: 500; }
+
+  /* ─── STAGGER (axes + skills) ──────────── */
+  .axe, .skill {
+    opacity: 0;
+    transform: translateY(14px);
+  }
+  .reveal.in .axe {
+    animation: card-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 100ms);
+  }
+  .reveal.in .skill {
+    animation: card-in 0.4s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    animation-delay: calc(var(--i, 0) * 40ms);
+  }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── PIPELINE arrows pulse ────────────── */
+  .arrow {
+    position: relative;
+    color: var(--text-muted);
+  }
+  .arrow::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    transform: translate(-50%, -50%);
+    opacity: 0;
+    animation: arrow-pulse 2.4s ease-in-out infinite;
+    z-index: -1;
+    filter: blur(10px);
+  }
+  .arrow:nth-child(4)::after { animation-delay: 1.2s; }
+  @keyframes arrow-pulse {
+    0%, 100% { opacity: 0; transform: translate(-50%, -50%) scale(0.6); }
+    50% { opacity: 0.55; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* ─── Hero stats count-up ──────────────── */
+  .hero-meta strong { transition: color 0.3s; }
+  .hero-meta strong.counting { color: var(--accent); }
+
   /* fade-in on scroll */
   .reveal {
     opacity: 0;
@@ -705,6 +935,7 @@
     <div class="nav-links">
       <a href="#axes">Axes</a>
       <a href="#pipeline">Pipeline</a>
+      <a href="#day">Journée</a>
       <a href="#skills">Skills</a>
       <a href="#install">Install</a>
       <a href="https://github.com/lgrante/ai-founder-workflow" class="nav-github" target="_blank" rel="noopener">
@@ -722,7 +953,7 @@
       <div class="badge"><span class="pulse"></span>Open source · MIT · Conçu pour Claude Code</div>
       <h1>Un workflow Claude Code pour <span class="grad">fondateurs qui font tout</span>.</h1>
       <p class="tagline">
-        Discover · Build · Broadcast. Sessions jetables, mémoire dans les fichiers, vérification automatisée. Déployable sur n'importe quel repo en deux commandes.
+        Ton code, ta veille marché, tes notes users, tes drafts LinkedIn, tes tickets support — <strong style="color:var(--text);font-weight:600;">tout dans un seul repo</strong>. Un workflow Claude Code pour piloter l'ensemble sans saturer le contexte. <span style="color:var(--text-muted);">Déployable en deux commandes.</span>
       </p>
       <div class="cta">
         <a href="https://github.com/lgrante/ai-founder-workflow" class="btn btn-primary" target="_blank" rel="noopener">
@@ -735,9 +966,9 @@
         </a>
       </div>
       <div class="hero-meta">
-        <span><strong>10</strong> skills</span>
-        <span><strong>3</strong> axes</span>
-        <span><strong>2</strong> commandes pour démarrer</span>
+        <span><strong data-count="10">0</strong> skills</span>
+        <span><strong data-count="3">0</strong> axes</span>
+        <span><strong data-count="2">0</strong> commandes pour démarrer</span>
       </div>
     </div>
 
@@ -755,6 +986,43 @@
     </div>
   </div>
 </header>
+
+<!-- ═══════════════ CONTEXT (founder + one repo) ═══════════════ -->
+<section class="context reveal">
+  <div class="container context-grid">
+    <div>
+      <div class="eyebrow">Le contexte</div>
+      <h2>Un repo. <span class="grad">Toute ta startup</span>.</h2>
+      <p class="lede">
+        Tu es <strong style="color:var(--text);font-weight:600;">founder solo</strong>. Tu codes, tu apprends, tu publies, tu supportes — souvent en même temps. Tout ce que tu produis vit dans <span class="underline">un seul repo privé</span> : ton app, ta veille concurrentielle, tes notes 1-à-1 avec des users, tes tickets clients, tes drafts LinkedIn.
+      </p>
+      <p class="lede">
+        Ce kit rend Claude Code <strong style="color:var(--text);font-weight:600;">intelligent sur l'ensemble</strong>. Sessions par sujet, mémoire dans des fichiers — Claude lit ce qu'il faut quand il faut, sans saturer la fenêtre de contexte.
+      </p>
+      <div class="context-tags">
+        <span class="ctx-tag blue">market research</span>
+        <span class="ctx-tag blue">user interviews</span>
+        <span class="ctx-tag blue">support tickets</span>
+        <span class="ctx-tag">specs + code</span>
+        <span class="ctx-tag purple">linkedin drafts</span>
+        <span class="ctx-tag purple">blog wip</span>
+        <span class="ctx-tag purple">newsletter</span>
+        <span class="ctx-tag yellow">.claude/ skills</span>
+      </div>
+    </div>
+
+    <div class="repo-tree">
+      <div class="repo-tree-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="repo-tree-title">~/my-startup &nbsp;·&nbsp; tree</span>
+      </div>
+      <div class="repo-tree-body" id="repo-tree">
+<span class="tree-line" style="--i:0"><span class="tree-root">my-startup/</span>                       <span class="tree-cmt"># un seul repo (privé)</span></span><span class="tree-line" style="--i:1"><span class="tree-branch">├──</span> <span class="tree-folder">code/</span>                       <span class="tree-cmt"># ton app — inchangé par le kit</span></span><span class="tree-line" style="--i:2"><span class="tree-branch">├──</span> <span class="tree-folder">knowledge/</span>                  <span class="tree-cmt"># ta veille business · ta discovery</span></span><span class="tree-line" style="--i:3"><span class="tree-branch">│   ├──</span> <span class="tree-folder">market/</span>                <span class="tree-cmt"># concurrents, tendances</span></span><span class="tree-line" style="--i:4"><span class="tree-branch">│   ├──</span> <span class="tree-folder">crm/contacts/</span>          <span class="tree-cmt"># users que tu rencontres</span></span><span class="tree-line" style="--i:5"><span class="tree-branch">│   ├──</span> <span class="tree-folder">support/clients/</span>       <span class="tree-cmt"># tickets · motifs cross-clients</span></span><span class="tree-line" style="--i:6"><span class="tree-branch">│   └──</span> <span class="tree-file">insights.md</span>            <span class="tree-cmt"># ce qui émerge des 3</span></span><span class="tree-line" style="--i:7"><span class="tree-branch">├──</span> <span class="tree-folder-build">features/</span>                   <span class="tree-cmt"># ton roadmap actif</span></span><span class="tree-line" style="--i:8"><span class="tree-branch">│   └──</span> <span class="tree-folder-build">checkout-flow/</span>         <span class="tree-cmt"># SPEC + PLAN + sub-features + qa</span></span><span class="tree-line" style="--i:9"><span class="tree-branch">├──</span> <span class="tree-folder-content">content/</span>                    <span class="tree-cmt"># ce que tu publies</span></span><span class="tree-line" style="--i:10"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">linkedin/drafts/</span>       <span class="tree-cmt"># drafts → scheduled → posted</span></span><span class="tree-line" style="--i:11"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">blog/wip/</span></span><span class="tree-line" style="--i:12"><span class="tree-branch">│   └──</span> <span class="tree-folder-content">newsletter/</span></span><span class="tree-line" style="--i:13"><span class="tree-branch">└──</span> <span class="tree-folder-claude">.claude/</span>                    <span class="tree-cmt"># Claude Code, intelligent sur tout ↑</span></span></div>
+    </div>
+  </div>
+</section>
 
 <!-- ═══════════════ PROBLEM ═══════════════ -->
 <section class="problem reveal">
@@ -776,7 +1044,7 @@
     </p>
 
     <div class="axe-grid">
-      <div class="axe axe-discover">
+      <div class="axe axe-discover" style="--i:0">
         <div class="axe-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="11" cy="11" r="7"/>
@@ -793,7 +1061,7 @@
         <div class="dest">→ <code>knowledge/</code></div>
       </div>
 
-      <div class="axe axe-build">
+      <div class="axe axe-build" style="--i:1">
         <div class="axe-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>
@@ -809,7 +1077,7 @@
         <div class="dest">→ <code>features/</code></div>
       </div>
 
-      <div class="axe axe-broadcast">
+      <div class="axe axe-broadcast" style="--i:2">
         <div class="axe-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M3 11l18-5v12L3 14v-3z"/>
@@ -861,6 +1129,40 @@
   </div>
 </section>
 
+<!-- ═══════════════ DAY-IN-LIFE ═══════════════ -->
+<section id="day" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Une journée type</div>
+    <h2>Trois moments. <span class="grad">Trois sessions.</span> Trois fichiers qui s'accumulent.</h2>
+    <p class="lede">
+      Le kit n'est pas un mode de travail à part — c'est juste la suite logique de ce que tu fais déjà. Chaque session laisse un artefact que la prochaine relit. Les sessions passent ; les fichiers restent.
+    </p>
+
+    <div class="day-grid">
+      <div class="scene">
+        <div class="scene-time">Lundi 09:24 · Build</div>
+        <h3>Tu reprends une feature en cours.</h3>
+        <p>Tu lis ton <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">SPEC.md</code> de vendredi, et tu enchaînes sur la prochaine étape. Le hook lance les tests rapides à chaque commit. Tu ne réexpliques rien à Claude.</p>
+        <div class="scene-cmd"><span class="prompt">&gt;</span><span class="cmd">/code checkout-flow</span></div>
+      </div>
+
+      <div class="scene blue">
+        <div class="scene-time">Mardi 14:10 · Discover</div>
+        <h3>Tu sors d'un appel avec un user.</h3>
+        <p>Tu notes ce qui ressort. Claude range dans <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">knowledge/crm/contacts/</code>, repère si un motif récurrent émerge, et propose de l'ajouter à <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">insights.md</code>.</p>
+        <div class="scene-cmd"><span class="prompt">&gt;</span><span class="cmd">/feedback laurent</span></div>
+      </div>
+
+      <div class="scene purple">
+        <div class="scene-time">Jeudi 18:30 · Broadcast</div>
+        <h3>Tu publies un post LinkedIn.</h3>
+        <p>Tu pars d'un insight users récent. Le brand book applique ta voix. Le draft va dans <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">content/linkedin/drafts/</code> ; après ta review, il bascule en <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">posted/</code>.</p>
+        <div class="scene-cmd"><span class="prompt">&gt;</span><span class="cmd">/post linkedin churn-paradox</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════ SKILLS ═══════════════ -->
 <section id="skills" class="reveal">
   <div class="container">
@@ -871,16 +1173,16 @@
     </p>
 
     <div class="skill-grid">
-      <div class="skill"><div><div class="cmd">/setup</div><div class="tag">SETUP</div></div><div class="desc">Déploie le workflow sur le repo, en interactif. Une seule fois.</div></div>
-      <div class="skill"><div><div class="cmd">/spec &lt;feature&gt;</div><div class="tag">BUILD · 01</div></div><div class="desc">Écrit le spec — critères d'acceptation et jalons. Pas de code.</div></div>
-      <div class="skill"><div><div class="cmd">/code &lt;feature&gt;</div><div class="tag">BUILD · 02</div></div><div class="desc">Plan détaillé puis implémentation étape par étape, avec filet rapide.</div></div>
-      <div class="skill"><div><div class="cmd">/test &lt;feature&gt;</div><div class="tag">BUILD · 03</div></div><div class="desc">Session fraîche : e2e depuis le spec + revue à œil neuf.</div></div>
-      <div class="skill"><div><div class="cmd">/research &lt;sujet&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Recherche marché : concurrents, tendances, paysage.</div></div>
-      <div class="skill"><div><div class="cmd">/feedback &lt;qui&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Échange 1-à-1 avec un utilisateur. Notes structurées.</div></div>
-      <div class="skill"><div><div class="cmd">/support &lt;client&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Sift de tickets — Jira via MCP Atlassian Rovo, ou API token.</div></div>
-      <div class="skill"><div><div class="cmd">/post &lt;channel&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Post court. Invoque ton skill de copywriting si dispo.</div></div>
-      <div class="skill"><div><div class="cmd">/article &lt;sujet&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Long form : plan validé → wip → section par section.</div></div>
-      <div class="skill"><div><div class="cmd">/newsletter</div><div class="tag">AUDIENCE</div></div><div class="desc">Édition assemblée depuis le reste. Brand book partagé.</div></div>
+      <div class="skill" style="--i:0"><div><div class="cmd">/setup</div><div class="tag">SETUP</div></div><div class="desc">Déploie le workflow sur le repo, en interactif. Une seule fois.</div></div>
+      <div class="skill" style="--i:1"><div><div class="cmd">/spec &lt;feature&gt;</div><div class="tag">BUILD · 01</div></div><div class="desc">Écrit le spec — critères d'acceptation et jalons. Pas de code.</div></div>
+      <div class="skill" style="--i:2"><div><div class="cmd">/code &lt;feature&gt;</div><div class="tag">BUILD · 02</div></div><div class="desc">Plan détaillé puis implémentation étape par étape, avec filet rapide.</div></div>
+      <div class="skill" style="--i:3"><div><div class="cmd">/test &lt;feature&gt;</div><div class="tag">BUILD · 03</div></div><div class="desc">Session fraîche : e2e depuis le spec + revue à œil neuf.</div></div>
+      <div class="skill" style="--i:4"><div><div class="cmd">/research &lt;sujet&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Recherche marché : concurrents, tendances, paysage.</div></div>
+      <div class="skill" style="--i:5"><div><div class="cmd">/feedback &lt;qui&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Échange 1-à-1 avec un utilisateur. Notes structurées.</div></div>
+      <div class="skill" style="--i:6"><div><div class="cmd">/support &lt;client&gt;</div><div class="tag">DISCOVER</div></div><div class="desc">Sift de tickets — Jira via MCP Atlassian Rovo, ou API token.</div></div>
+      <div class="skill" style="--i:7"><div><div class="cmd">/post &lt;channel&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Post court. Invoque ton skill de copywriting si dispo.</div></div>
+      <div class="skill" style="--i:8"><div><div class="cmd">/article &lt;sujet&gt;</div><div class="tag">AUDIENCE</div></div><div class="desc">Long form : plan validé → wip → section par section.</div></div>
+      <div class="skill" style="--i:9"><div><div class="cmd">/newsletter</div><div class="tag">AUDIENCE</div></div><div class="desc">Édition assemblée depuis le reste. Brand book partagé.</div></div>
     </div>
   </div>
 </section>
@@ -1139,6 +1441,29 @@
     });
   }, { threshold: 0.12 });
   document.querySelectorAll('.reveal').forEach(el => revealIo.observe(el));
+
+  // ─── Hero stats count-up ─────────────────────────────
+  function countUp(el, target, duration = 900) {
+    const start = performance.now();
+    const from = 0;
+    el.classList.add('counting');
+    function frame(now) {
+      const t = Math.min(1, (now - start) / duration);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - t, 3);
+      el.textContent = Math.round(from + (target - from) * eased);
+      if (t < 1) requestAnimationFrame(frame);
+      else { el.textContent = target; el.classList.remove('counting'); }
+    }
+    requestAnimationFrame(frame);
+  }
+  // run count-up after small delay (let hero render first)
+  setTimeout(() => {
+    document.querySelectorAll('.hero-meta strong[data-count]').forEach((el, i) => {
+      const target = parseInt(el.getAttribute('data-count'), 10);
+      setTimeout(() => countUp(el, target, 850 + i * 50), i * 180);
+    });
+  }, 400);
 
   // ─── Copy install command ────────────────────────────
   const copyBtn = document.getElementById('copy-btn');
