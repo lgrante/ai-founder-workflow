@@ -17,6 +17,7 @@ Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat 
 |---|---|---|---|
 | `market-research-…` | Découverte | marché, concurrents, tendances | `knowledge/market/` |
 | `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
+| `support-<client>` | Découverte | sift des tickets support (Jira / Zendesk / …) | `knowledge/support/clients/<client>.md` + `knowledge/support/insights.md` |
 | `spec-<feature>` | Build | le quoi : spec + critères + jalons | `features/<feature>/SPEC.md` |
 | `code-<feature>` | Build | le comment : plan + code + filet rapide | `features/<feature>/PLAN.md` + code commité |
 | `test-<feature>` | Build | e2e depuis le spec + revue, au jalon | suite e2e commitée |

@@ -13,7 +13,13 @@ Tu décides le **quoi**, jamais le **comment**. La sortie est un artefact durabl
    - **Si `features/$ARGUMENTS/` n'existe pas** : scaffold la structure standard. Crée le dossier + `README.md` court (statut + liens) + `SPEC.md` (à remplir) + `SPEC.html` placeholder + les sous-dossiers vides `sub-features/ prototypes/ qa/ plans/ archives/`. C'est le contrat de structure que TOUTES les features du repo partagent.
    - **Si `features/$ARGUMENTS/SPEC.md` existe DÉJÀ** : lis-le d'abord. Demande à l'utilisateur si c'est une **itération sur la version active** (édition in-place) ou une **refonte majeure** (alors propose d'archiver la racine actuelle dans `features/$ARGUMENTS/archives/v{N}/` avant d'écrire la nouvelle SPEC à la racine). Ne tranche pas seul.
    - **Sub-feature** (composant atomique d'une feature existante) : range-la dans `features/<parent>/sub-features/$ARGUMENTS/` avec la même structure récursive (SPEC, PLAN, archives…).
-4. Si pertinents, lis `knowledge/insights.md` et `knowledge/market/` — la découverte alimente le spec. Cite la source d'une demande quand elle vient d'un retour utilisateur. Lis aussi les `archives/v{N}/SPEC.md` éventuels pour avoir l'historique de la feature (utile pour ne pas réinventer ou contredire silencieusement).
+4. Si pertinents, lis les sources de découverte qui alimentent le spec :
+   - `knowledge/insights.md` (agrégat global des 3 axes discovery) et `knowledge/market/` (recherche marché)
+   - `knowledge/support/insights.md` (motifs cross-clients depuis les tickets) — souvent les signaux les plus directs sur ce qui manque ou casse
+   - `knowledge/support/clients/<client>.md` si la feature concerne un client spécifique nommé
+   - Les `archives/v{N}/SPEC.md` éventuels pour avoir l'historique de la feature (utile pour ne pas réinventer ou contredire silencieusement).
+
+   Cite la source d'une demande quand elle vient d'un retour utilisateur, d'un ticket support, ou d'une étude marché.
 5. Produis / mets à jour `features/$ARGUMENTS/SPEC.md` avec :
    - une **description** courte : le problème, l'utilisateur visé, ce qui est explicitement **hors périmètre** ;
    - les **critères d'acceptation** = la définition de « fini ». Dérive-les AVANT le code. Chacun doit être **observable et vérifiable** sans connaître l'implémentation (formule-les en Étant donné / Quand / Alors). Numérote-les (C1, C2…) : `code-` rattachera ses étapes à ces numéros, `test-` en dérivera les e2e.

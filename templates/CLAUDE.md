@@ -25,7 +25,8 @@ Ce repo suit le workflow décrit dans `docs/WORKFLOW.md` :
 sessions par feature (build) + découverte + audience, pipeline `spec → code → test` côté build, filet rapide via hook.
 
 Commandes :
-- **Setup / dev** : `/setup` `/spec` `/code` `/test` `/research` `/feedback`
+- **Setup / dev** : `/setup` `/spec` `/code` `/test`
+- **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>`
 
 ## À la compaction
