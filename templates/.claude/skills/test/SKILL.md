@@ -11,10 +11,11 @@ Tu es le **critique qui juge l'assiette face au menu**, pas le cuisinier. Ta val
 2. **IMPORTANT — étanchéité** : commence par lire `features/$ARGUMENTS/SPEC.md` (critères C1, C2… + jalons) et dérive tes tests **du spec**. Ne lis le code applicatif **qu'après** avoir cadré ce que les critères exigent — et seulement pour câbler les tests (sélecteurs, points d'entrée, fixtures), jamais pour décider *quoi* vérifier. Si tu te surprends à tester « ce que le code fait », reviens au critère.
 3. Écris / maintiens la **suite e2e (+ acceptation)** qui vérifie, du point de vue utilisateur, que la feature tient les promesses du spec. Couvre chaque critère du jalon courant, y compris les **chemins d'échec** et **cas limites** nommés dans le spec (paiement refusé, entrée invalide, état vide…).
 4. Fais une **revue à œil neuf** du code par rapport au spec : écarts (critère non tenu), cas limites manqués, dette, incohérences avec les conventions du repo. Restitue une **liste d'écarts** priorisée — c'est un relais éphémère (utilise un subagent pour fouiller si besoin), pas un nouvel artefact de statut.
-5. Les tests e2e sont des artefacts **commités** (rejoués ensuite par la CI / le hook). Range les résultats transitoires dans `.cc-scratch/`, pas dans le suivi de feature.
+5. **Bug net trouvé ?** (reproductible, contre un critère du spec, à fixer après le jalon courant) → dépose un ticket dans `bugs/<slug>/TICKET.md` (slug = problème, pas la feature ; ex. `checkout-safari-cancel-crash`). Format : repro + comportement attendu + critère « ne se reproduit plus + test de régression ». Ce ticket est l'entrée d'une future session `/code bugs/<slug>`. Les écarts plus diffus restent dans ta liste éphémère du point 4. (Cf. `docs/WORKFLOW.md` § Convention par-bug pour le format complet.)
+6. Les tests e2e sont des artefacts **commités** (rejoués ensuite par la CI / le hook). Range les résultats transitoires dans `.cc-scratch/`, pas dans le suivi de feature.
 
 Cas limites :
-- **L'e2e révèle un bug** : tu ne corriges pas le code ici (tu n'es pas la session de build). Tu écris le test qui échoue + consignes l'écart ; la correction revient à `code-$ARGUMENTS`.
+- **L'e2e révèle un bug net** : tu ne corriges pas le code ici (tu n'es pas la session de build). Tu écris le test qui échoue + tu déposes un `bugs/<slug>/TICKET.md` ; la correction revient à `/code bugs/<slug>` (ou à `/code $ARGUMENTS` si le bug bloque le jalon courant — l'utilisateur tranche).
 - **Le spec est ambigu sur un comportement** : ne tranche pas seul — remonte la question à l'utilisateur ; un test inventé deviendrait une fausse vérité.
 - **Critère marqué « revue humaine »** dans le spec : ne le force pas en assertion automatique ; signale-le pour le gate.
 

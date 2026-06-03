@@ -22,10 +22,10 @@
 
 ## Workflow
 Ce repo suit le workflow décrit dans `docs/WORKFLOW.md` :
-sessions par feature (build) + découverte + audience, pipeline `spec → code → test` côté build, filet rapide via hook.
+sessions par feature (build) + découverte + audience, pipeline `spec → code → test` côté build, tickets de bug dans `bugs/<slug>/TICKET.md` (écrits par `/test` ou `/support`, lus par `/code`), filet rapide via hook.
 
 Commandes :
-- **Setup / dev** : `/setup` `/spec` `/code` `/test`
+- **Setup / dev** : `/setup` `/spec` `/code <feature>` (ou `/code bugs/<slug>` pour fixer un ticket) `/test`
 - **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>`
 

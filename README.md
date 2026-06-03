@@ -99,6 +99,16 @@ Plus simple que le build — pas de tests automatisés, le gate est uniquement h
 - **`article-<sujet>`** : plan (validé) → wip → review section par section → `published/`.
 - **`newsletter-<edition>`** : structure (validée) → assemblage → review → posted.
 
+### Tickets de bug (annexe au build, pas un 4e axe)
+
+Un bug est une **mini-spec à 1-2 critères** (« ne se reproduit plus » + « test de régression couvre »). Pas de session dédiée — `/code` accepte un slug de bug exactement comme un slug de feature.
+
+- **`/test`** ou **`/support`** (ou n'importe quelle session qui en trouve un) dépose un `bugs/<slug>/TICKET.md` : repro + comportement attendu + critère d'acceptation.
+- **`/code bugs/<slug>`** réutilise tout le pipeline de build (plan mode → étapes → filet rapide via hook → jalon humain → commit).
+- Pas de skill `/bug` ni `/fixer` — un ticket = une mini-spec, donc le pipeline existant suffit.
+
+**Différence avec un *pain point*** : un bug = problème ponctuel reproductible → `bugs/`. Un motif récurrent → `knowledge/support/insights.md` pour agrégation cross-clients, émerge en feature plus tard via `/spec`. Un même ticket Jira peut produire **les deux**. Cf. `templates/docs/WORKFLOW.md` § Convention par-bug pour le format complet.
+
 ### Session vs subagent
 
 - **Session séparée** quand le relais est un **artefact durable** (spec, code commité, tests, draft de contenu, résumé support).
@@ -184,6 +194,10 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │       ├── qa/sprint-{N}-{slug}/ # captures par sprint
 │       ├── plans/                # roadmap, plans de release
 │       └── archives/v{N}/        # versions périmées (refonte majeure → racine actuelle bascule ici)
+├── bugs/                     # tickets de bug (annexe au build)
+│   └── <slug>/
+│       ├── TICKET.md         # mini-spec : repro + comportement attendu + critère "ne se reproduit plus"
+│       └── PLAN.md           # plan de fix (optionnel — écrit par /code si non trivial)
 ├── content/                  # axe AUDIENCE (continu, output pour les réseaux)
 │   ├── linkedin/{drafts,scheduled,posted}/    # posts courts par channel
 │   ├── twitter-x/{drafts,posted}/             # idem (scheduled optionnel selon outil)
@@ -203,6 +217,7 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 - **Drafts/scheduled/posted séparés côté audience** : un draft se relit, un post publié n'a plus à être modifié. Les channels sont des sous-dossiers de `content/`, eux-mêmes avec une structure standard.
 - **Brand book partagé** : `knowledge/content/brand-book.md` est la source de tonalité, lue par tous les skills audience pour la cohérence.
 - **Support cumulatif** : `knowledge/support/clients/<client>.md` est **append-only** (sections datées par session). L'historique des motifs est lisible directement dans le fichier.
+- **Tickets de bug isolés** : `bugs/<slug>/TICKET.md` est une mini-spec à 1-2 critères, écrite par `/test` ou `/support`, lue par `/code bugs/<slug>`. Pas un 4e axe — c'est un dossier d'artefacts qui réutilise le pipeline de build.
 - Commandes + savoir de domaine dans `.claude/skills/` (chargés à la demande), pas dans un `CLAUDE.md` obèse.
 - Le **statut** d'avancement à **un seul endroit** (les cases du PLAN pour le build, le sous-dossier `drafts/`/`published/` pour le contenu) ; les résultats de tests sont du **scratch** gitignored.
 - Le `CLAUDE.md` reste **court** : pour chaque ligne, « la retirer ferait-elle faire une erreur à Claude ? » Sinon, on la coupe.

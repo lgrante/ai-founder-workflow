@@ -65,6 +65,7 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 - **Découverte** — sessions continues, jamais par feature, qui alimentent les futurs specs : `market-research-` (extérieur/marché) et `user-feedback-` (intérieur/personnes), deux types distincts.
 - **Gate humain** — la décision de valider une tranche au jalon. Reste humaine ; l'automatisation porte sur la régression, pas sur le jugement.
 - **Disjoncteur** — après 2-3 rouges persistants sur une étape, on arrête : le spec ou l'approche est en cause.
+- **Ticket de bug** — `bugs/<slug>/TICKET.md`, mini-spec à 1-2 critères, déposé par `/test` ou `/support` quand un bug net est trouvé. Lu par `/code <slug>` comme une SPEC. Distinct du *pain point* qui, lui, reste agrégé dans `knowledge/support/insights.md`.
 
 ## Exemple de cycle de bout en bout
 Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit `examples/checkout-flow/`).
@@ -101,6 +102,53 @@ features/<slug>/
 - **`/spec <feature>` scaffold la structure** quand le dossier n'existe pas. Et propose l'archivage quand `SPEC.md` existe déjà et qu'on annonce une refonte majeure.
 
 **Pourquoi cette uniformité** : un dossier prévisible = un LLM qui retrouve l'historique sans chercher. Et un onboarding humain à 0 effort.
+
+## Convention par-bug (tickets éphémères)
+
+**Principe** : un bug n'est pas une feature, mais il a le même cycle qu'une mini-spec (description → fix → vérif). On l'isole donc dans son propre dossier, à plat sous `bugs/`. Pas de skill dédié — `/code` accepte un slug de bug exactement comme un slug de feature.
+
+```
+bugs/<slug>/
+├── TICKET.md     # le quoi : repro + comportement attendu + critère "ne se reproduit plus"
+└── PLAN.md       # le comment, optionnel (écrit par /code si le fix n'est pas trivial)
+```
+
+**Qui écrit, qui lit** :
+- `/test` dépose un ticket quand l'e2e révèle un bug net (reproductible, contre un critère du spec).
+- `/support` dépose un ticket quand un sift Jira/Zendesk remonte un bug net (≠ pain point récurrent qui, lui, va dans `knowledge/support/insights.md` pour agrégation).
+- N'importe quelle session peut aussi en déposer un à la volée (« ouvre un ticket pour X » → écrit le fichier).
+- `/code bugs/<slug>` (ou `/code <slug>` si pas d'ambiguïté avec une feature) lit le ticket comme une SPEC, planifie, fixe, ajoute un test de régression.
+
+**Format TICKET.md** (minimal — verrouille la repro et le critère « ne se reproduit plus ») :
+
+```markdown
+# Bug : <titre court>
+
+> **Statut** : open
+> **Détecté** : 2026-06-03 par `test-checkout-flow`
+> **Origine** : feature `checkout-flow` · client `acme-corp` · autre
+
+## Reproduire
+1. ...
+2. ...
+3. → <observation>
+
+## Comportement attendu
+<ce qui devrait se passer>
+
+## Critère d'acceptation
+- C1 : le scénario ci-dessus ne reproduit plus l'erreur
+- C2 : un test de régression couvre ce cas
+
+## Notes
+<contexte, hypothèse, lien vers la session/ticket d'origine>
+```
+
+**Pourquoi pas un skill `/bug` ou `/fixer`** : un bug = une mini-spec à 1-2 critères, donc `/code` réutilise tout le pipeline (plan mode, étapes, filet rapide, hook, jalon). Ajouter un skill = +1 surface pour 0 comportement distinct.
+
+**Différence pain point vs bug** :
+- *Pain point* (motif support récurrent) → `knowledge/support/insights.md`, émerge en feature plus tard via `/spec`.
+- *Bug net* (problème ponctuel, reproductible, gravité claire) → `bugs/<slug>/TICKET.md`, fixé via `/code` directement.
 
 ## Optionnel : hooks de contexte & statusline
 Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.

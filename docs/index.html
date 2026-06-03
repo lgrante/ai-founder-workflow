@@ -773,6 +773,7 @@
   .tree-root   { color: var(--accent); font-weight: 600; }
   .tree-folder { color: var(--blue); }
   .tree-folder-build { color: var(--accent); }
+  .tree-folder-bug { color: var(--pink); }
   .tree-folder-content { color: var(--purple); }
   .tree-folder-claude { color: var(--yellow); }
   .tree-file   { color: var(--text); }
@@ -1127,10 +1128,11 @@
   /* ─── DAY-IN-LIFE ──────────────────────── */
   .day-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
     gap: 18px;
   }
-  @media (max-width: 980px) { .day-grid { grid-template-columns: 1fr; } }
+  @media (max-width: 1100px) { .day-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .day-grid { grid-template-columns: 1fr; } }
   .scene {
     padding: 28px 26px 26px;
     border: 1px solid var(--border);
@@ -1161,6 +1163,7 @@
   }
   .scene.blue .scene-time::before { background: var(--blue); box-shadow: 0 0 12px var(--blue); }
   .scene.purple .scene-time::before { background: var(--purple); box-shadow: 0 0 12px var(--purple); }
+  .scene.bug .scene-time::before { background: var(--pink); box-shadow: 0 0 12px var(--pink); }
   .scene h3 {
     font-size: 17px;
     font-weight: 700;
@@ -1188,6 +1191,7 @@
   .scene-cmd .prompt { color: var(--accent); user-select: none; }
   .scene.blue .scene-cmd .prompt { color: var(--blue); }
   .scene.purple .scene-cmd .prompt { color: var(--purple); }
+  .scene.bug .scene-cmd .prompt { color: var(--pink); }
   .scene-cmd .cmd { color: var(--text); font-weight: 500; }
 
   /* ─── STAGGER (axes + skills) ──────────── */
@@ -1337,7 +1341,7 @@
         <span class="repo-tree-title">~/my-startup &nbsp;·&nbsp; tree</span>
       </div>
       <div class="repo-tree-body" id="repo-tree">
-<span class="tree-line" style="--i:0"><span class="tree-root">my-startup/</span>                       <span class="tree-cmt"># un seul repo (privé)</span></span><span class="tree-line" style="--i:1"><span class="tree-branch">├──</span> <span class="tree-folder">code/</span>                       <span class="tree-cmt"># ton app — inchangé par le kit</span></span><span class="tree-line" style="--i:2"><span class="tree-branch">├──</span> <span class="tree-folder">knowledge/</span>                  <span class="tree-cmt"># ta veille business · ta discovery</span></span><span class="tree-line" style="--i:3"><span class="tree-branch">│   ├──</span> <span class="tree-folder">market/</span>                <span class="tree-cmt"># concurrents, tendances</span></span><span class="tree-line" style="--i:4"><span class="tree-branch">│   ├──</span> <span class="tree-folder">crm/contacts/</span>          <span class="tree-cmt"># users que tu rencontres</span></span><span class="tree-line" style="--i:5"><span class="tree-branch">│   ├──</span> <span class="tree-folder">support/clients/</span>       <span class="tree-cmt"># tickets · motifs cross-clients</span></span><span class="tree-line" style="--i:6"><span class="tree-branch">│   └──</span> <span class="tree-file">insights.md</span>            <span class="tree-cmt"># ce qui émerge des 3</span></span><span class="tree-line" style="--i:7"><span class="tree-branch">├──</span> <span class="tree-folder-build">features/</span>                   <span class="tree-cmt"># ton roadmap actif</span></span><span class="tree-line" style="--i:8"><span class="tree-branch">│   └──</span> <span class="tree-folder-build">checkout-flow/</span>         <span class="tree-cmt"># SPEC + PLAN + sub-features + qa</span></span><span class="tree-line" style="--i:9"><span class="tree-branch">├──</span> <span class="tree-folder-content">content/</span>                    <span class="tree-cmt"># ce que tu publies</span></span><span class="tree-line" style="--i:10"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">linkedin/drafts/</span>       <span class="tree-cmt"># drafts → scheduled → posted</span></span><span class="tree-line" style="--i:11"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">blog/wip/</span></span><span class="tree-line" style="--i:12"><span class="tree-branch">│   └──</span> <span class="tree-folder-content">newsletter/</span></span><span class="tree-line" style="--i:13"><span class="tree-branch">└──</span> <span class="tree-folder-claude">.claude/</span>                    <span class="tree-cmt"># Claude Code, intelligent sur tout ↑</span></span></div>
+<span class="tree-line" style="--i:0"><span class="tree-root">my-startup/</span>                       <span class="tree-cmt"># un seul repo (privé)</span></span><span class="tree-line" style="--i:1"><span class="tree-branch">├──</span> <span class="tree-folder">code/</span>                       <span class="tree-cmt"># ton app — inchangé par le kit</span></span><span class="tree-line" style="--i:2"><span class="tree-branch">├──</span> <span class="tree-folder">knowledge/</span>                  <span class="tree-cmt"># ta veille business · ta discovery</span></span><span class="tree-line" style="--i:3"><span class="tree-branch">│   ├──</span> <span class="tree-folder">market/</span>                <span class="tree-cmt"># concurrents, tendances</span></span><span class="tree-line" style="--i:4"><span class="tree-branch">│   ├──</span> <span class="tree-folder">crm/contacts/</span>          <span class="tree-cmt"># users que tu rencontres</span></span><span class="tree-line" style="--i:5"><span class="tree-branch">│   ├──</span> <span class="tree-folder">support/clients/</span>       <span class="tree-cmt"># tickets · motifs cross-clients</span></span><span class="tree-line" style="--i:6"><span class="tree-branch">│   └──</span> <span class="tree-file">insights.md</span>            <span class="tree-cmt"># ce qui émerge des 3</span></span><span class="tree-line" style="--i:7"><span class="tree-branch">├──</span> <span class="tree-folder-build">features/</span>                   <span class="tree-cmt"># ton roadmap actif</span></span><span class="tree-line" style="--i:8"><span class="tree-branch">│   └──</span> <span class="tree-folder-build">checkout-flow/</span>         <span class="tree-cmt"># SPEC + PLAN + sub-features + qa</span></span><span class="tree-line" style="--i:9"><span class="tree-branch">├──</span> <span class="tree-folder-bug">bugs/</span>                       <span class="tree-cmt"># tickets — écrits par /test ou /support</span></span><span class="tree-line" style="--i:10"><span class="tree-branch">│   └──</span> <span class="tree-folder-bug">safari-cancel-crash/</span>   <span class="tree-cmt"># TICKET.md → /code le fixe</span></span><span class="tree-line" style="--i:11"><span class="tree-branch">├──</span> <span class="tree-folder-content">content/</span>                    <span class="tree-cmt"># ce que tu publies</span></span><span class="tree-line" style="--i:12"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">linkedin/drafts/</span>       <span class="tree-cmt"># drafts → scheduled → posted</span></span><span class="tree-line" style="--i:13"><span class="tree-branch">│   ├──</span> <span class="tree-folder-content">blog/wip/</span></span><span class="tree-line" style="--i:14"><span class="tree-branch">│   └──</span> <span class="tree-folder-content">newsletter/</span></span><span class="tree-line" style="--i:15"><span class="tree-branch">└──</span> <span class="tree-folder-claude">.claude/</span>                    <span class="tree-cmt"># Claude Code, intelligent sur tout ↑</span></span></div>
     </div>
   </div>
 </section>
@@ -1386,13 +1390,13 @@
           </svg>
         </div>
         <h3>Build</h3>
-        <p class="desc">Spec → Code → Test. Par feature, en pipeline, avec gate humain au jalon.</p>
+        <p class="desc">Spec → Code → Test. Par feature, en pipeline, avec gate humain au jalon. Les bugs trouvés en chemin deviennent des tickets dans <code>bugs/</code>, lus par <code>/code</code> comme des mini-specs.</p>
         <ul>
           <li><code>/spec</code>le quoi + critères</li>
           <li><code>/code</code>le comment, étape par étape</li>
           <li><code>/test</code>e2e à œil neuf</li>
         </ul>
-        <div class="dest">→ <code>features/</code></div>
+        <div class="dest">→ <code>features/</code> · <code>bugs/</code></div>
       </div>
 
       <div class="axe axe-broadcast" style="--i:2">
@@ -1560,6 +1564,10 @@
     <p class="gate" style="margin-top: 32px;">
       <strong>Le secret du découpage</strong> : <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/test</code> n'a pas écrit le code. Il lit <strong style="color:var(--text);">le même SPEC</strong> que <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/code</code> a lu — donc ses tests s'ancrent sur l'intention, pas sur le code écrit. C'est ce qui empêche les tests de ratifier les bugs.
     </p>
+
+    <p class="gate" style="display: block; margin-top: 18px; border-color: rgba(255,123,114,0.4); background: linear-gradient(90deg, rgba(255,123,114,0.06), var(--bg-elev));">
+      <strong style="color:var(--pink);">Et les bugs trouvés en chemin ?</strong> Quand <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/test</code> ou <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/support</code> tombe sur un bug net, il dépose <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">bugs/&lt;slug&gt;/TICKET.md</code> — repro + critère « ne se reproduit plus ». La même session <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/code bugs/&lt;slug&gt;</code> le lit comme une mini-SPEC et réutilise tout le pipeline (plan → étapes → hook → commit). Pas un 4<sup>e</sup> axe, juste un dossier d'artefacts.
+    </p>
   </div>
 </section>
 
@@ -1567,7 +1575,7 @@
 <section id="day" class="reveal">
   <div class="container">
     <div class="eyebrow">Une journée type</div>
-    <h2>Trois moments. <span class="grad">Trois sessions.</span> Trois fichiers qui s'accumulent.</h2>
+    <h2>Quatre moments. <span class="grad">Quatre sessions.</span> Des fichiers qui s'accumulent.</h2>
     <p class="lede">
       Le kit n'est pas un mode de travail à part — c'est juste la suite logique de ce que tu fais déjà. Chaque session laisse un artefact que la prochaine relit. Les sessions passent ; les fichiers restent.
     </p>
@@ -1585,6 +1593,13 @@
         <h3>Tu sors d'un appel avec un user.</h3>
         <p>Tu notes ce qui ressort. Claude range dans <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">knowledge/crm/contacts/</code>, repère si un motif récurrent émerge, et propose de l'ajouter à <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">insights.md</code>.</p>
         <div class="scene-cmd"><span class="prompt">&gt;</span><span class="cmd">/feedback laurent</span></div>
+      </div>
+
+      <div class="scene bug">
+        <div class="scene-time">Mercredi 11:00 · Fix</div>
+        <h3>Un bug est tombé hier soir.</h3>
+        <p>Le ticket est déjà dans <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">bugs/safari-cancel-crash/TICKET.md</code> — déposé par <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">/test</code> à la fin du sprint. <code style="background:var(--bg-soft);padding:2px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">/code</code> le lit comme une mini-SPEC, fixe, écrit le test de régression, ferme.</p>
+        <div class="scene-cmd"><span class="prompt">&gt;</span><span class="cmd">/code bugs/safari-cancel-crash</span></div>
       </div>
 
       <div class="scene purple">

@@ -111,6 +111,9 @@ Aucun fichier perdu (les déplacements via `git mv` sont récupérables via le r
 │   ├── qa/sprint-{N}-{slug}/ # captures par sprint
 │   ├── plans/                # roadmap
 │   └── archives/v{N}/        # versions périmées
+├── bugs/<slug>/              # tickets de bug — écrits par /test ou /support, lus par /code
+│   ├── TICKET.md             # repro + comportement attendu + critère "ne se reproduit plus"
+│   └── PLAN.md               # plan de fix (optionnel, écrit par /code si non trivial)
 ├── content/                  # axe AUDIENCE (continu, output pour les réseaux)
 │   ├── linkedin/{drafts,scheduled,posted}/
 │   ├── twitter-x/{drafts,posted}/
@@ -167,7 +170,7 @@ Détail complet : `templates/docs/WORKFLOW.md` du kit (Convention par-feature + 
 
    - **Attends la validation complète (plan + carte + questions + artefacts retrouvés) AVANT toute action.**
 
-3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `content/<channels>/{drafts,posted,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
+3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `bugs/`, `content/<channels>/{drafts,posted,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
 
 4. **Phase 2 — Doctrine** : crée `CLAUDE.md` (court, rempli avec specs du repo, **infusé des décisions tirées des memory files**), copie `docs/WORKFLOW.md` depuis `templates/docs/WORKFLOW.md` du kit, crée READMEs racine + `knowledge/` + `features/` + `content/`, crée `knowledge/insights.md` squelette, crée `knowledge/content/brand-book.md` placeholder si absent, crée `knowledge/support/insights.md` squelette. **Commit Phase 2.**
 

@@ -39,11 +39,11 @@ Format attendu : `/support <client-slug>` (par client) ou `/support <sujet>` (an
    - **Append daté** : chaque session ajoute une section `## <YYYY-MM-DD> (N nouveaux tickets depuis <date>)`. Jamais d'écrasement de l'historique. Si une section pour aujourd'hui existe déjà, demande à l'utilisateur (fusion ou écrasement explicite).
    - Sections par session : `Pain points`, `Verbatims marquants` (anonymisés — IDs Jira plutôt que noms), `Statistiques`, `Status des thèmes ouverts`.
 
-6. **Détecte les motifs forts** (fréquence ≥ 3 tickets sur le thème, ou criticité haute, ou récurrents sur 3+ sessions) → propose à l'utilisateur de :
-   - Ajouter / renforcer dans `knowledge/support/insights.md` (agrégat support cross-clients).
-   - Et si le motif est transverse aux 3 axes discovery, propose aussi `knowledge/insights.md` (agrégat global).
+6. **Détecte (a) motifs forts et (b) bugs nets** — deux sorties distinctes :
+   - **Motif fort** (fréquence ≥ 3 tickets, criticité haute, récurrent 3+ sessions) → propose à l'utilisateur d'ajouter / renforcer dans `knowledge/support/insights.md` (agrégat support cross-clients). Si transverse aux 3 axes discovery, propose aussi `knowledge/insights.md` (agrégat global).
+   - **Bug net** (un ticket individuel = problème reproductible, gravité claire, fixable directement — distinct d'un motif diffus) → propose à l'utilisateur d'ouvrir un ticket dans `bugs/<slug>/TICKET.md` (slug = description du problème, ex. `acme-export-pdf-utf8`). Format : repro + comportement attendu + critère « ne se reproduit plus + test de régression » (cf. `docs/WORKFLOW.md` § Convention par-bug). Ce ticket est l'entrée d'une future `/code bugs/<slug>`. Un même ticket Jira peut produire **les deux** (un motif agrégé + un bug à fixer maintenant) — ce n'est pas un OU exclusif.
 
-7. **Stop** : ta session est finie. Pas de plan d'action, pas de spec. Les idées de features émergent de l'agrégat **sur plusieurs sessions** (la doctrine : un échange ≠ une preuve, c'est l'agrégat qui fait foi).
+7. **Stop** : ta session est finie. Pas de plan d'action, pas de spec. Les idées de features émergent de l'agrégat **sur plusieurs sessions** (la doctrine : un échange ≠ une preuve, c'est l'agrégat qui fait foi). Les bugs ouverts en 6.b vivent leur vie dans `bugs/` jusqu'à ce que `/code` les ferme.
 
 ## Cas limites
 
@@ -101,6 +101,7 @@ Sortie = `knowledge/support/clients/<client>.md` (mis à jour cumulativement) + 
   → détecte MCP atlassian (outils mcp__atlassian__* dispos) → utilise
   → lit knowledge/support/clients/acme-corp.md → last_synced = 2026-05-15
   → JQL : project = ACME AND updated >= "2026-05-15" → 12 tickets
-  → subagent sift → 3 thèmes (lenteur exports x5, auth SSO x2, UI export PDF x3)
+  → subagent sift → 3 thèmes (lenteur exports x5, auth SSO x2, UI export PDF x3) + 1 bug net (ACME-1267 : export PDF cassé sur caractères UTF-8 non-latin1, repro claire)
   → append section 2026-06-03 dans acme-corp.md
-  → "lenteur exports" est forte (récurrente 3 sessions, 5 tickets) → propose ajout à support/insights.md → utilisateur valide -->
+  → "lenteur exports" est forte (récurrente 3 sessions, 5 tickets) → propose ajout à support/insights.md → utilisateur valide
+  → ACME-1267 = bug net → propose `bugs/acme-export-pdf-utf8/TICKET.md` → utilisateur valide → ticket prêt pour /code -->
