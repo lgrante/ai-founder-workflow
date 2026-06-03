@@ -176,7 +176,16 @@ C'est un **point de départ**, pas un dogme : chaque dev l'adapte à son repo (n
 
 ## 7. Déployer sur ton repo
 
-Le kit fournit un brief (`DEPLOY.md`) qu'on donne à une session Claude Code dans **ton** repo. Elle connaît ton repo (pas l'inverse) : son job est de **poser l'architecture par défaut sur ta réalité**, pas de la réinventer.
+Deux voies — la doctrine est la même, la différence est qui pilote :
+
+### Voie A — Skill `/setup` (recommandée)
+
+1. **Copie templates/ + scaffold/** dans ton repo (manuel ou `install.sh`).
+2. **Ouvre une session Claude Code** dans ton repo et tape `/setup`.
+3. Le skill pilote tout : il vérifie l'état git (commit/stash si pas clean), crée `setup-workflow`, inventorie, propose une **carte de migration**, lance des `AskUserQuestion`, **attend ta validation à chaque batch destructif** (move/rename/delete), commite phase par phase. Tu n'as qu'à dire OK / pas OK entre les phases.
+4. **Renseigne les placeholders** : commandes de build/test dans `CLAUDE.md` et `TEST_CMD` du hook (le skill te guide).
+
+### Voie B — Brief `DEPLOY.md` (manuelle, héritage)
 
 1. **Récupère le kit** dans ton repo (copie de `templates/` + `scaffold/`, ou `install.sh`).
 2. **Branche propre** : `git switch -c setup-workflow` sur un état propre (filet de sécurité pour tout annuler).
@@ -184,6 +193,8 @@ Le kit fournit un brief (`DEPLOY.md`) qu'on donne à une session Claude Code dan
 4. **Tu valides** le plan + la carte + les questions.
 5. **Scaffolding phase par phase** : `git mv` (historique préservé), obsolètes → `_archive/` (jamais supprimés directement), un commit dédié + compte-rendu par phase, ta validation entre chaque.
 6. **Renseigne les placeholders** : commandes de build/test dans le `CLAUDE.md` et le hook, conventions de la stack dans les skills de domaine.
+
+Les deux voies appliquent les **mêmes garanties anti-perte** (cf. ci-dessous) — `/setup` est juste plus interactif et moins manuel.
 
 **Garanties anti-perte (le refacto n'est pas additif) :**
 - Chaque fichier existant figure dans la carte de migration (`move` / `merge` / `keep` / `archive` / `delete`+raison). **Rien ne disparaît en silence.**
@@ -209,7 +220,7 @@ ai-dev-workflow/              # le repo à partager
 │       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
-│       └── skills/{spec,code,test,research,feedback}/SKILL.md
+│       └── skills/{setup,spec,code,test,research,feedback}/SKILL.md
 ├── scaffold/                 # arborescence vide (knowledge/, features/, .cc-scratch/)
 ├── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 └── install.sh                # copie templates+scaffold dans le repo courant + .gitignore

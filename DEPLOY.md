@@ -3,6 +3,8 @@
 > **À donner en ouverture d'une session Claude Code, dans le repo cible.**
 > Tu connais ce repo ; ce brief décrit le workflow et l'architecture par défaut.
 > Doctrine complète : `README.md` du kit + `templates/docs/WORKFLOW.md`.
+>
+> **Alternative recommandée** : `/setup` (skill installé via `templates/.claude/skills/setup/`). Mêmes garanties, plus interactif — Claude pilote, demande validation à chaque batch destructif, commite phase par phase. Ce DEPLOY.md reste utile pour comprendre la doctrine ou si tu préfères la voie manuelle.
 
 ## Objectif
 Poser le workflow (sessions par feature + découverte, pipeline spec→code→test, filet rapide via hook) sur **ce** repo, **sans perdre aucun fichier** et en gardant l'humain dans la boucle à chaque étape.
