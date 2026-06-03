@@ -22,8 +22,11 @@
 
 ## Workflow
 Ce repo suit le workflow décrit dans `docs/WORKFLOW.md` :
-sessions par feature + découverte, pipeline spec → code → test, filet rapide via hook.
-Commandes : `/spec` `/code` `/test` `/research` `/feedback`.
+sessions par feature (build) + découverte + audience, pipeline `spec → code → test` côté build, filet rapide via hook.
+
+Commandes :
+- **Setup / dev** : `/setup` `/spec` `/code` `/test` `/research` `/feedback`
+- **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>`
 
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.

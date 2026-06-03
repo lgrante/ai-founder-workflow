@@ -7,20 +7,24 @@ La mémoire persistante vit dans des **fichiers**, pas dans les sessions. Les se
 Le relais entre deux étapes = un **artefact durable** (spec, code commité, fichier de tests).
 Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat une longue session encombrée.
 
-## Deux axes de sessions
-- **Découverte** — continu, jamais par feature. Sort dans des fichiers (`knowledge/`).
-- **Build** — par feature, en pipeline `spec → code → test`.
+## Trois axes de sessions
+- **Découverte** — continu, jamais par feature. Sort dans `knowledge/`.
+- **Build** — par feature, en pipeline `spec → code → test`. Sort dans `features/`.
+- **Audience** — continu, par output (réseaux, blog, newsletter). Sort dans `content/`.
 
 ### Nomenclature
 | Préfixe | Axe | Pour quoi | Écrit dans |
 |---|---|---|---|
 | `market-research-…` | Découverte | marché, concurrents, tendances | `knowledge/market/` |
-| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs | `knowledge/crm/contacts/` + `knowledge/insights.md` |
+| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
 | `spec-<feature>` | Build | le quoi : spec + critères + jalons | `features/<feature>/SPEC.md` |
 | `code-<feature>` | Build | le comment : plan + code + filet rapide | `features/<feature>/PLAN.md` + code commité |
 | `test-<feature>` | Build | e2e depuis le spec + revue, au jalon | suite e2e commitée |
+| `post-<channel>-<sujet>` | Audience | post court réseau social | `content/<channel>/{drafts,scheduled,posted}/` |
+| `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
+| `newsletter-<edition>` | Audience | édition assemblée | `content/newsletter/<edition>.md` |
 
-`market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
+`market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Les skills audience **invoquent** des skills de copywriting globales (ex. `marketing-skills:writing-linkedin-posts`) si disponibles. Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
 
 ## Pipeline de build
 - `spec-<feature>` : écrit `SPEC.md` (description + **critères d'acceptation** dérivés AVANT le code + **jalons**).

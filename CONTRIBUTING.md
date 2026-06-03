@@ -8,7 +8,7 @@ Ce repo est un **kit partagé** : il déploie un workflow de dev sur n'importe q
 - Avant d'ouvrir une PR, on **teste** ses changements (voir plus bas).
 
 ## Avant de toucher quoi que ce soit
-Lis, dans l'ordre : `README.md`, `templates/docs/WORKFLOW.md`, les six `templates/.claude/skills/*/SKILL.md` (setup, spec, code, test, research, feedback). Comprends **l'intention** avant de proposer.
+Lis, dans l'ordre : `README.md`, `templates/docs/WORKFLOW.md`, les neuf `templates/.claude/skills/*/SKILL.md` (setup, spec, code, test, research, feedback, post, article, newsletter). Comprends **l'intention** avant de proposer.
 
 ## La doctrine à préserver (non négociable)
 Une PR qui régresse l'un de ces points sera refusée :

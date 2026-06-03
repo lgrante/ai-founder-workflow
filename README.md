@@ -1,10 +1,10 @@
-# ai-founder-workflow — kit de déploiement d'un workflow de dev assisté par IA
+# ai-founder-workflow — kit de workflow IA pour solo founders et équipes dev
 
-Un modèle de sessions **répétable** pour développer avec Claude Code : par feature, avec une **vérification automatisée** et un **contexte qui reste propre**. Conçu pour être **déployé sur n'importe quel repo**.
+Un modèle de sessions **répétable** pour piloter Claude Code : par feature côté build, par sujet côté découverte, par output côté audience. Avec une **vérification automatisée** sur le build et un **contexte qui reste propre** sur tous les axes. Conçu pour être **déployé sur n'importe quel repo**.
 
-> **Pour qui** : les développeurs d'une équipe qui veut un workflow IA cohérent et partageable.
+> **Pour qui** : les **solo founders** (qui font tout — dev, contenu, sales-discovery) et les **équipes dev** qui veulent un workflow IA cohérent et partageable.
 > **Sur quoi** : n'importe quel repo de l'équipe.
-> **Ce que ça remplace** : l'organisation « une session par rôle » (product / frontend / backend / qa), qui sature le contexte et fait que les sessions travaillent mal ensemble.
+> **Ce que ça remplace** : l'organisation « une session par rôle » (product / frontend / backend / qa / marketing), qui sature le contexte et fait que les sessions travaillent mal ensemble.
 
 ---
 
@@ -14,22 +14,23 @@ Tout part d'une contrainte unique : **la fenêtre de contexte se remplit vite, e
 
 **Trois principes :**
 
-1. **La mémoire persistante vit dans des fichiers, pas dans les sessions.** Les sessions sont **jetables**. Le relais entre deux étapes est toujours un **artefact durable** : un spec, du code commité, un fichier de tests — jamais « la conversation ».
-2. **Une session = un contexte cohérent.** L'organisation se fait par **feature** (et par axe de découverte), **pas par rôle**. Les rôles (investiguer, relire…) deviennent des **subagents** *dans* une session.
-3. **La vérification est automatisée**, pour que le développeur ne soit jamais le messager entre deux étapes.
+1. **La mémoire persistante vit dans des fichiers, pas dans les sessions.** Les sessions sont **jetables**. Le relais entre deux étapes est toujours un **artefact durable** : un spec, du code commité, un fichier de tests, un draft de post, une édition de newsletter — jamais « la conversation ».
+2. **Une session = un contexte cohérent.** L'organisation se fait par **feature** (build), par **sujet** (découverte, audience), **pas par rôle**. Les rôles (investiguer, relire…) deviennent des **subagents** *dans* une session.
+3. **La vérification est automatisée** côté build, pour que le développeur ne soit jamais le messager entre deux étapes.
 
 L'idée clé : **dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat une longue session encombrée.**
 
 ---
 
-## 2. Les deux axes de sessions
+## 2. Les trois axes de sessions
 
 | Axe | Sessions | Nature | Sortie |
 |---|---|---|---|
-| **Découverte** | `market-research-…`, `user-feedback-…` | continu, jamais par feature | fichiers de connaissance |
-| **Build** | `spec-…` → `code-…` → `test-…` | par feature, en pipeline | spec, code, tests |
+| **Découverte** | `market-research-…`, `user-feedback-…` | continu, jamais par feature | fichiers de connaissance (`knowledge/`) |
+| **Build** | `spec-…` → `code-…` → `test-…` | par feature, en pipeline | spec, code, tests (`features/`) |
+| **Audience** | `post-…`, `article-…`, `newsletter-…` | continu, par output | fichiers de contenu (`content/`) |
 
-La **découverte** est la source qui alimente les specs du **build**.
+Les axes sont **horizontaux** (chacun avec sa logique propre), pas **verticaux** (rôles dans une feature). La **découverte** est la source qui alimente les `spec-` du build ET les rédactions de l'audience.
 
 ### Nomenclature des sessions
 
@@ -38,13 +39,17 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | Préfixe | Axe | Pour quoi | Écrit dans |
 |---|---|---|---|
 | `market-research-…` | Découverte | paysage marché, concurrents, tendances | `knowledge/market/` |
-| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs, ce qu'ils demandent | CRM `knowledge/crm/contacts/` + `knowledge/insights.md` |
+| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
 | `spec-<feature>` | Build | le **quoi** : spec + critères + jalons | `features/<feature>/SPEC.md` |
 | `code-<feature>` | Build | le **comment** : plan + code + filet rapide | `features/<feature>/PLAN.md` + code commité |
 | `test-<feature>` | Build | e2e depuis le spec + revue, au jalon | suite e2e commitée |
+| `post-<channel>-<sujet>` | Audience | post court pour un réseau (LinkedIn, Twitter/X, …) | `content/<channel>/{drafts,scheduled,posted}/` |
+| `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
+| `newsletter-<edition>` | Audience | édition assemblée à partir du reste | `content/newsletter/<edition>.md` |
 
-- **`market-research` et `user-feedback` sont deux types distincts**, pas un seul « discovery ». Le premier regarde le **marché** (extérieur, abstrait) ; le second regarde des **personnes précises** (intérieur, concret) et nourrit le CRM par contact + l'agrégat `insights.md`. Tous deux **continus** et **jamais rattachés à une feature**.
-- Le **format exact** (séparateur, casse — `market-research-…`, `market_research_…`, `MARKET_RESEARCH_…`) est une préférence d'équipe ; seul le **préfixe par type** compte. La cohérence importe.
+- **`market-research` et `user-feedback` sont deux types distincts**. Le premier regarde le **marché** (extérieur, abstrait) ; le second regarde des **personnes précises** (intérieur, concret) et nourrit le CRM par contact + l'agrégat `insights.md`. Tous deux **continus**, jamais rattachés à une feature.
+- Les skills audience (`post`, `article`, `newsletter`) **invoquent** les skills de copywriting existantes (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement. Le kit fournit la **structure** + le **workflow** (où ranger, draft → review → publish), pas la rédaction elle-même.
+- Le **format exact** des préfixes (séparateur, casse) est une préférence d'équipe ; seul le **préfixe par type** compte. La cohérence importe.
 
 ---
 
@@ -58,7 +63,7 @@ Trois sessions, dans l'ordre. Chacune laisse un fichier que la suivante lit.
 
 Puis **un humain valide le jalon** avant d'enchaîner.
 
-**Une feature = une branche git.** L'axe build est rattaché à une branche : les trois sessions d'une feature (`spec-`, `code-`, `test-`) travaillent toutes sur **cette même** branche dédiée (ex. `feature/<feature>`) — jamais deux features mélangées sur une branche. Plusieurs features en parallèle → **worktrees git séparés** (une branche chacune). Les sessions de **découverte** ne sont rattachées à aucune branche.
+**Une feature = une branche git.** L'axe build est rattaché à une branche : les trois sessions d'une feature (`spec-`, `code-`, `test-`) travaillent toutes sur **cette même** branche dédiée (ex. `feature/<feature>`) — jamais deux features mélangées sur une branche. Plusieurs features en parallèle → **worktrees git séparés** (une branche chacune). Les sessions de **découverte** et d'**audience** ne sont rattachées à aucune branche.
 
 ```mermaid
 flowchart TD
@@ -84,16 +89,26 @@ flowchart TD
     test --> human
 ```
 
+### Pipeline d'audience (par output)
+
+Plus simple que le build — pas de tests automatisés, le gate est uniquement humain :
+
+- **`post-<channel>-<sujet>`** : draft → review humaine → `scheduled/` ou `posted/`.
+- **`article-<sujet>`** : plan (validé) → wip → review section par section → `published/`.
+- **`newsletter-<edition>`** : structure (validée) → assemblage → review → posted.
+
 ### Session vs subagent
 
-- **Session séparée** quand le relais est un **artefact durable** (spec, code commité, tests).
-- **Subagent** (dans la session) quand le relais est des **trouvailles éphémères** qui reviennent dans le travail courant (investigation, liste d'écarts d'une revue).
+- **Session séparée** quand le relais est un **artefact durable** (spec, code commité, tests, draft de contenu).
+- **Subagent** (dans la session) quand le relais est des **trouvailles éphémères** qui reviennent dans le travail courant (investigation, rédaction de tests, copywriting d'une section).
 
 ---
 
-## 4. Vérification — deux sortes de tests, deux boulots
+## 4. Vérification — deux sortes de tests, deux boulots (côté build)
 
-La ligne de partage n'est **pas** « unitaire vs le reste ». C'est **rapide & incrémental** (`code-x`, à chaque étape) **vs bout-en-bout** (`test-x`, au jalon).
+La vérification automatisée s'applique au **build** uniquement (les axes découverte et audience ont un gate purement humain à la review).
+
+La ligne de partage côté build n'est **pas** « unitaire vs le reste ». C'est **rapide & incrémental** (`code-x`, à chaque étape) **vs bout-en-bout** (`test-x`, au jalon).
 
 | | **Filet rapide** | **Validation indépendante** |
 |---|---|---|
@@ -144,14 +159,16 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │   ├── settings.json         # hooks (Stop / PostToolUse)
 │   ├── hooks/                # scripts (ex. test-gate) + anti-boucle stop_hook_active
 │   └── skills/               # savoir de domaine + commandes de session (/<nom>)
-│       ├── setup/ spec/ code/ test/ research/ feedback/   # SKILL.md par commande
+│       ├── setup/ spec/ code/ test/ research/ feedback/   # cœur dev (5 + setup)
+│       ├── post/ article/ newsletter/                     # cœur audience
 │       └── <skills de domaine>                            # conventions front, back/API — À ADAPTER
 ├── docs/WORKFLOW.md          # cette doctrine + conventions de nommage
-├── knowledge/                # AXE DÉCOUVERTE (continu, jamais par feature)
+├── knowledge/                # axe DÉCOUVERTE (continu, jamais par feature)
 │   ├── market/               # recherche marché
-│   ├── insights.md           # agrégat des retours → idées de features
+│   ├── insights.md           # agrégat des retours → idées de features ET de contenu
+│   ├── content/brand-book.md # tonalité, style, voice (utilisé par /post /article /newsletter)
 │   └── crm/contacts/         # données perso — repo privé séparé OU gitignored
-├── features/                 # AXE BUILD (par feature) — structure standard pour CHAQUE feature
+├── features/                 # axe BUILD (par feature) — structure standard pour CHAQUE feature
 │   └── <feature>/            # racine = la VERSION ACTIVE
 │       ├── README.md         # statut + liens
 │       ├── SPEC.md / SPEC.html   # le quoi (possédé par spec-x)
@@ -161,18 +178,25 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │       ├── qa/sprint-{N}-{slug}/ # captures par sprint
 │       ├── plans/                # roadmap, plans de release
 │       └── archives/v{N}/        # versions périmées (refonte majeure → racine actuelle bascule ici)
+├── content/                  # axe AUDIENCE (continu, output pour les réseaux)
+│   ├── linkedin/{drafts,scheduled,posted}/    # posts courts par channel
+│   ├── twitter-x/{drafts,posted}/             # idem (scheduled optionnel selon outil)
+│   ├── blog/{wip,published}/                  # long form
+│   └── newsletter/<edition>.md                # éditions périodiques
 ├── .cc-scratch/              # gitignored — résultats de tests TRANSITOIRES
 └── <code applicatif>         # INCHANGÉ
 ```
 
 **Ce qui doit survivre, peu importe les noms :**
 
-- Découverte (`knowledge/`) et build (`features/`) **physiquement séparés**.
+- **Trois axes physiquement séparés** : découverte (`knowledge/`), build (`features/`), audience (`content/`).
 - Pour une feature, **SPEC et PLAN au même endroit**, dans une **structure standard reproductible** (sub-features / prototypes / qa / plans / archives) que TOUTES les features partagent. Le LLM (et l'humain qui prend le relais) connaît alors immédiatement où chercher l'historique du produit et où ranger un nouvel artefact.
-- **Versionnage par dossier** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (la doctrine appelle « refonte majeure » : on bascule la racine entière, on n'édite pas in-place). L'historique du produit est ainsi lisible à la lecture du dossier.
-- **Sub-features récursives** : un composant atomique d'une version active vit dans `sub-features/<sub>/` avec la même structure (SPEC, PLAN, archives, etc.).
+- **Versionnage par dossier côté build** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (« refonte majeure » : on bascule la racine entière, on n'édite pas in-place).
+- **Sub-features récursives** : un composant atomique d'une version active vit dans `sub-features/<sub>/` avec la même structure.
+- **Drafts/scheduled/posted séparés côté audience** : un draft se relit, un post publié n'a plus à être modifié. Les channels sont des sous-dossiers de `content/`, eux-mêmes avec une structure standard.
+- **Brand book partagé** : `knowledge/content/brand-book.md` est la source de tonalité, lue par tous les skills audience pour la cohérence.
 - Commandes + savoir de domaine dans `.claude/skills/` (chargés à la demande), pas dans un `CLAUDE.md` obèse.
-- Le **statut** d'avancement à **un seul endroit** (les cases du PLAN) ; les résultats de tests sont du **scratch** gitignored, pas un second statut.
+- Le **statut** d'avancement à **un seul endroit** (les cases du PLAN pour le build, le sous-dossier `drafts/`/`published/` pour le contenu) ; les résultats de tests sont du **scratch** gitignored.
 - Le `CLAUDE.md` reste **court** : pour chaque ligne, « la retirer ferait-elle faire une erreur à Claude ? » Sinon, on la coupe.
 
 ---
@@ -193,7 +217,7 @@ gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ~/ai-founder-workflow/install.sh --global
 ```
 
-Les skills `/setup /spec /code /test /research /feedback` sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
+Les 9 skills (`/setup /spec /code /test /research /feedback /post /article /newsletter`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
 
 ### Étape 3 — Déployer le workflow dans un repo cible
 
@@ -210,7 +234,7 @@ Le skill `/setup` pilote toute l'installation interactivement :
 4. Exécute phase par phase, **avec autorisation explicite à chaque batch destructif** (move / rename / delete). Chaque phase fait un commit dédié + un compte-rendu.
 5. Termine en proposant le push et un dry-run avec `/spec <feature>` sur une petite feature pour valider le pipeline en bout-en-bout.
 
-### Alternative — Install per-repo (voie héritage)
+### Alternative — Install per-repo
 
 Pour versionner les skills + hooks avec le repo lui-même (au lieu de les charger globalement) :
 
@@ -237,23 +261,24 @@ Le skill `/setup` applique les règles suivantes — quel que soit le repo :
 
 **Non-négociable (la doctrine §1–§5) :**
 - Mémoire dans les fichiers, sessions jetables, relais = artefact durable.
-- Organisation **par feature + découverte**, jamais par rôle.
-- Pipeline `spec → code → test` ; tests ancrés sur l'intention.
+- Organisation **par feature + découverte + audience**, jamais par rôle.
+- Pipeline build `spec → code → test` ; tests ancrés sur l'intention.
 - Filet rapide (étape, `code-x`) vs validation indépendante (jalon, `test-x`).
-- Gate humain au jalon.
+- Gate humain au jalon côté build, et à la review côté audience.
 
 **Adaptable (par repo) :**
 - Noms et emplacements des dossiers.
 - La stack, les frameworks de test, les commandes exactes.
 - Le format des préfixes de session.
 - L'intégration avec un `.claude/` ou des hooks déjà présents.
+- Les channels audience (LinkedIn, Twitter/X, Bluesky, etc. — à étendre selon les besoins).
 
 ---
 
 ## 9. Le repo kit lui-même
 
 ```
-ai-founder-workflow/              # le repo à partager
+ai-founder-workflow/          # le repo à partager
 ├── README.md · README.html   # ce guide (markdown + version web)
 ├── CONTRIBUTING.md           # comment l'équipe contribue (PR, doctrine, tests)
 ├── LICENSE                   # MIT
@@ -267,8 +292,8 @@ ai-founder-workflow/              # le repo à partager
 │       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
-│       └── skills/{setup,spec,code,test,research,feedback}/SKILL.md
-├── scaffold/                 # arborescence vide (knowledge/, features/, .cc-scratch/)
+│       └── skills/{setup,spec,code,test,research,feedback,post,article,newsletter}/SKILL.md
+├── scaffold/                 # arborescence vide (knowledge/, features/, content/, .cc-scratch/)
 └── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 ```
 
@@ -281,4 +306,5 @@ Mises à jour : `git pull` côté kit, puis re-run de `install.sh --global` (ou 
 ## 10. Ce que ce kit n'est *pas*
 
 - **Ce n'est pas de l'orchestration multi-agents autonome.** C'est un workflow pour **un humain qui pilote Claude Code en interactif**. Des agents qui se surveillent et se déclenchent mutuellement, c'est un autre problème (un runtime d'orchestration) — hors scope.
-- **Ce n'est pas une promesse de « zéro relecture ».** Le gate humain au jalon et la revue à œil neuf sont volontairement maintenus : l'automatisation porte sur la **régression**, pas sur le **jugement**.
+- **Ce n'est pas une promesse de « zéro relecture ».** Le gate humain au jalon, la revue à œil neuf côté build, et la review humaine côté audience sont volontairement maintenus : l'automatisation porte sur la **régression**, pas sur le **jugement**.
+- **Ce n'est pas un kit de copywriting.** Les skills audience (`/post`, `/article`, `/newsletter`) fournissent la **structure et le workflow** (où ranger, dans quel ordre, validation). Pour la rédaction elle-même, ils **invoquent** des skills spécialisées (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement.
