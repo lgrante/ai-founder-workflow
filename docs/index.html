@@ -1776,58 +1776,6 @@
   </div>
 </section>
 
-<!-- ═══════════════ STUDIO AUDIENCE ═══════════════ -->
-<section id="studio" class="reveal">
-  <div class="container">
-    <div class="eyebrow">Studio audience</div>
-    <h2>Écrire, illustrer, mesurer, itérer. <span class="grad">Dans le même dossier.</span></h2>
-    <p class="lede">
-      Chaque réseau social a son propre studio. Un seul dossier contient tes drafts, les snapshots bruts du MCP, les rapports de perf synthétisés, et même les images générées. Tu écris → tu publies → tu mesures → ton prochain post le sait déjà. <strong style="color:var(--text);">Sans changer d'outil.</strong>
-    </p>
-
-    <div class="studio-canvas">
-      <div class="studio-canvas-header">
-        <span class="studio-canvas-dots"><span></span><span></span><span></span></span>
-        <span class="studio-canvas-title">content/linkedin/ &nbsp;·&nbsp; un dossier par réseau, même schéma partout</span>
-      </div>
-      <div class="studio-canvas-body">
-<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">drafts/</span> <span class="sl-arrow">→</span> <span class="sl-desc">ce que tu rédiges</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">2026-06-03-note.md</span> <span class="sl-arrow">→</span> <span class="sl-desc">post text-only (.md plat)</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-folder-sub">2026-06-04-launch/</span> <span class="sl-arrow">→</span> <span class="sl-desc">post avec asset (un dossier)</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">post.md</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">hero.png</span> <span class="sl-badge nb">↻ nano-banana</span></div>
-<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">scheduled/</span> <span class="sl-arrow">→</span> <span class="sl-desc">validés, en attente de publication</span></div>
-<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">posted/</span> <span class="sl-arrow">→</span> <span class="sl-desc">publiés (immuables)</span></div>
-<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder stats">stats/</span> <span class="sl-arrow">→</span> <span class="sl-desc">snapshots bruts, append-only</span> <span class="sl-badge mcp">mcp__linkedin__*</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">2026-06-03-snapshot.json</span></div>
-<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-05-27-snapshot.json</span></div>
-<div class="studio-line"><span class="sl-tree">└──</span> <span class="sl-folder insights">insights/</span> <span class="sl-arrow">→</span> <span class="sl-desc">rapports synthétisés (md + html)</span> <span class="sl-badge report">↻ /report</span></div>
-<div class="studio-line"><span class="sl-tree">&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-06-03-report.md / .html</span></div>
-      </div>
-    </div>
-
-    <div class="studio-callouts">
-      <div class="studio-callout">
-        <span class="num">01 — Convention</span>
-        <h4>Un post sans image = un fichier. Avec image = un dossier.</h4>
-        <p>Tu ne sépares jamais un post de son visuel. <code>.md</code> plat tant que c'est text-only ; dès qu'il y a un asset, le slug devient un dossier <code>&lt;slug&gt;/{post.md, hero.png}</code>. <strong>Un <code>.md</code> isolé sans son image est cassé</strong>, alors on les colle.</p>
-      </div>
-      <div class="studio-callout">
-        <span class="num">02 — Images</span>
-        <h4>Compagnon <code style="color:var(--accent);background:var(--bg-soft);padding:1px 6px;border-radius:4px;font-size:0.95em;">nano-banana</code> pour les visuels.</h4>
-        <p>Si <a href="https://github.com/kkoppenhaver/cc-nano-banana" target="_blank" rel="noopener">cc-nano-banana</a> est installé globalement (wrap le Gemini CLI), <code>/post</code> détecte sa présence et propose <code>/generate</code>. L'image atterrit dans le dossier du post, prête à être commitée avec lui.</p>
-        <div class="callout-tag">~0,04 $/image · Gemini CLI · skill global</div>
-      </div>
-      <div class="studio-callout">
-        <span class="num">03 — Stats & Insights</span>
-        <h4>Boucle de feedback : ce qui marche nourrit le prochain post.</h4>
-        <p><code>/report linkedin</code> détecte ton MCP réseau, archive les snapshots dans <code>stats/</code>, synthétise dans <code>insights/</code>. <strong>Le prochain <code>/post</code> lit ces insights au démarrage</strong> pour appliquer ce qui marche (format gagnant, timing, longueur).</p>
-        <div class="callout-tag">MCP-agnostique · fallback export manuel</div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- ═══════════════ SAFETY ═══════════════ -->
 <section class="safety reveal">
   <div class="container">
@@ -1859,6 +1807,41 @@
         <p>Chaque skill bosse sur sa propre branche (<code>feat/&lt;feature&gt;</code>, <code>research/&lt;topic&gt;</code>, <code>post/&lt;channel&gt;/&lt;slug&gt;</code>, …). 3 agents Claude sur le même checkout = zéro conflit. Stage par chemin explicite, jamais <code>git add -A</code>.</p>
       </div>
     </div>
+  </div>
+</section>
+
+<!-- ═══════════════ STUDIO AUDIENCE (détail) ═══════════════ -->
+<section id="studio" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Sous le capot · audience</div>
+    <h2 style="font-size: clamp(1.5rem, 2.4vw, 2rem); max-width: 720px;">Un dossier par réseau, même structure partout.</h2>
+    <p style="color: var(--text-soft); font-size: 15px; line-height: 1.65; max-width: 720px; margin-top: 12px;">
+      Pour <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">/post</code>, <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">/article</code>, <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">/newsletter</code> et <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">/report</code>, chaque réseau a son dossier identique : drafts → scheduled → posted côté écriture, <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">stats/</code> (raw MCP) + <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:13px;">insights/</code> (rapports) côté boucle de feedback.
+    </p>
+
+    <div class="studio-canvas">
+      <div class="studio-canvas-header">
+        <span class="studio-canvas-dots"><span></span><span></span><span></span></span>
+        <span class="studio-canvas-title">content/linkedin/ &nbsp;·&nbsp; même schéma pour twitter-x/, blog/, newsletter/</span>
+      </div>
+      <div class="studio-canvas-body">
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">drafts/</span> <span class="sl-arrow">→</span> <span class="sl-desc">ce que tu rédiges</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">2026-06-03-note.md</span> <span class="sl-arrow">→</span> <span class="sl-desc">post text-only (.md plat)</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-folder-sub">2026-06-04-launch/</span> <span class="sl-arrow">→</span> <span class="sl-desc">post avec asset (un dossier)</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">post.md</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">hero.png</span> <span class="sl-badge nb">↻ nano-banana</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">scheduled/</span> <span class="sl-arrow">→</span> <span class="sl-desc">validés, en attente de publication</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">posted/</span> <span class="sl-arrow">→</span> <span class="sl-desc">publiés (immuables)</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder stats">stats/</span> <span class="sl-arrow">→</span> <span class="sl-desc">snapshots bruts, append-only</span> <span class="sl-badge mcp">mcp__linkedin__*</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-06-03-snapshot.json</span></div>
+<div class="studio-line"><span class="sl-tree">└──</span> <span class="sl-folder insights">insights/</span> <span class="sl-arrow">→</span> <span class="sl-desc">rapports synthétisés (md + html)</span> <span class="sl-badge report">↻ /report</span></div>
+<div class="studio-line"><span class="sl-tree">&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-06-03-report.md / .html</span></div>
+      </div>
+    </div>
+
+    <p style="margin-top: 24px; color: var(--text-soft); font-size: 14px; line-height: 1.7; max-width: 820px;">
+      <strong style="color: var(--text);">Compagnons opt-in</strong> détectés à la volée par les skills audience : <a href="https://github.com/kkoppenhaver/cc-nano-banana" target="_blank" rel="noopener" style="color: var(--accent); border-bottom: 1px solid rgba(126,231,135,0.4); text-decoration: none;">cc-nano-banana</a> (skill global, wrap le Gemini CLI) pour générer une image dans le dossier du post (~0,04 $/image) ; le MCP du réseau (préfixe <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">mcp__linkedin__*</code>, <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">mcp__twitter__*</code>, etc.) pour que <code style="background:var(--bg-elev);padding:1px 6px;border-radius:4px;border:1px solid var(--border);font-size:12.5px;">/report</code> pull les stats. Aucun n'est requis — fallback export manuel pour les stats, post text-only sans image sinon.
+    </p>
   </div>
 </section>
 
