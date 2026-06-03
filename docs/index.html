@@ -1247,6 +1247,143 @@
     transition: opacity 0.7s ease, transform 0.7s ease;
   }
   .reveal.in { opacity: 1; transform: translateY(0); }
+
+  /* ─── STUDIO AUDIENCE ───────────────────────── */
+  .studio-canvas {
+    background: #0d1117;
+    border: 1px solid var(--border-strong);
+    border-radius: 14px;
+    margin: 44px 0 0;
+    overflow: hidden;
+    box-shadow: 0 30px 80px -25px rgba(0,0,0,0.6), 0 0 0 1px rgba(210,168,255,0.06);
+    position: relative;
+  }
+  .studio-canvas::before {
+    content: '';
+    position: absolute;
+    inset: -30px;
+    background: radial-gradient(ellipse at 70% 40%, rgba(210,168,255,0.10) 0%, transparent 60%);
+    filter: blur(40px);
+    z-index: -1;
+    pointer-events: none;
+  }
+  .studio-canvas-header {
+    background: linear-gradient(180deg, #181f28 0%, #141a22 100%);
+    padding: 11px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .studio-canvas-dots { display: flex; gap: 6px; }
+  .studio-canvas-dots span {
+    width: 11px; height: 11px; border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+  }
+  .studio-canvas-dots span:nth-child(1) { background: rgba(255, 95, 86, 0.45); }
+  .studio-canvas-dots span:nth-child(2) { background: rgba(255, 189, 46, 0.45); }
+  .studio-canvas-dots span:nth-child(3) { background: rgba(40, 200, 64, 0.45); }
+  .studio-canvas-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    color: var(--text-muted);
+    letter-spacing: 0.04em;
+  }
+  .studio-canvas-body {
+    padding: 26px 28px 28px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13.5px;
+    line-height: 2.0;
+    overflow-x: auto;
+  }
+  .studio-line {
+    display: flex; align-items: center; gap: 10px;
+    flex-wrap: nowrap; padding: 2px 0;
+    transition: background 0.2s ease;
+    white-space: nowrap;
+  }
+  .studio-line:hover { background: rgba(255,255,255,0.025); border-radius: 4px; }
+  .sl-tree { color: #4a5663; flex-shrink: 0; }
+  .sl-folder { color: var(--purple); font-weight: 600; }
+  .sl-folder.stats { color: var(--blue); }
+  .sl-folder.insights { color: var(--purple); }
+  .sl-folder-sub { color: var(--purple); }
+  .sl-file { color: var(--text); }
+  .sl-arrow { color: var(--text-muted); flex-shrink: 0; }
+  .sl-desc { color: var(--text-muted); font-style: italic; }
+  .sl-badge {
+    display: inline-flex; align-items: center;
+    padding: 2px 9px; border-radius: 100px;
+    font-size: 10.5px; letter-spacing: 0.04em;
+    border: 1px solid; background: var(--bg);
+    flex-shrink: 0; margin-left: 6px;
+  }
+  .sl-badge.nb     { color: var(--accent); border-color: rgba(126,231,135,0.35); }
+  .sl-badge.mcp    { color: var(--blue);   border-color: rgba(121,192,255,0.35); }
+  .sl-badge.report { color: var(--purple); border-color: rgba(210,168,255,0.35); }
+
+  .studio-callouts {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 18px;
+    margin-top: 28px;
+  }
+  @media (max-width: 980px) {
+    .studio-callouts { grid-template-columns: 1fr; }
+  }
+  .studio-callout {
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 26px 24px 22px;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+    position: relative;
+  }
+  .studio-callout:hover { transform: translateY(-3px); border-color: var(--border-strong); }
+  .studio-callout .num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--purple);
+    letter-spacing: 0.14em;
+    margin-bottom: 12px;
+    display: block;
+  }
+  .studio-callout h4 {
+    font-size: 1.08rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 10px;
+    letter-spacing: -0.01em;
+    line-height: 1.3;
+  }
+  .studio-callout p {
+    font-size: 14px;
+    color: var(--text-soft);
+    line-height: 1.65;
+    margin: 0;
+  }
+  .studio-callout p code {
+    background: var(--bg-soft);
+    padding: 1px 6px;
+    border-radius: 4px;
+    border: 1px solid var(--border);
+    font-size: 12.5px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .studio-callout p a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(126,231,135,0.4); }
+  .studio-callout p a:hover { border-bottom-color: var(--accent); }
+  .callout-tag {
+    margin-top: 14px;
+    display: inline-block;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    color: var(--text-muted);
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    letter-spacing: 0.04em;
+  }
 </style>
 </head>
 <body>
@@ -1259,6 +1396,7 @@
       <a href="#pipeline">Pipeline</a>
       <a href="#day">Journée</a>
       <a href="#skills">Skills</a>
+      <a href="#studio">Studio</a>
       <a href="#install">Install</a>
       <a href="https://github.com/lgrante/ai-founder-workflow" class="nav-github" target="_blank" rel="noopener">
         <svg viewBox="0 0 24 24"><path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.56 0-.28-.01-1.02-.02-2-3.2.7-3.88-1.54-3.88-1.54-.52-1.34-1.28-1.69-1.28-1.69-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.97.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.69 0-1.26.45-2.29 1.19-3.09-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.18 1.18.92-.26 1.91-.39 2.9-.39.99 0 1.98.13 2.9.39 2.21-1.49 3.18-1.18 3.18-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.09 0 4.42-2.69 5.39-5.26 5.68.41.36.78 1.06.78 2.14 0 1.54-.01 2.78-.01 3.16 0 .31.21.67.8.56C20.21 21.38 23.5 17.07 23.5 12 23.5 5.65 18.35.5 12 .5z"/></svg>
@@ -1638,6 +1776,58 @@
   </div>
 </section>
 
+<!-- ═══════════════ STUDIO AUDIENCE ═══════════════ -->
+<section id="studio" class="reveal">
+  <div class="container">
+    <div class="eyebrow">Studio audience</div>
+    <h2>Écrire, illustrer, mesurer, itérer. <span class="grad">Dans le même dossier.</span></h2>
+    <p class="lede">
+      Chaque réseau social a son propre studio. Un seul dossier contient tes drafts, les snapshots bruts du MCP, les rapports de perf synthétisés, et même les images générées. Tu écris → tu publies → tu mesures → ton prochain post le sait déjà. <strong style="color:var(--text);">Sans changer d'outil.</strong>
+    </p>
+
+    <div class="studio-canvas">
+      <div class="studio-canvas-header">
+        <span class="studio-canvas-dots"><span></span><span></span><span></span></span>
+        <span class="studio-canvas-title">content/linkedin/ &nbsp;·&nbsp; un dossier par réseau, même schéma partout</span>
+      </div>
+      <div class="studio-canvas-body">
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">drafts/</span> <span class="sl-arrow">→</span> <span class="sl-desc">ce que tu rédiges</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">2026-06-03-note.md</span> <span class="sl-arrow">→</span> <span class="sl-desc">post text-only (.md plat)</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-folder-sub">2026-06-04-launch/</span> <span class="sl-arrow">→</span> <span class="sl-desc">post avec asset (un dossier)</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">post.md</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">hero.png</span> <span class="sl-badge nb">↻ nano-banana</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">scheduled/</span> <span class="sl-arrow">→</span> <span class="sl-desc">validés, en attente de publication</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder">posted/</span> <span class="sl-arrow">→</span> <span class="sl-desc">publiés (immuables)</span></div>
+<div class="studio-line"><span class="sl-tree">├──</span> <span class="sl-folder stats">stats/</span> <span class="sl-arrow">→</span> <span class="sl-desc">snapshots bruts, append-only</span> <span class="sl-badge mcp">mcp__linkedin__*</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;├──</span> <span class="sl-file">2026-06-03-snapshot.json</span></div>
+<div class="studio-line"><span class="sl-tree">│&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-05-27-snapshot.json</span></div>
+<div class="studio-line"><span class="sl-tree">└──</span> <span class="sl-folder insights">insights/</span> <span class="sl-arrow">→</span> <span class="sl-desc">rapports synthétisés (md + html)</span> <span class="sl-badge report">↻ /report</span></div>
+<div class="studio-line"><span class="sl-tree">&nbsp;&nbsp;&nbsp;&nbsp;└──</span> <span class="sl-file">2026-06-03-report.md / .html</span></div>
+      </div>
+    </div>
+
+    <div class="studio-callouts">
+      <div class="studio-callout">
+        <span class="num">01 — Convention</span>
+        <h4>Un post sans image = un fichier. Avec image = un dossier.</h4>
+        <p>Tu ne sépares jamais un post de son visuel. <code>.md</code> plat tant que c'est text-only ; dès qu'il y a un asset, le slug devient un dossier <code>&lt;slug&gt;/{post.md, hero.png}</code>. <strong>Un <code>.md</code> isolé sans son image est cassé</strong>, alors on les colle.</p>
+      </div>
+      <div class="studio-callout">
+        <span class="num">02 — Images</span>
+        <h4>Compagnon <code style="color:var(--accent);background:var(--bg-soft);padding:1px 6px;border-radius:4px;font-size:0.95em;">nano-banana</code> pour les visuels.</h4>
+        <p>Si <a href="https://github.com/kkoppenhaver/cc-nano-banana" target="_blank" rel="noopener">cc-nano-banana</a> est installé globalement (wrap le Gemini CLI), <code>/post</code> détecte sa présence et propose <code>/generate</code>. L'image atterrit dans le dossier du post, prête à être commitée avec lui.</p>
+        <div class="callout-tag">~0,04 $/image · Gemini CLI · skill global</div>
+      </div>
+      <div class="studio-callout">
+        <span class="num">03 — Stats & Insights</span>
+        <h4>Boucle de feedback : ce qui marche nourrit le prochain post.</h4>
+        <p><code>/report linkedin</code> détecte ton MCP réseau, archive les snapshots dans <code>stats/</code>, synthétise dans <code>insights/</code>. <strong>Le prochain <code>/post</code> lit ces insights au démarrage</strong> pour appliquer ce qui marche (format gagnant, timing, longueur).</p>
+        <div class="callout-tag">MCP-agnostique · fallback export manuel</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <!-- ═══════════════ SAFETY ═══════════════ -->
 <section class="safety reveal">
   <div class="container">
@@ -1695,15 +1885,6 @@
     </div>
 
     <p class="install-next">Puis dans ton repo cible, ouvre Claude Code et tape <code>/setup</code>. Le skill pilote le déploiement, phase par phase, avec ton OK à chaque étape destructive.</p>
-
-    <div style="margin-top: 36px; padding: 24px 28px; background: var(--bg-elev); border: 1px solid var(--border); border-left: 3px solid var(--accent); border-radius: 10px;">
-      <div style="font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px;">Compagnons optionnels</div>
-      <p style="margin: 0; color: var(--text-soft); font-size: 14.5px; line-height: 1.65;">
-        <strong style="color: var(--text);"><a href="https://github.com/kkoppenhaver/cc-nano-banana" target="_blank" rel="noopener" style="color: var(--text); text-decoration: underline; text-decoration-color: var(--accent);">nano-banana</a></strong> (skill global, wrap le Gemini CLI) — quand tu veux générer une image pour un post, <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/post</code> &amp; <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/article</code> le détectent et proposent <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/generate</code>. Coût ~0,04 $/image.<br>
-        <strong style="color: var(--text);">MCP par réseau</strong> (LinkedIn, Twitter/X, Substack…) — <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/report</code> détecte le MCP du réseau via préfixe (<code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">mcp__linkedin__*</code>, etc.) et pull les stats. Sans MCP, fallback export manuel.<br>
-        <span style="color: var(--text-muted); font-size: 13px;">Aucun n'est requis. Le kit fonctionne sans.</span>
-      </p>
-    </div>
 
     <div class="cta" style="margin-top:32px;">
       <a href="https://github.com/lgrante/ai-founder-workflow" class="btn btn-primary" target="_blank" rel="noopener">
