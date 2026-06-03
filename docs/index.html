@@ -806,6 +806,324 @@
   .ctx-tag.purple::before { background: var(--purple); }
   .ctx-tag.yellow::before { background: var(--yellow); }
 
+  /* ─── HOW (animated SVG schema) ────────── */
+  .how { padding-bottom: 100px; }
+  .how h2 { max-width: 760px; }
+  .how-diagram-wrap {
+    margin-top: 48px;
+    padding: 40px 32px 32px;
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    background:
+      radial-gradient(ellipse 600px 300px at 50% 30%, rgba(126,231,135,0.04), transparent 70%),
+      linear-gradient(180deg, var(--bg-elev) 0%, var(--bg) 100%);
+    position: relative;
+    overflow: hidden;
+  }
+  .how-diagram-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 1px 1px, var(--border) 1px, transparent 0);
+    background-size: 24px 24px;
+    opacity: 0.35;
+    pointer-events: none;
+  }
+  .how-diagram {
+    position: relative;
+    z-index: 1;
+  }
+  .how-diagram svg {
+    width: 100%;
+    height: auto;
+    max-width: 900px;
+    display: block;
+    margin: 0 auto;
+    overflow: visible;
+  }
+  .how-legend {
+    display: flex;
+    justify-content: center;
+    gap: 26px;
+    margin-top: 32px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 1;
+  }
+  .legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--text-soft);
+  }
+  .legend-dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    box-shadow: 0 0 8px currentColor;
+  }
+  .legend-discover { color: var(--blue); }
+  .legend-build { color: var(--accent); }
+  .legend-broadcast { color: var(--purple); }
+
+  /* SVG node / flow / file styles */
+  .svg-repo-border {
+    fill: none;
+    stroke: rgba(126,231,135,0.18);
+    stroke-width: 1.5;
+    stroke-dasharray: 5 7;
+    animation: repo-rotate 60s linear infinite;
+  }
+  @keyframes repo-rotate {
+    to { stroke-dashoffset: -120; }
+  }
+  .svg-repo-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    fill: var(--accent);
+    font-weight: 600;
+  }
+  .svg-section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    fill: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .svg-node {
+    fill: var(--bg-soft);
+    stroke-width: 2.2;
+  }
+  .svg-node-discover { stroke: var(--blue); animation: pulse-discover 3.2s ease-in-out infinite; }
+  .svg-node-build { stroke: var(--accent); animation: pulse-build 3.2s ease-in-out infinite; animation-delay: 1.1s; }
+  .svg-node-broadcast { stroke: var(--purple); animation: pulse-broadcast 3.2s ease-in-out infinite; animation-delay: 2.2s; }
+
+  @keyframes pulse-discover {
+    0%, 100% { stroke-width: 2.2; filter: drop-shadow(0 0 0 transparent); }
+    50% { stroke-width: 3; filter: drop-shadow(0 0 10px #79c0ff); }
+  }
+  @keyframes pulse-build {
+    0%, 100% { stroke-width: 2.2; filter: drop-shadow(0 0 0 transparent); }
+    50% { stroke-width: 3; filter: drop-shadow(0 0 10px #7ee787); }
+  }
+  @keyframes pulse-broadcast {
+    0%, 100% { stroke-width: 2.2; filter: drop-shadow(0 0 0 transparent); }
+    50% { stroke-width: 3; filter: drop-shadow(0 0 10px #d2a8ff); }
+  }
+
+  .svg-node-cmd {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .svg-node-cmd-discover { fill: var(--blue); }
+  .svg-node-cmd-build { fill: var(--accent); }
+  .svg-node-cmd-broadcast { fill: var(--purple); }
+  .svg-node-sublabel {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--text-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .svg-flow {
+    fill: none;
+    stroke-width: 2;
+    stroke-dasharray: 8 9;
+    stroke-linecap: round;
+    animation: flow-march 0.9s linear infinite;
+  }
+  .svg-flow-discover { stroke: var(--blue); }
+  .svg-flow-build { stroke: var(--accent); }
+  .svg-flow-broadcast { stroke: var(--purple); }
+  @keyframes flow-march {
+    to { stroke-dashoffset: -17; }
+  }
+
+  .svg-arrowhead-discover { fill: var(--blue); }
+  .svg-arrowhead-build { fill: var(--accent); }
+  .svg-arrowhead-broadcast { fill: var(--purple); }
+
+  .svg-particle-discover { fill: var(--blue); filter: drop-shadow(0 0 4px #79c0ff); }
+  .svg-particle-build { fill: var(--accent); filter: drop-shadow(0 0 4px #7ee787); }
+  .svg-particle-broadcast { fill: var(--purple); filter: drop-shadow(0 0 4px #d2a8ff); }
+
+  .svg-file {
+    fill: rgba(13,17,23,0.85);
+    stroke-width: 1.5;
+  }
+  .svg-file-discover { stroke: rgba(121,192,255,0.5); }
+  .svg-file-build { stroke: rgba(126,231,135,0.5); }
+  .svg-file-broadcast { stroke: rgba(210,168,255,0.5); }
+
+  .svg-file-icon { fill: var(--text-muted); }
+  .svg-file-name {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    font-weight: 500;
+    fill: var(--text);
+  }
+  .svg-file-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    fill: var(--text-muted);
+  }
+
+  .svg-cross-flow {
+    fill: none;
+    stroke: rgba(121,192,255,0.45);
+    stroke-width: 1.4;
+    stroke-dasharray: 3 5;
+    animation: cross-march 1.4s linear infinite;
+  }
+  @keyframes cross-march {
+    to { stroke-dashoffset: -16; }
+  }
+  .svg-cross-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--blue);
+    letter-spacing: 0.04em;
+    font-style: italic;
+  }
+
+  .svg-annot {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    fill: var(--text-muted);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+  .svg-annot-strong { fill: var(--text-soft); font-weight: 600; }
+
+  /* Pipeline end-to-end schema */
+  .svg-gate {
+    fill: rgba(227, 179, 65, 0.12);
+    stroke: var(--yellow);
+    stroke-width: 1.8;
+    animation: gate-glow 3s ease-in-out infinite;
+  }
+  @keyframes gate-glow {
+    0%, 100% { filter: drop-shadow(0 0 0 transparent); }
+    50% { filter: drop-shadow(0 0 12px rgba(227,179,65,0.45)); }
+  }
+  .svg-gate-icon { fill: var(--yellow); }
+  .svg-gate-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--yellow);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .svg-loop {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 1.6;
+    stroke-dasharray: 4 4;
+    transform-origin: center;
+    transform-box: fill-box;
+    animation: loop-spin 4s linear infinite;
+  }
+  @keyframes loop-spin {
+    to { transform: rotate(360deg); }
+  }
+  .svg-loop-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--accent);
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .svg-read-flow {
+    fill: none;
+    stroke: rgba(121,192,255,0.6);
+    stroke-width: 1.6;
+    stroke-dasharray: 5 6;
+    stroke-linecap: round;
+    animation: read-march 1.6s linear infinite;
+  }
+  .svg-read-flow.key {
+    stroke: var(--blue);
+    stroke-width: 2;
+    stroke-dasharray: 6 6;
+    animation: read-march 1.4s linear infinite;
+  }
+  @keyframes read-march {
+    to { stroke-dashoffset: -22; }
+  }
+  .svg-read-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    fill: var(--blue);
+    letter-spacing: 0.04em;
+    font-style: italic;
+    font-weight: 500;
+  }
+
+  .svg-write-flow {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 2;
+    stroke-linecap: round;
+    marker-end: url(#arrow-build);
+  }
+  .svg-write-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--text-muted);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  .svg-criteria {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    fill: var(--accent);
+    font-weight: 500;
+  }
+
+  /* fresh-session badge above /test */
+  .svg-fresh-badge {
+    fill: rgba(121,192,255,0.15);
+    stroke: var(--blue);
+    stroke-width: 1.2;
+  }
+  .svg-fresh-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--blue);
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+
+  /* subagent satellite */
+  .svg-subagent {
+    fill: var(--bg-soft);
+    stroke: var(--accent);
+    stroke-width: 1.5;
+    stroke-dasharray: 2 3;
+    animation: sub-pulse 2.4s ease-in-out infinite;
+  }
+  @keyframes sub-pulse {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 1; }
+  }
+  .svg-subagent-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    fill: var(--text-soft);
+    letter-spacing: 0.04em;
+  }
+
   /* ─── DAY-IN-LIFE ──────────────────────── */
   .day-grid {
     display: grid;
@@ -1097,35 +1415,151 @@
   </div>
 </section>
 
-<!-- ═══════════════ PIPELINE ═══════════════ -->
-<section id="pipeline" class="reveal">
+<!-- ═══════════════ PIPELINE (end-to-end animated schema) ═══════════════ -->
+<section id="pipeline" class="how reveal">
   <div class="container">
-    <div class="eyebrow">Pipeline build</div>
-    <h2>Trois sessions, dans <span class="grad">l'ordre</span>.</h2>
+    <div class="eyebrow">Comment ça marche · bout en bout</div>
+    <h2>Trois sessions. Un fichier <span class="grad">lu deux fois</span>.</h2>
     <p class="lede">
-      Chacune laisse un fichier que la suivante lit. Les tests s'ancrent sur l'intention (le spec), jamais sur le code qu'on vient d'écrire.
+      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:5px;border:1px solid var(--border);font-size:13.5px;">/spec</code> écrit les critères.
+      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:5px;border:1px solid var(--border);font-size:13.5px;">/code</code> les lit pour <em>construire</em>.
+      <code style="background:var(--bg-elev);padding:2px 8px;border-radius:5px;border:1px solid var(--border);font-size:13.5px;">/test</code> les lit pour <em>valider à œil neuf</em>.
+      Les sessions passent ; les fichiers (et les critères) restent l'ancre commune.
     </p>
 
-    <div class="pipeline-flow">
-      <div class="step">
-        <span class="step-num">01</span>
-        <h4>/spec &lt;feature&gt;</h4>
-        <p>Décide le <strong style="color:var(--text)">quoi</strong>. Critères d'acceptation numérotés (C1, C2…) + jalons user-facing. Validés <em>avant</em> le code.</p>
+    <div class="how-diagram-wrap">
+      <div class="how-diagram">
+        <svg viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="xMidYMid meet">
+          <defs>
+            <marker id="arrow-build" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="#7ee787"/>
+            </marker>
+            <marker id="arrow-blue" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="#79c0ff"/>
+            </marker>
+            <marker id="arrow-yellow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto">
+              <path d="M 0 0 L 10 5 L 0 10 Z" fill="#e3b341"/>
+            </marker>
+          </defs>
+
+          <!-- repo container -->
+          <rect x="20" y="20" width="1060" height="440" rx="18" class="svg-repo-border"/>
+          <text x="40" y="46" class="svg-repo-label">features/checkout-flow/</text>
+
+          <!-- annotations -->
+          <text x="555" y="46" text-anchor="middle" class="svg-annot svg-annot-strong">SESSIONS · éphémères</text>
+          <text x="555" y="450" text-anchor="middle" class="svg-annot svg-annot-strong">FICHIERS · persistants</text>
+
+          <!-- ─── /SPEC SESSION (left) ─── -->
+          <g>
+            <text x="135" y="84" text-anchor="middle" class="svg-node-sublabel">step 01</text>
+            <circle cx="135" cy="150" r="48" class="svg-node svg-node-build"/>
+            <text x="135" y="146" text-anchor="middle" dominant-baseline="middle" class="svg-node-cmd svg-node-cmd-build">/spec</text>
+            <text x="135" y="166" text-anchor="middle" dominant-baseline="middle" class="svg-node-sublabel">le quoi</text>
+          </g>
+
+          <!-- write arrow: /spec → SPEC.md -->
+          <path d="M 135 200 L 135 290" class="svg-write-flow"/>
+          <text x="142" y="248" class="svg-write-label">writes</text>
+
+          <!-- SPEC.md file -->
+          <g>
+            <rect x="35" y="296" width="200" height="92" rx="10" class="svg-file svg-file-build"/>
+            <text x="50" y="319" class="svg-file-name">SPEC.md</text>
+            <text x="50" y="340" class="svg-criteria">C1 · panier → commande</text>
+            <text x="50" y="356" class="svg-criteria">C2 · paiement refusé OK</text>
+            <text x="50" y="372" class="svg-criteria">… jalon 1 · jalon 2</text>
+          </g>
+
+          <!-- ─── /CODE SESSION (center) ─── -->
+          <g>
+            <text x="520" y="84" text-anchor="middle" class="svg-node-sublabel">step 02</text>
+            <circle cx="520" cy="150" r="56" class="svg-node svg-node-build"/>
+            <text x="520" y="146" text-anchor="middle" dominant-baseline="middle" class="svg-node-cmd svg-node-cmd-build">/code</text>
+            <text x="520" y="167" text-anchor="middle" dominant-baseline="middle" class="svg-node-sublabel">le comment</text>
+            <!-- code loop indicator (around the session) -->
+            <ellipse cx="520" cy="150" rx="72" ry="72" class="svg-loop"/>
+            <text x="520" y="68" text-anchor="middle" class="svg-loop-label">↻ étape → hook → étape</text>
+          </g>
+
+          <!-- subagent satellite (writes tests rapides) -->
+          <g>
+            <circle cx="620" cy="220" r="20" class="svg-subagent"/>
+            <text x="620" y="225" text-anchor="middle" dominant-baseline="middle" class="svg-subagent-label">sub</text>
+            <text x="620" y="258" text-anchor="middle" class="svg-subagent-label">↑ écrit tests rapides</text>
+          </g>
+
+          <!-- read arrow: SPEC.md → /code (curved up) -->
+          <path d="M 235 320 C 320 320, 360 200, 470 175" class="svg-read-flow" marker-end="url(#arrow-blue)"/>
+          <text x="290" y="260" class="svg-read-label">reads</text>
+
+          <!-- write arrow: /code → code+tests file -->
+          <path d="M 520 210 L 520 290" class="svg-write-flow"/>
+          <text x="527" y="252" class="svg-write-label">writes</text>
+
+          <!-- code+tests file -->
+          <g>
+            <rect x="420" y="296" width="200" height="92" rx="10" class="svg-file svg-file-build"/>
+            <text x="435" y="319" class="svg-file-name">code/ + tests/</text>
+            <text x="435" y="340" class="svg-file-meta">hook bloque tant que rouge</text>
+            <text x="435" y="358" class="svg-file-meta">stop_hook_active = anti-loop</text>
+            <text x="435" y="376" class="svg-file-meta">commit ✓ → étape suivante</text>
+          </g>
+
+          <!-- ─── HUMAN GATE (between /code and /test) ─── -->
+          <g>
+            <polygon points="745,150 790,115 835,150 790,185" class="svg-gate"/>
+            <text x="790" y="148" text-anchor="middle" dominant-baseline="middle" class="svg-gate-icon" font-size="22" font-weight="700">✓</text>
+            <text x="790" y="100" text-anchor="middle" class="svg-gate-label">humain · jalon</text>
+          </g>
+
+          <!-- horizontal connectors session row -->
+          <path d="M 195 150 L 460 150" class="svg-write-flow" stroke-dasharray="2 5"/>
+          <path d="M 580 150 L 740 150" class="svg-write-flow" stroke-dasharray="2 5"/>
+          <path d="M 840 150 L 920 150" class="svg-write-flow" stroke-dasharray="2 5"/>
+
+          <!-- ─── /TEST SESSION (right) ─── -->
+          <g>
+            <text x="965" y="84" text-anchor="middle" class="svg-node-sublabel">step 03</text>
+            <circle cx="965" cy="150" r="48" class="svg-node svg-node-build"/>
+            <text x="965" y="146" text-anchor="middle" dominant-baseline="middle" class="svg-node-cmd svg-node-cmd-build">/test</text>
+            <text x="965" y="166" text-anchor="middle" dominant-baseline="middle" class="svg-node-sublabel">œil neuf</text>
+            <!-- fresh-session badge -->
+            <rect x="930" y="196" width="70" height="18" rx="9" class="svg-fresh-badge"/>
+            <text x="965" y="208" text-anchor="middle" dominant-baseline="middle" class="svg-fresh-label">FRESH</text>
+          </g>
+
+          <!-- KEY cross-arrow: SPEC.md → /test (LONG arc, highlighted) -->
+          <path d="M 235 296 C 400 240, 800 240, 940 178" class="svg-read-flow key" marker-end="url(#arrow-blue)"/>
+          <text x="570" y="232" text-anchor="middle" class="svg-read-label">le MÊME SPEC.md, relu sans avoir vu le code</text>
+
+          <!-- write arrow: /test → e2e -->
+          <path d="M 965 220 L 965 290" class="svg-write-flow"/>
+          <text x="972" y="258" class="svg-write-label">writes</text>
+
+          <!-- e2e file -->
+          <g>
+            <rect x="865" y="296" width="200" height="92" rx="10" class="svg-file svg-file-build"/>
+            <text x="880" y="319" class="svg-file-name">tests/e2e/ + review</text>
+            <text x="880" y="340" class="svg-file-meta">e2e dérivés du SPEC</text>
+            <text x="880" y="358" class="svg-file-meta">revue à œil neuf</text>
+            <text x="880" y="376" class="svg-file-meta">→ ship 🚀 (jalon humain)</text>
+          </g>
+
+        </svg>
       </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <span class="step-num">02</span>
-        <h4>/code &lt;feature&gt;</h4>
-        <p>Construit étape par étape. Un subagent écrit le filet rapide depuis les critères. Un hook le lance et bloque tant que rouge.</p>
-      </div>
-      <div class="arrow">→</div>
-      <div class="step">
-        <span class="step-num">03</span>
-        <h4>/test &lt;feature&gt;</h4>
-        <p>Session fraîche qui n'a pas écrit le code. Écrit l'e2e depuis le spec et fait la revue à œil neuf.</p>
+
+      <div class="how-legend">
+        <span class="legend-item legend-build"><span class="legend-dot" style="background:currentColor"></span>session /</span>
+        <span class="legend-item legend-build"><span class="legend-dot" style="background:transparent;border:1.5px solid currentColor"></span>fichier persistant</span>
+        <span class="legend-item legend-discover"><span class="legend-dot" style="background:transparent;border:1.5px dashed currentColor"></span>lecture (reads)</span>
+        <span class="legend-item" style="color:var(--yellow)"><span class="legend-dot" style="background:currentColor;clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%);border-radius:0"></span>gate humain</span>
       </div>
     </div>
-    <p class="gate">Puis <strong>un humain valide le jalon</strong> avant d'enchaîner. L'automatisation porte sur la régression — pas sur le jugement.</p>
+
+    <p class="gate" style="margin-top: 32px;">
+      <strong>Le secret du découpage</strong> : <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/test</code> n'a pas écrit le code. Il lit <strong style="color:var(--text);">le même SPEC</strong> que <code style="background:var(--bg);padding:2px 6px;border-radius:4px;border:1px solid var(--border-strong);font-size:12.5px;">/code</code> a lu — donc ses tests s'ancrent sur l'intention, pas sur le code écrit. C'est ce qui empêche les tests de ratifier les bugs.
+    </p>
   </div>
 </section>
 
