@@ -27,7 +27,7 @@ sessions par feature (build) + découverte + audience, pipeline `spec → code �
 Commandes :
 - **Setup / dev** : `/setup` `/spec` `/code <feature>` (ou `/code bugs/<slug>` pour fixer un ticket) `/test`
 - **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
-- **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>`
+- **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>` `/report <network>`
 
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.

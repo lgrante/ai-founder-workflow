@@ -47,6 +47,7 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | `post-<channel>-<sujet>` | Audience | post court pour un réseau (LinkedIn, Twitter/X, …) | `content/<channel>/{drafts,scheduled,posted}/` |
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée à partir du reste | `content/newsletter/<edition>.md` |
+| `report-<network>` | Audience | analyse de performance via le MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
 
 - **Trois types de découverte distincts** : `market-research-` regarde le **marché** (extérieur, abstrait) ; `user-feedback-` regarde des **personnes précises** (intérieur, qualitatif, 1-à-1) ; `support-` regarde des **tickets agrégés** (intérieur, quantitatif, depuis un système Jira/Zendesk/…). Les trois alimentent `knowledge/insights.md` global, qui est la source où émergent les motifs.
 - Les skills audience (`post`, `article`, `newsletter`) **invoquent** les skills de copywriting existantes (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement. Le kit fournit la **structure** + le **workflow** (où ranger, draft → review → publish), pas la rédaction elle-même.
@@ -95,9 +96,12 @@ flowchart TD
 
 Plus simple que le build — pas de tests automatisés, le gate est uniquement humain :
 
-- **`post-<channel>-<sujet>`** : draft → review humaine → `scheduled/` ou `posted/`.
-- **`article-<sujet>`** : plan (validé) → wip → review section par section → `published/`.
-- **`newsletter-<edition>`** : structure (validée) → assemblage → review → posted.
+- **`post-<channel>-<sujet>`** : draft → review humaine → `scheduled/` ou `posted/`. Lit les insights du dernier `/report <channel>` au démarrage pour appliquer ce qui marche.
+- **`article-<sujet>`** : plan (validé) → wip → review section par section → `published/`. Idem (insights du `/report blog`).
+- **`newsletter-<edition>`** : structure (validée) → assemblage → review → posted. Idem (insights du `/report newsletter`).
+- **`report-<network>`** : pull les stats via le MCP du réseau (LinkedIn, Twitter/X, blog analytics, mailing tool…) → archive le raw dans `stats/` → écrit le rapport synthétisé dans `insights/`. Les prochaines sessions audience le lisent.
+
+**Bonus** : si tu as une image / un diagramme à produire, les skills audience détectent le compagnon [nano-banana](https://github.com/kkoppenhaver/cc-nano-banana) (skill global qui wrap le Gemini CLI) et proposent de l'invoquer (cf. § Compagnons optionnels plus bas).
 
 ### Tickets de bug (annexe au build, pas un 4e axe)
 
@@ -199,10 +203,12 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │       ├── TICKET.md         # mini-spec : repro + comportement attendu + critère "ne se reproduit plus"
 │       └── PLAN.md           # plan de fix (optionnel — écrit par /code si non trivial)
 ├── content/                  # axe AUDIENCE (continu, output pour les réseaux)
-│   ├── linkedin/{drafts,scheduled,posted}/    # posts courts par channel
-│   ├── twitter-x/{drafts,posted}/             # idem (scheduled optionnel selon outil)
-│   ├── blog/{wip,published}/                  # long form
-│   └── newsletter/<edition>.md                # éditions périodiques
+│   ├── linkedin/             # drafts/ scheduled/ posted/ + stats/ insights/
+│   ├── twitter-x/            # drafts/ posted/ + stats/ insights/
+│   ├── blog/                 # wip/ published/ + stats/ insights/
+│   └── newsletter/           # <edition>.md + stats/ insights/
+│   # post text-only = .md plat ; post avec asset = dossier <slug>/{post.md, hero.png, …}
+│   # stats/ = raw MCP/exports append-only · insights/ = rapports /report (md + html)
 ├── .cc-scratch/              # gitignored — résultats de tests + creds locaux (support-creds.json, etc.)
 └── <code applicatif>         # INCHANGÉ
 ```
@@ -240,7 +246,7 @@ gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ~/ai-founder-workflow/install.sh --global
 ```
 
-Les 10 skills (`/setup /spec /code /test /research /feedback /support /post /article /newsletter`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
+Les 11 skills (`/setup /spec /code /test /research /feedback /support /post /article /newsletter /report`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
 
 ### Étape 3 — Déployer le workflow dans un repo cible
 
@@ -280,6 +286,45 @@ Le skill `/setup` applique les règles suivantes — quel que soit le repo :
 
 ---
 
+## 7bis. Compagnons optionnels
+
+Le kit reste utilisable seul. Pour enrichir certaines capacités, tu peux installer des skills externes dans `~/.claude/skills/` — détectés à la volée par nos skills. Aucun n'est requis.
+
+### Génération d'images — cc-nano-banana
+
+[**cc-nano-banana**](https://github.com/kkoppenhaver/cc-nano-banana) wrap le Gemini CLI + extension nanobanana pour générer / éditer des images. Une fois installé globalement, il fournit `/generate`, `/icon`, `/diagram`, `/edit`, etc. Les skills `/post`, `/article`, `/newsletter` le détectent et proposent de l'invoquer pour produire l'image / le hero / le diagramme du contenu.
+
+**Install** (résumé — voir le README du skill pour le détail) :
+
+```bash
+# 1. Gemini CLI
+npm install -g @google/gemini-cli
+
+# 2. Clé API Google AI Studio
+export NANOBANANA_GEMINI_API_KEY="ton-api-key"
+
+# 3. Extension nanobanana via Gemini CLI
+gemini extensions install https://github.com/gemini-cli-extensions/nanobanana
+
+# 4. Le skill lui-même
+git clone https://github.com/kkoppenhaver/cc-nano-banana ~/.claude/skills/nano-banana
+```
+
+**Coût** : ~0,04 $/image avec le modèle par défaut (`gemini-2.5-flash-image`), plus avec le modèle pro.
+
+**Flux dans `/post`** : la skill génère dans `./nanobanana-output/` du cwd ; on `mv` ensuite vers le dossier du post (`content/<channel>/<status>/<slug>/hero.png`). Si pas installé : skip silencieux, le post est créé sans image.
+
+### MCP par réseau social — pour `/report` et la lecture d'insights
+
+`/report <network>` (et `/post`, `/article`, `/newsletter` pour lire les insights produits) détectent automatiquement le MCP du réseau visé via le préfixe d'outils :
+
+- LinkedIn → `mcp__linkedin__*` (ex. linkedin-scraper-mcp)
+- Twitter/X → `mcp__twitter__*` ou `mcp__x__*`
+- Blog → MCP analytics (Plausible, GA via wrapper, …)
+- Newsletter → MCP de l'outil mailing (Substack, Beehiiv, ConvertKit…)
+
+Le kit est **agnostique** : il n'embarque aucun MCP, il les détecte si présents. Sans MCP, `/report` propose un fallback export manuel (CSV/JSON collé par l'utilisateur).
+
 ## 8. Non-négociable vs adaptable
 
 **Non-négociable (la doctrine §1–§5) :**
@@ -317,8 +362,8 @@ ai-founder-workflow/          # le repo à partager
 │       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
-│       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter}/SKILL.md
-├── scaffold/                 # arborescence vide (knowledge/, features/, content/, .cc-scratch/)
+│       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter,report}/SKILL.md
+├── scaffold/                 # arborescence vide (knowledge/, features/, bugs/, content/<channels>/{stats,insights,…}/, .cc-scratch/)
 └── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 ```
 

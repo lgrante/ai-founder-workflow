@@ -24,6 +24,7 @@ Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat 
 | `post-<channel>-<sujet>` | Audience | post court réseau social | `content/<channel>/{drafts,scheduled,posted}/` |
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée | `content/newsletter/<edition>.md` |
+| `report-<network>` | Audience | analyse de performance via MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
 
 `market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Les skills audience **invoquent** des skills de copywriting globales (ex. `marketing-skills:writing-linkedin-posts`) si disponibles. Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
 
@@ -66,6 +67,8 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 - **Gate humain** — la décision de valider une tranche au jalon. Reste humaine ; l'automatisation porte sur la régression, pas sur le jugement.
 - **Disjoncteur** — après 2-3 rouges persistants sur une étape, on arrête : le spec ou l'approche est en cause.
 - **Ticket de bug** — `bugs/<slug>/TICKET.md`, mini-spec à 1-2 critères, déposé par `/test` ou `/support` quand un bug net est trouvé. Lu par `/code <slug>` comme une SPEC. Distinct du *pain point* qui, lui, reste agrégé dans `knowledge/support/insights.md`.
+- **Stats (audience)** — raw dump horodaté du MCP réseau dans `content/<network>/stats/<date>-snapshot.<ext>`. Preuve brute, append-only, sert de traçabilité aux insights.
+- **Insight (audience)** — rapport synthétisé par `/report` dans `content/<network>/insights/<date>-report.md` (+ .html). Source actionnable lue par `/post`, `/article`, `/newsletter` pour informer leurs drafts.
 
 ## Exemple de cycle de bout en bout
 Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit `examples/checkout-flow/`).
@@ -102,6 +105,41 @@ features/<slug>/
 - **`/spec <feature>` scaffold la structure** quand le dossier n'existe pas. Et propose l'archivage quand `SPEC.md` existe déjà et qu'on annonce une refonte majeure.
 
 **Pourquoi cette uniformité** : un dossier prévisible = un LLM qui retrouve l'historique sans chercher. Et un onboarding humain à 0 effort.
+
+## Convention par-channel audience (stats + insights + assets)
+
+**Principe** : chaque channel d'audience (`linkedin`, `twitter-x`, `blog`, `newsletter`…) suit la même structure — `/post`, `/article`, `/newsletter` écrivent les drafts et publications ; `/report` mesure et synthétise.
+
+```
+content/<channel>/
+├── drafts/          # WIP (post.md plat OU dossier <slug>/{post.md, assets})
+├── scheduled/       # validé, en attente de publication (idem)
+├── posted/          # publié (idem)
+├── stats/           # raw dumps MCP/exports, append-only, horodatés
+│   └── 2026-06-03-snapshot.json
+└── insights/        # rapports synthétisés par /report (md + html dual)
+    └── 2026-06-03-report.md / .html
+```
+
+*(Variantes : `blog/` utilise `wip/` au lieu de `drafts/` et n'a pas de `scheduled/`. `newsletter/` n'a pas de sous-dossiers de statut — chaque édition est un fichier unique chronologique.)*
+
+**Règles** :
+- **Post text-only** → `content/<channel>/<status>/<YYYY-MM-DD>-<slug>.md` (fichier plat).
+- **Post avec asset** (image, diagramme) → `content/<channel>/<status>/<YYYY-MM-DD>-<slug>/` (dossier) contenant `post.md` + les assets. Garde l'artefact et ses visuels ensemble — un `.md` séparé de son image est cassé.
+- **`stats/` est append-only** : chaque pull `/report` écrit un nouveau snapshot horodaté ; jamais d'écrasement (traçabilité « d'où sort ce 1 345 ? »).
+- **`insights/` respecte la convention dual md+html** : `<date>-report.md` + `<date>-report.html` synchronisés.
+- **`/post` et `/article` lisent `insights/`** au démarrage pour informer leurs choix éditoriaux (format gagnant, recommandations en cours).
+
+**Pourquoi cette séparation stats/insights** : même logique que support (`knowledge/support/clients/<client>.md` cumul vs `knowledge/support/insights.md` motifs). Le raw est la preuve, l'insight est la synthèse actionnable. Les deux servent à un moment différent et ne se mélangent pas.
+
+## Compagnons optionnels (skills externes)
+
+Le kit reste utilisable seul. Certaines capacités peuvent être ajoutées via des skills installés globalement dans `~/.claude/skills/` :
+
+- **[cc-nano-banana](https://github.com/kkoppenhaver/cc-nano-banana)** — wrap le Gemini CLI + extension nanobanana pour générer / éditer des images. Fournit `/generate`, `/icon`, `/diagram`, etc. Détecté à la volée par `/post`, `/article`, `/newsletter`. Output par défaut : `./nanobanana-output/` (à déplacer dans le dossier du post). Coût ~0,04 $/image. Prérequis : Gemini CLI + clé API Google AI Studio.
+- **MCP du réseau social** (LinkedIn, Twitter/X, Substack…) — détecté par `/report` (et `/post`, `/article`, `/newsletter` pour lire les insights). Sans MCP, fallback export manuel ou skip.
+
+Aucun n'est requis ; chacun enrichit une capacité existante.
 
 ## Convention par-bug (tickets éphémères)
 

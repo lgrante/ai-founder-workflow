@@ -93,7 +93,7 @@ Aucun fichier perdu (les déplacements via `git mv` sont récupérables via le r
 │   ├── settings.json         # Stop hook → test-gate.sh
 │   ├── hooks/test-gate.sh    # filet rapide (anti-boucle stop_hook_active obligatoire)
 │   ├── statusline.sh         # OPTIONNEL — % contexte
-│   └── skills/               # 10 skills : setup, spec, code, test (dev) + research, feedback, support (découverte) + post, article, newsletter (audience)
+│   └── skills/               # 11 skills : setup, spec, code, test (dev) + research, feedback, support (découverte) + post, article, newsletter, report (audience)
 ├── knowledge/                # axe DÉCOUVERTE (continu, jamais par feature)
 │   ├── market/               # recherche marché
 │   ├── insights.md           # agrégat global (features ET contenu — alimenté par les 3 types discovery)
@@ -115,10 +115,11 @@ Aucun fichier perdu (les déplacements via `git mv` sont récupérables via le r
 │   ├── TICKET.md             # repro + comportement attendu + critère "ne se reproduit plus"
 │   └── PLAN.md               # plan de fix (optionnel, écrit par /code si non trivial)
 ├── content/                  # axe AUDIENCE (continu, output pour les réseaux)
-│   ├── linkedin/{drafts,scheduled,posted}/
-│   ├── twitter-x/{drafts,posted}/
-│   ├── blog/{wip,published}/
-│   └── newsletter/<edition>.md
+│   ├── linkedin/             # drafts/ scheduled/ posted/ + stats/ insights/ (alimentés par /report)
+│   ├── twitter-x/            # drafts/ posted/ + stats/ insights/
+│   ├── blog/                 # wip/ published/ + stats/ insights/
+│   └── newsletter/           # <edition>.md + stats/ insights/
+│   # Post text-only = .md plat. Post avec asset = dossier <slug>/{post.md, hero.png, …}
 ├── .cc-scratch/              # gitignored — résultats de tests transitoires + creds locaux (ex. support-creds.json)
 ├── _archive/                 # transit avant suppression définitive
 └── <code applicatif>         # INCHANGÉ
@@ -170,17 +171,17 @@ Détail complet : `templates/docs/WORKFLOW.md` du kit (Convention par-feature + 
 
    - **Attends la validation complète (plan + carte + questions + artefacts retrouvés) AVANT toute action.**
 
-3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `bugs/`, `content/<channels>/{drafts,posted,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
+3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `bugs/`, `content/<channels>/{drafts,posted,stats,insights,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). **Important** : pour chaque channel audience scaffold-é (linkedin, twitter-x, blog, newsletter…), créer aussi `stats/` (raw dumps MCP/exports, archives append-only) et `insights/` (rapports synthétisés par `/report`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
 
 4. **Phase 2 — Doctrine** : crée `CLAUDE.md` (court, rempli avec specs du repo, **infusé des décisions tirées des memory files**), copie `docs/WORKFLOW.md` depuis `templates/docs/WORKFLOW.md` du kit, crée READMEs racine + `knowledge/` + `features/` + `content/`, crée `knowledge/insights.md` squelette, crée `knowledge/content/brand-book.md` placeholder si absent, crée `knowledge/support/insights.md` squelette. **Commit Phase 2.**
 
-5. **Phase 3 — Outillage** : importe les 10 skills depuis `templates/.claude/skills/` (setup, spec, code, test côté dev ; research, feedback, support côté découverte ; post, article, newsletter côté audience), les hooks (`test-gate.sh` + 2 optionnels `context-handoff.sh` et `context-restore.sh`), `settings.json`, `statusline.sh`. Modifie `.gitignore` pour versionnement partiel `.claude/` (ignore `settings.local.json`, `scheduled_tasks.lock`, `worktrees/`). **Commit Phase 3.**
+5. **Phase 3 — Outillage** : importe les 11 skills depuis `templates/.claude/skills/` (setup, spec, code, test côté dev ; research, feedback, support côté découverte ; post, article, newsletter, report côté audience), les hooks (`test-gate.sh` + 2 optionnels `context-handoff.sh` et `context-restore.sh`), `settings.json`, `statusline.sh`. Modifie `.gitignore` pour versionnement partiel `.claude/` (ignore `settings.local.json`, `scheduled_tasks.lock`, `worktrees/`). **Note** : suggère à l'utilisateur d'installer aussi le skill compagnon `nano-banana` globalement s'il prévoit de générer des images de posts (cf. README § Compagnons optionnels). **Commit Phase 3.**
 
 6. **Phase 4 — Configurer TEST_CMD** : discute avec l'utilisateur des options selon la stack (uv / venv / docker / autre). Demande la commande exacte. Edit `test-gate.sh` + `CLAUDE.md` (cohérence : la commande doit matcher au mot près). Smoke-test : `echo '{}' | .claude/hooks/test-gate.sh ; echo "exit=$?"`. **Commit Phase 4.**
 
 7. **Phase 5 — Refonte features/ existantes** (optionnel, si le repo a déjà du contenu produit) : pour chaque feature pré-existante avec contenu, propose la migration vers la convention standard (`SPEC.md / PLAN.md / sub-features/ / prototypes/ / qa/ / plans/ / archives/v{N}/`). Pour chaque feature, demande si c'est une **itération sur la version active** (édition in-place) ou une **refonte majeure** (archive la racine dans `archives/v{N}/`). **Commit Phase 5.**
 
-8. **Final** : **propose** le push de la branche `setup-workflow` (avec OK explicite séparé — aucun push automatique). Rappelle à l'utilisateur : merger sur `main` quand satisfait, vider `_archive/` après validation finale, supprimer le tag `pre-setup-<timestamp>` quand tout va bien. Suggère des dry-run pour valider les pipelines en bout-en-bout : `/spec <feature>` (build), `/support <client>` (découverte si système de tickets configuré), `/post linkedin <sujet>` (audience).
+8. **Final** : **propose** le push de la branche `setup-workflow` (avec OK explicite séparé — aucun push automatique). Rappelle à l'utilisateur : merger sur `main` quand satisfait, vider `_archive/` après validation finale, supprimer le tag `pre-setup-<timestamp>` quand tout va bien. Suggère des dry-run pour valider les pipelines en bout-en-bout : `/spec <feature>` (build), `/support <client>` (découverte si système de tickets configuré), `/post linkedin <sujet>` (audience), `/report linkedin` (analytics si MCP réseau configuré).
 
 ## Critères de succès
 
@@ -194,7 +195,7 @@ Détail complet : `templates/docs/WORKFLOW.md` du kit (Convention par-feature + 
 - **`~/.claude/projects/` intact** : `git diff` sur les transcripts originaux n'existe pas (lecture seule respectée).
 - **Aucun push automatique** : la branche `setup-workflow` reste locale jusqu'à l'OK explicite de la Phase Final.
 - **Tag de rollback présent** : `git tag` montre `pre-setup-<timestamp>` et l'utilisateur peut revenir en arrière à tout moment.
-- L'outillage marche : `/hooks` montre le `Stop` hook chargé ; `/setup /spec /code /test /research /feedback /support /post /article /newsletter` apparaissent (les 10).
+- L'outillage marche : `/hooks` montre le `Stop` hook chargé ; `/setup /spec /code /test /research /feedback /support /post /article /newsletter /report` apparaissent (les 11).
 - Smoke-test du hook : `echo '{}' | .claude/hooks/test-gate.sh ; echo "exit=$?"` retourne `exit=0` (vert) ou un JSON `decision:block` parsable.
 - Dry-run d'une petite feature passe le pipeline build de bout en bout : `/spec` → `SPEC.md` → `/code` → étape → hook vert → `/test` au jalon → gate humain.
 
