@@ -48,6 +48,7 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée à partir du reste | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via le MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
+| `status-<date>` | Transverse | snapshot 360° du projet en HTML responsive (mobile-first) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public anonymisé) |
 
 - **Trois types de découverte distincts** : `market-research-` regarde le **marché** (extérieur, abstrait) ; `user-feedback-` regarde des **personnes précises** (intérieur, qualitatif, 1-à-1) ; `support-` regarde des **tickets agrégés** (intérieur, quantitatif, depuis un système Jira/Zendesk/…). Les trois alimentent `knowledge/insights.md` global, qui est la source où émergent les motifs.
 - Les skills audience (`post`, `article`, `newsletter`) **invoquent** les skills de copywriting existantes (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement. Le kit fournit la **structure** + le **workflow** (où ranger, draft → review → publish), pas la rédaction elle-même.
@@ -256,7 +257,7 @@ gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ~/ai-founder-workflow/install.sh --global
 ```
 
-Les 11 skills (`/setup /spec /code /test /research /feedback /support /post /article /newsletter /report`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
+Les 12 skills (`/setup /spec /code /test /research /feedback /support /post /article /newsletter /report /status`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
 
 ### Étape 3 — Déployer le workflow dans un repo cible
 
@@ -372,7 +373,7 @@ ai-founder-workflow/          # le repo à partager
 │       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
-│       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter,report}/SKILL.md
+│       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter,report,status}/SKILL.md
 ├── scaffold/                 # arborescence vide (knowledge/, features/, bugs/, content/<channels>/{stats,insights,…}/, .cc-scratch/)
 └── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 ```

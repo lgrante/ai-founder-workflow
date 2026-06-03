@@ -33,6 +33,7 @@ Commandes :
 - **Setup / dev** : `/setup` `/spec` `/code <feature>` (ou `/code bugs/<slug>` pour fixer un ticket) `/test`
 - **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>` `/report <network>`
+- **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages)
 
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.

@@ -67,6 +67,7 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
+| `status-<date>` | Transverse | snapshot 360° du projet (build + discovery + audience + activity + archi) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public anonymisé) |
 
 `market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Les skills audience **invoquent** des skills de copywriting globales (ex. `marketing-skills:writing-linkedin-posts`) si disponibles. Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
 
@@ -165,6 +166,7 @@ features/<slug>/
 | **Audience (article)** | `article/<slug>` | `article/inherited-org-monitoring` |
 | **Audience (newsletter)** | `newsletter/<edition>` | `newsletter/2026-06` |
 | **Audience (report)** | `report/<network>/<YYYY-MM-DD>` | `report/linkedin/2026-06-03` |
+| **Transverse (status)** | `status/<YYYY-MM-DD>` | `status/2026-06-03` |
 
 Le format exact (séparateur `-` vs `_`, casse) est une préférence d'équipe ; seul le **préfixe par axe** compte pour la lecture rapide de `git branch`. La cohérence importe plus que la forme.
 
