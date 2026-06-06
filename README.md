@@ -160,6 +160,7 @@ La ligne de partage côté build n'est **pas** « unitaire vs le reste ». C'est
 
 - **`Stop` hook** (ou `PostToolUse` sur `Edit|Write`) : lance les tests rapides et **bloque la fin du tour** tant que ce n'est pas vert → `code-x` corrige et relance **seule**.
 - **Anti-boucle obligatoire** : flag `stop_hook_active` dans le hook.
+- **Jumeau HTML déterministe** : `PostToolUse` (`Write|Edit`) → `md-to-html.py` régénère un `<fichier>.html` au contenu identique pour **chaque `.md` livrable** (thème sombre responsive, offline, zéro dépendance). Le `.md` reste la source ; le `.html` est dérivé. Denylist : `CLAUDE.md`, `README.md`, `.cc-scratch/`, `.claude/`, `memory/`… Cf. `docs/WORKFLOW.md` § Jumeau HTML.
 - (Optionnel) **statusline** affichant le % de contexte, **seuil d'auto-compact abaissé** (~0,85), et un **PreCompact → fichier + SessionStart → restore** comme filet sur les longues sessions.
 
 ---
@@ -183,8 +184,8 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 ├── CLAUDE.md                 # racine, versionné — COURT (commandes, conventions, étiquette)
 ├── CLAUDE.local.md           # gitignored — notes perso
 ├── .claude/
-│   ├── settings.json         # hooks (Stop / PostToolUse)
-│   ├── hooks/                # scripts (ex. test-gate) + anti-boucle stop_hook_active
+│   ├── settings.json         # hooks (Stop / PostToolUse / UserPromptSubmit)
+│   ├── hooks/                # scripts : test-gate (Stop), preflight-guard + md-to-html (jumeau HTML des livrables)
 │   └── skills/               # savoir de domaine + commandes de session (/<nom>)
 │       ├── setup/ spec/ code/ test/                       # cœur dev (4 + setup)
 │       ├── research/ feedback/ support/                   # découverte (3 types)
@@ -371,6 +372,8 @@ ai-founder-workflow/          # le repo à partager
 │       ├── settings.json     # hooks — placeholders de commandes de test
 │       ├── statusline.sh     # OPTIONNEL (opt-in) — % de contexte
 │       ├── hooks/test-gate.sh             # Stop hook (filet rapide)
+│       ├── hooks/preflight-guard.py       # UserPromptSubmit — bloque les skills hors repo setup
+│       ├── hooks/md-to-html.py            # PostToolUse (Write|Edit) — jumeau .html de chaque .md livrable
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
 │       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter,report,status}/SKILL.md

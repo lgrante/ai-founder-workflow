@@ -7,10 +7,11 @@ Enregistre idempotemment un hook Claude Code dans un settings.json
 pour le per-repo).
 
 Usage :
-    register-hook.py <settings.json path> <event> <command path> [timeout]
+    register-hook.py <settings.json path> <event> <command path> [timeout] [matcher]
 
-Exemple :
+Exemples :
     register-hook.py ~/.claude/settings.json UserPromptSubmit ~/.claude/hooks/preflight-guard.py 5
+    register-hook.py ~/.claude/settings.json PostToolUse ~/.claude/hooks/md-to-html.py 15 "Write|Edit"
 
 Sécurité :
 - Backup automatique du settings.json en `.bak` avant modification.
@@ -39,6 +40,7 @@ def main() -> int:
     event = sys.argv[2]
     command = sys.argv[3]
     timeout = int(sys.argv[4]) if len(sys.argv) >= 5 else 5
+    matcher = sys.argv[5] if len(sys.argv) >= 6 else None
 
     # Load existing settings or start fresh.
     if os.path.exists(settings_path):
@@ -90,11 +92,14 @@ def main() -> int:
         print(f"Backup : {backup}")
 
     # Append the new entry.
-    event_list.append({
+    entry = {
         "hooks": [
             {"type": "command", "command": command, "timeout": timeout}
         ]
-    })
+    }
+    if matcher:
+        entry = {"matcher": matcher, **entry}
+    event_list.append(entry)
 
     # Write.
     os.makedirs(os.path.dirname(settings_path), exist_ok=True)

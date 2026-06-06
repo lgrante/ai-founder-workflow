@@ -98,6 +98,17 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 ## Hook
 `Stop` hook (`.claude/hooks/test-gate.sh`) : lance les tests rapides, bloque la fin du tour via `{"decision":"block","reason":...}` (sortie sur stdout, `exit 0`) tant que rouge. Garde anti-boucle `stop_hook_active` obligatoire.
 
+## Jumeau HTML des livrables (garde-fou déterministe)
+Chaque livrable Markdown (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) a un **jumeau `.html` au contenu identique**, lisible/partageable sans rien installer : thème sombre responsive (mobile-first), offline (`file://`), cohérent avec la landing et `/status`.
+
+C'est **déterministe**, pas une consigne au LLM (même doctrine que `preflight-guard.py` / `test-gate.sh`) :
+- Hook `PostToolUse` (matcher `Write|Edit`) → `.claude/hooks/md-to-html.py` (per-repo après `/setup`) **et/ou** `~/.claude/hooks/md-to-html.py` (global après `install.sh --global`). Enregistré dans `settings.json` via `register-hook.py`.
+- À chaque écriture d'un `*.md` *livrable*, le `<fichier>.html` est régénéré à côté. Le `.md` reste la **source** ; le `.html` est dérivé (ne pas l'éditer — il sera réécrit).
+- **Portée (denylist)** : pas de jumeau pour `CLAUDE.md`, `README.md` (jumelé à la main), `MEMORY.md`, `AGENTS.md`, `CONTRIBUTING.md`, `LICENSE*`, ni sous `.cc-scratch/`, `.claude/`, `.git/`, `node_modules/`, `memory/`, `dist/`, `build/`.
+- **Zéro dépendance** (stdlib Python : pas de pandoc/pip) ; ne bloque **jamais** l'écriture (toujours `exit 0`, un échec de rendu est silencieux). GFM : titres+ancres, listes imbriquées, task lists, tables alignées, code fences, blockquotes, images, frontmatter→carte meta, sommaire auto (≥3 titres).
+
+> Conséquence : les `(+ .html)` mentionnés ci-dessous (insights, ARCHITECTURE…) ne sont plus à produire à la main — le hook s'en charge pour **tout** `.md` livrable.
+
 ## Mini-glossaire
 - **Session** — un fil Claude Code, jetable. Porte un préfixe par type (`spec-`, `code-`, `test-`, `market-research-`, `user-feedback-`). Ce qui survit n'est pas la session mais son **artefact**.
 - **Subagent** — un sous-fil lancé *dans* une session pour une tâche bornée (fouiller, écrire le filet rapide, lister des écarts). Son contexte ne pollue pas la session ; il rend une synthèse.

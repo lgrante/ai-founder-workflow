@@ -13,6 +13,14 @@
           { "type": "command", "command": ".claude/hooks/test-gate.sh", "timeout": 120 }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/md-to-html.py", "timeout": 15 }
+        ]
+      }
     ]
   }
 }

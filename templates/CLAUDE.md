@@ -35,6 +35,9 @@ Commandes :
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>` `/report <network>`
 - **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages)
 
+## Jumeaux HTML
+Tout `.md` livrable (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) obtient automatiquement un `<fichier>.html` jumeau via le hook `.claude/hooks/md-to-html.py` (`PostToolUse`). N'écris **pas** ce `.html` à la main et ne l'édite jamais (il est réécrit à chaque sauvegarde du `.md`) — édite seulement le `.md` source. Cf. `docs/WORKFLOW.md` § Jumeau HTML.
+
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.
 Jeter le bruit des échecs déjà résolus.

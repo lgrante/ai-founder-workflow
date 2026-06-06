@@ -76,10 +76,12 @@ if [ "$MODE" = "global" ]; then
   TARGET_SETTINGS="$HOME/.claude/settings.json"
   mkdir -p "$TARGET_HOOKS"
   cp "$KIT_DIR/templates/.claude/hooks/preflight-guard.py" "$TARGET_HOOKS/preflight-guard.py"
-  chmod +x "$TARGET_HOOKS/preflight-guard.py"
+  cp "$KIT_DIR/templates/.claude/hooks/md-to-html.py" "$TARGET_HOOKS/md-to-html.py"
+  chmod +x "$TARGET_HOOKS/preflight-guard.py" "$TARGET_HOOKS/md-to-html.py"
   echo
-  echo "→ Installation du garde-fou pre-flight (script déterministe)…"
+  echo "→ Installation des garde-fous déterministes (scripts)…"
   echo "  ✓ Hook copié : $TARGET_HOOKS/preflight-guard.py"
+  echo "  ✓ Hook copié : $TARGET_HOOKS/md-to-html.py (jumeau HTML des livrables .md)"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
@@ -87,14 +89,25 @@ if [ "$MODE" = "global" ]; then
       "UserPromptSubmit" \
       "$TARGET_HOOKS/preflight-guard.py" \
       5
+    python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+      "$TARGET_SETTINGS" \
+      "PostToolUse" \
+      "$TARGET_HOOKS/md-to-html.py" \
+      15 \
+      "Write|Edit"
   else
-    echo "  ⚠ python3 absent — ajoute manuellement cette entrée à $TARGET_SETTINGS :"
+    echo "  ⚠ python3 absent — ajoute manuellement ces entrées à $TARGET_SETTINGS :"
     cat <<EOF
   {
     "hooks": {
       "UserPromptSubmit": [
         { "hooks": [
             { "type": "command", "command": "$TARGET_HOOKS/preflight-guard.py", "timeout": 5 }
+        ]}
+      ],
+      "PostToolUse": [
+        { "matcher": "Write|Edit", "hooks": [
+            { "type": "command", "command": "$TARGET_HOOKS/md-to-html.py", "timeout": 15 }
         ]}
       ]
     }
@@ -147,7 +160,7 @@ touch "$TARGET/.gitignore"
 grep -qxF '.cc-scratch/' "$TARGET/.gitignore" || echo '.cc-scratch/' >> "$TARGET/.gitignore"
 grep -qxF 'CLAUDE.local.md' "$TARGET/.gitignore" || echo 'CLAUDE.local.md' >> "$TARGET/.gitignore"
 
-chmod +x "$TARGET/.claude/hooks/"*.sh "$TARGET/.claude/statusline.sh" 2>/dev/null || true
+chmod +x "$TARGET/.claude/hooks/"*.sh "$TARGET/.claude/hooks/"*.py "$TARGET/.claude/statusline.sh" 2>/dev/null || true
 
 echo
 echo "✓ Fichiers en place. Étapes suivantes :"
