@@ -50,6 +50,7 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | `newsletter-<edition>` | Audience | édition assemblée à partir du reste | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via le MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
 | `status-<date>` | Transverse | snapshot 360° du projet en HTML responsive (mobile-first) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public) + `knowledge/dashboard.html` (latest, gitignored) |
+| `update` | Transverse | propage les améliorations du kit sur ce repo (clone auto + `kit-manifest.json`) | `.claude/` (kit-owned) + scaffolds manquants + `.claude/.kit-version` |
 
 - **Trois types de découverte distincts** : `market-research-` regarde le **marché** (extérieur, abstrait) ; `user-feedback-` regarde des **personnes précises** (intérieur, qualitatif, 1-à-1) ; `support-` regarde des **tickets agrégés** (intérieur, quantitatif, depuis un système Jira/Zendesk/…). Les trois alimentent `knowledge/insights.md` global, qui est la source où émergent les motifs.
 - Les skills audience (`post`, `article`, `newsletter`) **invoquent** les skills de copywriting existantes (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement. Le kit fournit la **structure** + le **workflow** (où ranger, draft → review → publish), pas la rédaction elle-même.
@@ -213,6 +214,9 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │       ├── qa/sprint-{N}-{slug}/ # captures par sprint
 │       ├── plans/                # roadmap, plans de release
 │       └── archives/v{N}/        # versions périmées (refonte majeure → racine actuelle bascule ici)
+├── backlog/                  # pont Découverte→Build (groomé par /backlog, lu par /spec)
+│   ├── <slug>.md             # candidat à spécifier (statut idea/triaged/specced/dropped + priorité)
+│   └── _template.md          # gabarit
 ├── bugs/                     # tickets de bug (annexe au build)
 │   └── <slug>/
 │       ├── TICKET.md         # mini-spec : repro + comportement attendu + critère "ne se reproduit plus"
@@ -261,7 +265,7 @@ gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ~/ai-founder-workflow/install.sh --global
 ```
 
-Les 13 skills (`/setup /spec /code /test /research /feedback /support /backlog /post /article /newsletter /report /status`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
+Les 14 skills (`/setup /spec /code /test /research /feedback /support /backlog /post /article /newsletter /report /status /update`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
 
 ### Étape 3 — Déployer le workflow dans un repo cible
 
@@ -380,13 +384,17 @@ ai-founder-workflow/          # le repo à partager
 │       ├── hooks/context-handoff.sh       # OPTIONNEL — PreCompact
 │       ├── hooks/context-restore.sh       # OPTIONNEL — SessionStart
 │       └── skills/{setup,spec,code,test,research,feedback,support,post,article,newsletter,report,status}/SKILL.md
-├── scaffold/                 # arborescence vide (knowledge/, features/, bugs/, content/<channels>/{stats,insights,…}/, .cc-scratch/)
+├── scaffold/                 # arborescence vide (knowledge/, features/, backlog/, bugs/, content/<channels>/{stats,insights,…}/, .cc-scratch/)
 └── examples/checkout-flow/   # exemple travaillé : SPEC.md + PLAN.md
 ```
 
 > Les fichiers marqués **OPTIONNEL** sont livrés mais **non activés** : ils ne sont pas branchés dans `settings.json`. Voir `templates/docs/WORKFLOW.md` (§ Optionnel) pour les activer.
 
-Mises à jour : `git pull` côté kit, puis re-run de `install.sh --global` (ou `install.sh` per-repo). Contributions de l'équipe : par PR sur ce repo (voir `CONTRIBUTING.md`).
+**Mises à jour** : le kit évolue souvent. Deux voies, selon le modèle de distribution (cf. `templates/docs/WORKFLOW.md` § Propagation) :
+- **Global** (défaut solo) : `install.sh --global` re-joué propage skills + hooks à **tous** tes repos d'un coup.
+- **Per-repo** (repos installés via `/setup`) : lance **`/update`** dans le repo — il clone automatiquement le kit, calcule le delta via `CHANGELOG.md`, et propage par catégorie selon `kit-manifest.json` (écrase le kit-owned, **préserve** `CLAUDE.md`/`TEST_CMD`, crée les scaffolds manquants), commits par catégorie, jamais de push.
+
+Versioning : `KIT_VERSION` + `CHANGELOG.md` (kit), `.claude/.kit-version` (marqueur par repo). Contributions de l'équipe : par PR sur ce repo (voir `CONTRIBUTING.md`).
 
 ---
 

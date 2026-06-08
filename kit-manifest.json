@@ -1,0 +1,111 @@
+{
+  "kit_version": "1.0.0",
+  "marker": ".claude/.kit-version",
+  "_comment": "Politique de propagation par fichier. Lu par /update depuis le kit cloné. Chemins 'source' relatifs à la racine du kit ; 'target' relatifs à la racine du repo cible. Politiques : overwrite (kit-owned, écraser sans état d'âme) | overwrite-confirm (canonique, montrer le diff + OK) | merge-preserve (préserver des lignes locales) | register (enregistrer dans settings.json via register-hook.py, idempotent) | append (ajouter lignes manquantes) | create-if-missing (ne jamais toucher l'existant) | suggest-only (ne jamais écraser, proposer des ajouts chirurgicaux).",
+
+  "files": [
+    {
+      "source": "templates/.claude/skills/",
+      "target": ".claude/skills/",
+      "glob": "*/SKILL.md",
+      "policy": "overwrite",
+      "kind": "skill",
+      "scope": "per-repo-only",
+      "note": "Kit-owned. En mode global, les skills viennent de ~/.claude/skills/ (via install.sh --global) : ne pas resynchroniser per-repo, proposer install.sh --global."
+    },
+    {
+      "source": "templates/.claude/hooks/preflight-guard.py",
+      "target": ".claude/hooks/preflight-guard.py",
+      "policy": "overwrite",
+      "kind": "hook"
+    },
+    {
+      "source": "templates/.claude/hooks/md-to-html.py",
+      "target": ".claude/hooks/md-to-html.py",
+      "policy": "overwrite",
+      "kind": "hook"
+    },
+    {
+      "source": "templates/.claude/hooks/backlog-lint.py",
+      "target": ".claude/hooks/backlog-lint.py",
+      "policy": "overwrite",
+      "kind": "hook"
+    },
+    {
+      "source": "templates/.claude/hooks/register-hook.py",
+      "target": ".claude/hooks/register-hook.py",
+      "policy": "overwrite",
+      "kind": "hook"
+    },
+    {
+      "source": "templates/.claude/hooks/test-gate.sh",
+      "target": ".claude/hooks/test-gate.sh",
+      "policy": "merge-preserve",
+      "kind": "hook",
+      "preserve": ["TEST_CMD"],
+      "note": "Contient la commande de tests du repo (TEST_CMD) : préserver cette ligne, ne mettre à jour que le scaffolding autour si nécessaire — sinon diff + OK."
+    },
+    {
+      "source": "templates/.claude/hooks/context-handoff.sh",
+      "target": ".claude/hooks/context-handoff.sh",
+      "policy": "overwrite",
+      "kind": "hook",
+      "optional": true
+    },
+    {
+      "source": "templates/.claude/hooks/context-restore.sh",
+      "target": ".claude/hooks/context-restore.sh",
+      "policy": "overwrite",
+      "kind": "hook",
+      "optional": true
+    },
+    {
+      "source": "templates/.claude/statusline.sh",
+      "target": ".claude/statusline.sh",
+      "policy": "overwrite",
+      "kind": "tooling",
+      "optional": true
+    },
+    {
+      "source": "templates/docs/WORKFLOW.md",
+      "target": "docs/WORKFLOW.md",
+      "policy": "overwrite-confirm",
+      "kind": "doctrine"
+    },
+    {
+      "source": "templates/CLAUDE.md",
+      "target": "CLAUDE.md",
+      "policy": "suggest-only",
+      "kind": "doctrine",
+      "note": "Customisé par repo (commandes, TEST_CMD, conventions maison). Ne jamais écraser : proposer les ajouts (nouvelles commandes, nouvelles lignes d'étiquette) et les appliquer chirurgicalement avec OK."
+    },
+    {
+      "source": "templates/.gitignore",
+      "target": ".gitignore",
+      "policy": "append",
+      "kind": "config",
+      "note": "Ajouter uniquement les lignes du kit absentes (ex. knowledge/dashboard.html, .cc-scratch/)."
+    },
+    {
+      "source": "scaffold/",
+      "target": ".",
+      "glob": "**",
+      "policy": "create-if-missing",
+      "kind": "scaffold",
+      "note": "Crée les dossiers/gabarits absents (backlog/, backlog/_template.md, knowledge/*, content/*). Ne touche jamais l'existant (items, notes, drafts utilisateur)."
+    }
+  ],
+
+  "hooks_registration": [
+    { "event": "UserPromptSubmit", "command": ".claude/hooks/preflight-guard.py", "timeout": 5 },
+    { "event": "Stop", "command": ".claude/hooks/test-gate.sh", "timeout": 120 },
+    { "event": "PostToolUse", "matcher": "Write|Edit", "command": ".claude/hooks/md-to-html.py", "timeout": 15 },
+    { "event": "PostToolUse", "matcher": "Write|Edit", "command": ".claude/hooks/backlog-lint.py", "timeout": 5 }
+  ],
+
+  "gitignore_lines": [
+    ".cc-scratch/",
+    "CLAUDE.local.md",
+    "knowledge/dashboard.html"
+  ]
+}

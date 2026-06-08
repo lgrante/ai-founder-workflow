@@ -21,6 +21,7 @@
   - **Découverte** : `research/<topic>` · `feedback/<person>` · `support/<client>` (une branche par sujet/contact/client, reprise à chaque session)
   - **Backlog** : `backlog` (branche unique, reprise)
   - **Audience** : `post/<channel>/<slug>` · `article/<slug>` · `newsletter/<edition>` · `report/<network>/<date>` (une branche par pièce / par rapport daté)
+  - **Transverse** : `status/<date>` · `update` (branche unique, reprise)
 - Stage **par chemin explicite uniquement** (jamais `git add -A`) — multi-agents potentiels sur le même checkout.
 - Pas de push automatique ; chaque session sur sa branche, merge à toi.
 - Commits : conventionnels (`feat:`, `fix:`, `docs:`, `refactor:`, `chore:`).
@@ -35,7 +36,7 @@ Commandes :
 - **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
 - **Backlog** : `/backlog` (toilette/priorise les motifs en candidats à spécifier → `backlog/<slug>.md`)
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>` `/report <network>`
-- **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages ; écrit aussi `knowledge/dashboard.html`, vue *latest* gitignored)
+- **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages ; écrit aussi `knowledge/dashboard.html`, vue *latest* gitignored) · `/update` (propage les améliorations du kit sur ce repo — clone auto + `kit-manifest.json`, jamais de push)
 
 ## Jumeaux HTML
 Tout `.md` livrable (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) obtient automatiquement un `<fichier>.html` jumeau via le hook `.claude/hooks/md-to-html.py` (`PostToolUse`). N'écris **pas** ce `.html` à la main et ne l'édite jamais (il est réécrit à chaque sauvegarde du `.md`) — édite seulement le `.md` source. Cf. `docs/WORKFLOW.md` § Jumeau HTML.

@@ -15,13 +15,13 @@ Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat 
 
 ### Couche 1 — Hook Python déterministe (garde-fou primaire)
 
-Le vrai garde-fou est un **script Python** branché en `UserPromptSubmit` hook. Quand l'utilisateur tape `/spec`, `/code`, `/test`, `/research`, `/feedback`, `/support`, `/backlog`, `/post`, `/article`, `/newsletter`, `/report`, ou `/status`, le hook s'exécute **avant** que Claude ne lise le SKILL.md — et bloque déterministiquement si `docs/WORKFLOW.md` est absent du repo. Réponse au format `{"decision":"block","reason":"…"}`.
+Le vrai garde-fou est un **script Python** branché en `UserPromptSubmit` hook. Quand l'utilisateur tape `/spec`, `/code`, `/test`, `/research`, `/feedback`, `/support`, `/backlog`, `/post`, `/article`, `/newsletter`, `/report`, `/status`, ou `/update`, le hook s'exécute **avant** que Claude ne lise le SKILL.md — et bloque déterministiquement si `docs/WORKFLOW.md` est absent du repo. Réponse au format `{"decision":"block","reason":"…"}`.
 
 Fichier : `.claude/hooks/preflight-guard.py` (per-repo après `/setup`) **et/ou** `~/.claude/hooks/preflight-guard.py` (global après `install.sh --global`). Enregistré dans `settings.json` via le helper `register-hook.py` (idempotent, backup auto).
 
 Le hook fait :
 1. Lit le payload JSON sur stdin (clé `prompt`).
-2. Si la commande n'est pas une des 12 skills gardées, ou si c'est `/setup` → passe (exit 0 silencieux).
+2. Si la commande n'est pas une des 13 skills gardées, ou si c'est `/setup` → passe (exit 0 silencieux).
 3. Trouve la racine git (`git rev-parse --show-toplevel`) ; teste si `docs/WORKFLOW.md` existe.
 4. Si présent → passe. Si absent → bloque avec un message clair indiquant de lancer `/setup`.
 
@@ -69,6 +69,7 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 | `newsletter-<edition>` | Audience | édition assemblée | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
 | `status-<date>` | Transverse | snapshot 360° du projet (build + backlog + discovery + audience + activity + archi) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public) + `knowledge/dashboard.html` (latest, gitignored) |
+| `update` | Transverse | propage les améliorations du kit sur ce repo (clone auto + `kit-manifest.json`) | `.claude/` (kit-owned) + scaffolds manquants + marqueur `.claude/.kit-version` |
 
 `market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Les skills audience **invoquent** des skills de copywriting globales (ex. `marketing-skills:writing-linkedin-posts`) si disponibles. Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
 
@@ -125,6 +126,9 @@ C'est **déterministe**, pas une consigne au LLM (même doctrine que `preflight-
 - **Ticket de bug** — `bugs/<slug>/TICKET.md`, mini-spec à 1-2 critères, déposé par `/test` ou `/support` quand un bug net est trouvé. Lu par `/code <slug>` comme une SPEC. Distinct du *pain point* qui, lui, reste agrégé dans `knowledge/support/insights.md`.
 - **Item de backlog** — `backlog/<slug>.md`, un motif discovery **promu, formulé et priorisé** comme candidat à spécifier (le pont Découverte→Build). Statut `idea`→`triaged`→`specced`/`dropped`. Groomé par `/backlog`, lu par `/spec`. Distinct du *bug* (valeur à construire vs défaut à réparer) et du *motif* brut (signal agrégé non encore promu dans `knowledge/insights.md`). Cf. § Convention backlog.
 - **Dashboard latest** — `knowledge/dashboard.html`, le pointeur vivant (HTML seul, gitignored) vers le dernier snapshot `/status`, à chemin stable. Cf. § Dashboard latest.
+- **Propagation** — faire arriver les améliorations du kit sur un repo déjà installé. Outil : le skill `/update` (clone auto du kit + `kit-manifest.json`). Cf. § Propagation & mise à jour.
+- **kit-manifest.json** — fichier (racine du kit) qui décrit, **par fichier**, la politique de propagation (`overwrite` / `overwrite-confirm` / `merge-preserve` / `register` / `append` / `create-if-missing` / `suggest-only`). Rend `/update` déterministe : le kit se décrit lui-même.
+- **`.kit-version`** — marqueur per-repo (`.claude/.kit-version`) de la version du kit installée. Comparé à `KIT_VERSION` du kit pour calculer le delta. Absent → repo pré-versioning (`0.0.0`).
 - **Stats (audience)** — raw dump horodaté du MCP réseau dans `content/<network>/stats/<date>-snapshot.<ext>`. Preuve brute, append-only, sert de traçabilité aux insights.
 - **Insight (audience)** — rapport synthétisé par `/report` dans `content/<network>/insights/<date>-report.md` (+ .html). Source actionnable lue par `/post`, `/article`, `/newsletter` pour informer leurs drafts.
 - **Architecture (artefact)** — `ARCHITECTURE.md` + `ARCHITECTURE.html` produits par `/code` en régime full (entre porte 1 et porte 2). Vue d'ensemble + diagrammes Mermaid + choix architecturaux + application SOLID/GRASP + risques. Validé par l'utilisateur avant la 1ʳᵉ ligne de code.
@@ -183,6 +187,7 @@ features/<slug>/
 | **Découverte (user feedback)** | `feedback/<person>` | `feedback/laurent` |
 | **Découverte (support sift)** | `support/<client>` | `support/acme-corp` |
 | **Transverse (backlog)** | `backlog` (branche unique, reprise) | `backlog` |
+| **Transverse (update)** | `update` (branche unique, reprise) | `update` |
 | **Audience (post)** | `post/<channel>/<slug>` | `post/linkedin/churn-paradox` |
 | **Audience (article)** | `article/<slug>` | `article/inherited-org-monitoring` |
 | **Audience (newsletter)** | `newsletter/<edition>` | `newsletter/2026-06` |
@@ -390,6 +395,37 @@ Note-les dans ARCHITECTURE.md § *Application SOLID + GRASP* avec la raison :
 - Trois couches d'abstraction pour un CRUD.
 
 Ces signaux = sur-design. Préfère la **violation consciente** notée à la cathédrale d'abstractions.
+
+## Propagation & mise à jour (kit → repos)
+
+**Principe** : le kit s'améliore souvent (nouveaux skills, hooks, doctrine). Le faire **arriver proprement** sur les repos déjà installés, sans écraser ce qui est customisé, est un problème à part entière. Deux leviers : le **modèle de distribution** et le skill **`/update`**.
+
+### Modèle de distribution (hybride, défaut global)
+
+- **Global** — `install.sh --global` copie skills + hooks dans `~/.claude/`. Mis à jour **une fois**, ça profite à **tous** les repos. Idéal solo founder. Les hooks globaux sont **scopés aux repos workflow** (`preflight-guard.py` n'agit que sur les slash-commands du kit ; `md-to-html.py` ne génère un jumeau que si `docs/WORKFLOW.md` existe en remontant ; `backlog-lint.py` n'agit que sous `backlog/`) — donc inoffensifs dans les repos non-workflow.
+- **Per-repo** — `/setup` vendore tout dans `.claude/` du repo : self-contained, partageable équipe/CI, mais chaque repo se met à jour séparément.
+- **Hybride** (recommandé) : global par défaut pour la vitesse ; vendoring per-repo pour les repos partagés. `/update` détecte le mode et agit en conséquence.
+
+### Versioning
+
+- `KIT_VERSION` (racine du kit) = version courante (SemVer). `CHANGELOG.md` = ce qui change entre versions.
+- Marqueur per-repo : `.claude/.kit-version` (posé par `/setup` et `/update`). Son absence = repo installé avant le versioning (`/update` traite comme `0.0.0` → sync complète).
+
+### Le skill `/update`
+
+`/update` (cf. son SKILL.md) **clone automatiquement** le kit (URL `$AI_FOUNDER_WORKFLOW_KIT_URL` ou défaut GitHub, cache `~/.cache/ai-founder-workflow/kit` rafraîchi par `fetch`), calcule le delta via le changelog, puis propage selon **`kit-manifest.json`** — qui décrit la politique **par fichier** :
+
+| Politique | Pour | Comportement |
+|---|---|---|
+| `overwrite` | kit-owned (skills, hooks, statusline) | écrase sans état d'âme |
+| `overwrite-confirm` | `docs/WORKFLOW.md` (doctrine) | diff + OK (l'utilisateur a pu l'éditer) |
+| `merge-preserve` | `test-gate.sh` | préserve `TEST_CMD`, met à jour le reste |
+| `register` | hooks → `settings.json` | enregistre idempotemment (`register-hook.py`) |
+| `append` | `.gitignore` | ajoute les lignes manquantes |
+| `create-if-missing` | scaffolds (`backlog/`, …) | ne touche jamais l'existant |
+| `suggest-only` | `CLAUDE.md` (repo-spécifique) | ne jamais écraser, ajouts chirurgicaux avec OK |
+
+Le manifest rend la propagation **déterministe** : le kit se décrit lui-même, `/update` n'a aucune règle hardcodée. Branche dédiée `update`, commits par catégorie, **jamais de push** (geste humain). `/setup` sur un repo déjà installé **délègue à `/update`** plutôt que de ré-installer.
 
 ## Optionnel : hooks de contexte & statusline
 Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.

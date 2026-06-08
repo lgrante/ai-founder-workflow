@@ -37,6 +37,7 @@ GUARDED_SKILLS = frozenset({
     "/newsletter",
     "/report",
     "/status",
+    "/update",
 })
 
 # Detection signal — the canonical file installed by /setup Phase 2.
