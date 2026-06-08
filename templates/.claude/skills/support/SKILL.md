@@ -58,7 +58,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - Sections par session : `Pain points`, `Verbatims marquants` (anonymisés — IDs Jira plutôt que noms), `Statistiques`, `Status des thèmes ouverts`.
 
 6. **Détecte (a) motifs forts et (b) bugs nets** — deux sorties distinctes :
-   - **Motif fort** (fréquence ≥ 3 tickets, criticité haute, récurrent 3+ sessions) → propose à l'utilisateur d'ajouter / renforcer dans `knowledge/support/insights.md` (agrégat support cross-clients). Si transverse aux 3 axes discovery, propose aussi `knowledge/insights.md` (agrégat global).
+   - **Motif fort** (fréquence ≥ 3 tickets, criticité haute, récurrent 3+ sessions) → propose à l'utilisateur d'ajouter / renforcer dans `knowledge/support/insights.md` (agrégat support cross-clients). Si transverse aux 3 axes discovery, propose aussi `knowledge/insights.md` (agrégat global). **Si le motif est mûr** (besoin produit clair, pas juste un bug à fixer), propose en plus de déposer un item `backlog/<slug>.md` (cf. `docs/WORKFLOW.md` § Convention backlog) — sinon laisse `/backlog` le promouvoir depuis l'agrégat. Distinction clé : un **pain point récurrent = valeur à construire → backlog** ; un **bug net = défaut à réparer → bugs/** (6.b).
    - **Bug net** (un ticket individuel = problème reproductible, gravité claire, fixable directement — distinct d'un motif diffus) → propose à l'utilisateur d'ouvrir un ticket dans `bugs/<slug>/TICKET.md` (slug = description du problème, ex. `acme-export-pdf-utf8`). Format : repro + comportement attendu + critère « ne se reproduit plus + test de régression » (cf. `docs/WORKFLOW.md` § Convention par-bug). Ce ticket est l'entrée d'une future `/code bugs/<slug>`. Un même ticket Jira peut produire **les deux** (un motif agrégé + un bug à fixer maintenant) — ce n'est pas un OU exclusif.
 
 7. **Stop** : ta session est finie. Pas de plan d'action, pas de spec. Les idées de features émergent de l'agrégat **sur plusieurs sessions** (la doctrine : un échange ≠ une preuve, c'est l'agrégat qui fait foi). Les bugs ouverts en 6.b vivent leur vie dans `bugs/` jusqu'à ce que `/code` les ferme.
@@ -112,7 +112,7 @@ total_tickets_analyzed: 47
 ...
 ```
 
-Sortie = `knowledge/support/clients/<client>.md` (mis à jour cumulativement) + éventuels ajouts dans `knowledge/support/insights.md` et `knowledge/insights.md`.
+Sortie = `knowledge/support/clients/<client>.md` (mis à jour cumulativement) + éventuels ajouts dans `knowledge/support/insights.md` et `knowledge/insights.md` + éventuels `bugs/<slug>/TICKET.md` (bugs nets) ou `backlog/<slug>.md` (motifs mûrs).
 
 <!-- Exemple d'usage :
   /support acme-corp

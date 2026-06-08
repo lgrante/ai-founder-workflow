@@ -33,6 +33,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - **Si `features/$ARGUMENTS/SPEC.md` existe DÉJÀ** : lis-le d'abord. Demande à l'utilisateur si c'est une **itération sur la version active** (édition in-place) ou une **refonte majeure** (alors propose d'archiver la racine actuelle dans `features/$ARGUMENTS/archives/v{N}/` avant d'écrire la nouvelle SPEC à la racine). Ne tranche pas seul.
    - **Sub-feature** (composant atomique d'une feature existante) : range-la dans `features/<parent>/sub-features/$ARGUMENTS/` avec la même structure récursive (SPEC, PLAN, archives…).
 4. Si pertinents, lis les sources de découverte qui alimentent le spec :
+   - **`backlog/$ARGUMENTS.md` s'il existe** (cf. `docs/WORKFLOW.md` § Convention backlog) : c'est le point de départ idéal — l'item porte déjà le problème, le signal (preuve agrégée) et la priorité, groomés par `/backlog`. Pars de là plutôt que de repartir de zéro.
    - `knowledge/insights.md` (agrégat global des 3 axes discovery) et `knowledge/market/` (recherche marché)
    - `knowledge/support/insights.md` (motifs cross-clients depuis les tickets) — souvent les signaux les plus directs sur ce qui manque ou casse
    - `knowledge/support/clients/<client>.md` si la feature concerne un client spécifique nommé
@@ -44,6 +45,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - les **critères d'acceptation** = la définition de « fini ». Dérive-les AVANT le code. Chacun doit être **observable et vérifiable** sans connaître l'implémentation (formule-les en Étant donné / Quand / Alors). Numérote-les (C1, C2…) : `code-` rattachera ses étapes à ces numéros, `test-` en dérivera les e2e.
    - les **jalons** : les tranches user-facing successives, chacune livrable et démontrable. Chaque jalon = un point de contrôle e2e + un gate humain. Associe chaque critère à un jalon.
 5. Interviewe l'utilisateur pour combler les flous, **une question à la fois**. Ne devine pas les critères : fais-les valider. Si une réponse ouvre une nouvelle zone d'ombre, creuse-la avant de continuer.
+6. **Boucle le backlog** : si cette feature provient d'un item `backlog/$ARGUMENTS.md`, passe-le en `statut: specced` et ajoute `feature: $ARGUMENTS` dans son frontmatter (renvoi vers la feature) + mets à jour `maj`. Le backlog reflète ainsi ce qui est *parti en build* vs ce qui reste *à faire*. N'édite que le `.md` (le `.html` jumeau se régénère).
 
 Cas limites :
 - **Feature trop grosse** : si les jalons dépassent ~3-5 ou si les critères se comptent par dizaines, propose de scinder en plusieurs features (specs séparés).

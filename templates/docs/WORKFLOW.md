@@ -15,13 +15,13 @@ Dès que ce qui compte est dans un fichier, une session neuve (ou `/clear`) bat 
 
 ### Couche 1 — Hook Python déterministe (garde-fou primaire)
 
-Le vrai garde-fou est un **script Python** branché en `UserPromptSubmit` hook. Quand l'utilisateur tape `/spec`, `/code`, `/test`, `/research`, `/feedback`, `/support`, `/post`, `/article`, `/newsletter`, ou `/report`, le hook s'exécute **avant** que Claude ne lise le SKILL.md — et bloque déterministiquement si `docs/WORKFLOW.md` est absent du repo. Réponse au format `{"decision":"block","reason":"…"}`.
+Le vrai garde-fou est un **script Python** branché en `UserPromptSubmit` hook. Quand l'utilisateur tape `/spec`, `/code`, `/test`, `/research`, `/feedback`, `/support`, `/backlog`, `/post`, `/article`, `/newsletter`, `/report`, ou `/status`, le hook s'exécute **avant** que Claude ne lise le SKILL.md — et bloque déterministiquement si `docs/WORKFLOW.md` est absent du repo. Réponse au format `{"decision":"block","reason":"…"}`.
 
 Fichier : `.claude/hooks/preflight-guard.py` (per-repo après `/setup`) **et/ou** `~/.claude/hooks/preflight-guard.py` (global après `install.sh --global`). Enregistré dans `settings.json` via le helper `register-hook.py` (idempotent, backup auto).
 
 Le hook fait :
 1. Lit le payload JSON sur stdin (clé `prompt`).
-2. Si la commande n'est pas une des 10 skills gardées, ou si c'est `/setup` → passe (exit 0 silencieux).
+2. Si la commande n'est pas une des 12 skills gardées, ou si c'est `/setup` → passe (exit 0 silencieux).
 3. Trouve la racine git (`git rev-parse --show-toplevel`) ; teste si `docs/WORKFLOW.md` existe.
 4. Si présent → passe. Si absent → bloque avec un message clair indiquant de lancer `/setup`.
 
@@ -60,6 +60,7 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 | `market-research-…` | Découverte | marché, concurrents, tendances | `knowledge/market/` |
 | `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
 | `support-<client>` | Découverte | sift des tickets support (Jira / Zendesk / …) | `knowledge/support/clients/<client>.md` + `knowledge/support/insights.md` |
+| `backlog` | Transverse (pont Découverte→Build) | toilette/priorise les motifs en candidats à spécifier | `backlog/<slug>.md` |
 | `spec-<feature>` | Build | le quoi : spec + critères + jalons | `features/<feature>/SPEC.md` |
 | `code-<feature>` | Build | le comment : plan + code + filet rapide | `features/<feature>/PLAN.md` + code commité |
 | `test-<feature>` | Build | e2e depuis le spec + revue, au jalon | suite e2e commitée |
@@ -67,11 +68,12 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
-| `status-<date>` | Transverse | snapshot 360° du projet (build + discovery + audience + activity + archi) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public anonymisé) |
+| `status-<date>` | Transverse | snapshot 360° du projet (build + backlog + discovery + audience + activity + archi) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public) + `knowledge/dashboard.html` (latest, gitignored) |
 
 `market-research` et `user-feedback` sont **deux types distincts** (extérieur/marché vs intérieur/personnes). Les skills audience **invoquent** des skills de copywriting globales (ex. `marketing-skills:writing-linkedin-posts`) si disponibles. Le format exact des préfixes est une préférence ; seul le préfixe par type compte.
 
 ## Pipeline de build
+- **En amont** : `/backlog` toilette les motifs discovery en candidats priorisés (`backlog/<slug>.md`). `/spec` part du **top item `triaged`** et marque l'item `specced` quand la feature est lancée (cf. § Convention backlog).
 - `spec-<feature>` : écrit `SPEC.md` (description + **critères d'acceptation** dérivés AVANT le code + **jalons**).
 - `code-<feature>` : écrit `PLAN.md` en plan mode → **validation utilisateur (porte 1)**. Si régime **full** (≥3 étapes OU ≥2 jalons) → écrit aussi `ARCHITECTURE.md` + `.html` (vue d'ensemble, diagrammes Mermaid, choix architecturaux, application SOLID + GRASP, risques) → **validation utilisateur (porte 2)**. Si régime **light** (≤2 étapes ET ≤1 jalon), section *Architecture* courte intégrée à PLAN.md, pas de 2ᵉ porte. Puis implémente étape par étape (front + back ensemble). À chaque étape, un **subagent** écrit le filet rapide depuis les **critères de l'étape**, le hook le lance.
 - `test-<feature>` : session **fraîche**, écrit les **e2e** depuis le **spec** au jalon + **revue à œil neuf**.
@@ -121,6 +123,8 @@ C'est **déterministe**, pas une consigne au LLM (même doctrine que `preflight-
 - **Gate humain** — la décision de valider une tranche au jalon. Reste humaine ; l'automatisation porte sur la régression, pas sur le jugement.
 - **Disjoncteur** — après 2-3 rouges persistants sur une étape, on arrête : le spec ou l'approche est en cause.
 - **Ticket de bug** — `bugs/<slug>/TICKET.md`, mini-spec à 1-2 critères, déposé par `/test` ou `/support` quand un bug net est trouvé. Lu par `/code <slug>` comme une SPEC. Distinct du *pain point* qui, lui, reste agrégé dans `knowledge/support/insights.md`.
+- **Item de backlog** — `backlog/<slug>.md`, un motif discovery **promu, formulé et priorisé** comme candidat à spécifier (le pont Découverte→Build). Statut `idea`→`triaged`→`specced`/`dropped`. Groomé par `/backlog`, lu par `/spec`. Distinct du *bug* (valeur à construire vs défaut à réparer) et du *motif* brut (signal agrégé non encore promu dans `knowledge/insights.md`). Cf. § Convention backlog.
+- **Dashboard latest** — `knowledge/dashboard.html`, le pointeur vivant (HTML seul, gitignored) vers le dernier snapshot `/status`, à chemin stable. Cf. § Dashboard latest.
 - **Stats (audience)** — raw dump horodaté du MCP réseau dans `content/<network>/stats/<date>-snapshot.<ext>`. Preuve brute, append-only, sert de traçabilité aux insights.
 - **Insight (audience)** — rapport synthétisé par `/report` dans `content/<network>/insights/<date>-report.md` (+ .html). Source actionnable lue par `/post`, `/article`, `/newsletter` pour informer leurs drafts.
 - **Architecture (artefact)** — `ARCHITECTURE.md` + `ARCHITECTURE.html` produits par `/code` en régime full (entre porte 1 et porte 2). Vue d'ensemble + diagrammes Mermaid + choix architecturaux + application SOLID/GRASP + risques. Validé par l'utilisateur avant la 1ʳᵉ ligne de code.
@@ -131,10 +135,11 @@ C'est **déterministe**, pas une consigne au LLM (même doctrine que `preflight-
 Petite feature « checkout-flow » (voir un exemple travaillé dans le repo kit `examples/checkout-flow/`).
 
 1. **Découverte (en amont, continue)** — `user-feedback-marie` note « panier perdu quand le paiement est refusé » ; l'agrégat `knowledge/insights.md` voit ce motif sur 3 contacts.
-2. **`/spec checkout-flow`** — session `spec-checkout-flow`. Écrit `features/checkout-flow/SPEC.md` : critères C1 (panier → commande, stock décrémenté), C2 (paiement refusé → message clair, panier conservé)… ; jalons J1 « panier→commande » (C1, C4), J2 « paiement » (C2, C3). → artefact : `SPEC.md`.
-3. **`/code checkout-flow`** — session `code-checkout-flow`. Plan mode → `PLAN.md` (étapes ↔ critères), validé. Étape 1 (C1) : code la création de commande ; un subagent écrit les unitaires **depuis C1** ; le hook tourne, **rouge** (stock non décrémenté) → lit `.cc-scratch/test-gate.last.txt`, corrige la cause, relance, **vert** → commit + coche l'étape. Idem étape par étape. `/compact` aux points verts.
-4. **`/test checkout-flow`** — session **fraîche** `test-checkout-flow`, au jalon J2. Dérive les e2e **du spec** (pas du code), trouve que le panier est vidé sur refus (≠ C3) → consigne l'écart. La correction repart en `code-`.
-5. **Gate humain** — une fois J2 vert et l'écart corrigé, **tu** valides la tranche avant d'enchaîner sur le jalon suivant.
+2. **`/backlog`** — session `backlog`. Le motif récurrent est promu en `backlog/checkout-flow.md` (`statut: triaged`, `priorité: P0`, `source: feedback`). Recommande `/spec checkout-flow`. → artefact : l'item priorisé.
+3. **`/spec checkout-flow`** — session `spec-checkout-flow`. Part de l'item backlog. Écrit `features/checkout-flow/SPEC.md` : critères C1 (panier → commande, stock décrémenté), C2 (paiement refusé → message clair, panier conservé)… ; jalons J1 « panier→commande » (C1, C4), J2 « paiement » (C2, C3). → artefact : `SPEC.md`.
+4. **`/code checkout-flow`** — session `code-checkout-flow`. Plan mode → `PLAN.md` (étapes ↔ critères), validé. Étape 1 (C1) : code la création de commande ; un subagent écrit les unitaires **depuis C1** ; le hook tourne, **rouge** (stock non décrémenté) → lit `.cc-scratch/test-gate.last.txt`, corrige la cause, relance, **vert** → commit + coche l'étape. Idem étape par étape. `/compact` aux points verts.
+5. **`/test checkout-flow`** — session **fraîche** `test-checkout-flow`, au jalon J2. Dérive les e2e **du spec** (pas du code), trouve que le panier est vidé sur refus (≠ C3) → consigne l'écart. La correction repart en `code-`.
+6. **Gate humain** — une fois J2 vert et l'écart corrigé, **tu** valides la tranche avant d'enchaîner sur le jalon suivant.
 
 ## Convention par-feature (structure standard)
 
@@ -177,6 +182,7 @@ features/<slug>/
 | **Découverte (market)** | `research/<topic>` | `research/agentforce-monitoring` |
 | **Découverte (user feedback)** | `feedback/<person>` | `feedback/laurent` |
 | **Découverte (support sift)** | `support/<client>` | `support/acme-corp` |
+| **Transverse (backlog)** | `backlog` (branche unique, reprise) | `backlog` |
 | **Audience (post)** | `post/<channel>/<slug>` | `post/linkedin/churn-paradox` |
 | **Audience (article)** | `article/<slug>` | `article/inherited-org-monitoring` |
 | **Audience (newsletter)** | `newsletter/<edition>` | `newsletter/2026-06` |
@@ -251,6 +257,47 @@ Le kit reste utilisable seul. Certaines capacités peuvent être ajoutées via d
 - **MCP du réseau social** (LinkedIn, Twitter/X, Substack…) — détecté par `/report` (et `/post`, `/article`, `/newsletter` pour lire les insights). Sans MCP, fallback export manuel ou skip.
 
 Aucun n'est requis ; chacun enrichit une capacité existante.
+
+## Convention backlog (pont Découverte→Build)
+
+**Principe** : la découverte (`knowledge/`) produit des **signaux** ; le build (`features/`) démarre à `SPEC.md`. Le **backlog** est le chaînon entre les deux — la file d'attente **triée et priorisée** des motifs récurrents prêts à devenir des features. Sans lui, le passage « signal → spec » vit dans la tête du founder ; avec lui, c'est un artefact durable, reviewable, partagé.
+
+```
+backlog/
+├── <slug>.md          # un item = un candidat à spécifier (+ <slug>.html jumeau auto)
+└── _template.md       # gabarit (copié par /backlog)
+```
+
+**Item** = un fichier plat `backlog/<slug>.md` (à la racine, frère de `features/` et `bugs/`). Frontmatter : `titre`, `statut` (`idea` → `triaged` → `specced` | `dropped`), `priorité` (P0/P1/P2), `source` (insights/support/feedback/research/manuel), `créé`, `maj`, `feature` (rempli au passage `specced`). Le `.html` jumeau est généré par le hook `md-to-html` — n'édite que le `.md`.
+
+**Cycle de vie du statut** :
+- `idea` — capturé, pas encore groomé.
+- `triaged` — revu, priorisé, **prêt à spécifier**.
+- `specced` — promu en `features/<slug>/SPEC.md` (le frontmatter `feature:` pointe dessus).
+- `dropped` — écarté (avec raison) — **jamais supprimé** : l'historique des « non » est une information.
+
+**Qui écrit, qui lit** :
+- **`/backlog`** est le **groomer principal** : il promeut les motifs de `knowledge/insights.md` + `knowledge/support/insights.md` en items, dédoublonne, priorise, et recommande le prochain `/spec`. Il ne décide pas une feature seul (priorité = arbitrage humain) et n'écrit pas de spec.
+- **Les skills discovery** (`/research`, `/feedback`, `/support`) peuvent **déposer** un item quand un motif est déjà nettement récurrent (≥ ~3 signaux) — sinon ils laissent mûrir dans `insights.md`, et `/backlog` promouvra.
+- **N'importe quelle session** peut déposer un item à la volée (« ajoute X au backlog »).
+- **`/spec <slug>`** lit `backlog/<slug>.md` comme point de départ, puis passe l'item en `specced` + `feature: <slug>`.
+- **`/status`** agrège le backlog (compteurs par statut + top `triaged`).
+
+**Différence backlog vs bug** (les deux sont à plat à la racine, mais opposés) :
+- *Item backlog* = **valeur produit à construire** → devient une feature via `/spec`.
+- *Bug* = **défaut à réparer** → se fixe via `/code bugs/<slug>` (cf. § Convention par-bug).
+
+**Différence motif (insights) vs item (backlog)** : un *motif* est un signal agrégé brut dans `knowledge/insights.md` ; un *item* est ce motif **promu, formulé et priorisé** comme candidat actionnable. La promotion est le geste de `/backlog`.
+
+**Garde-fou déterministe** : un hook `PostToolUse` (`.claude/hooks/backlog-lint.py`) **valide le frontmatter** à chaque écriture d'un `backlog/<slug>.md` — `statut` ∈ {idea, triaged, specced, dropped}, `priorité` ∈ {P0, P1, P2}, `source` ∈ {insights, support, feedback, research, manuel}, champs requis présents, dates ISO `YYYY-MM-DD`, et `specced`↔`feature` cohérents. En cas d'écart, il renvoie un feedback actionnable pour correction (sans jamais perdre le fichier). Même doctrine que `preflight-guard.py` / `md-to-html.py` : stdlib, 0 dépendance, jamais oublié. C'est *ça* qui fiabilise les mutations de statut — pas un store externe (le markdown reste la source, lisible et diffable ; git est le filet de relecture).
+
+## Dashboard latest (`knowledge/dashboard.html`)
+
+`/status` écrit, à **chaque run et quel que soit le mode**, un `knowledge/dashboard.html` — le **pointeur vivant** vers le dernier snapshot 360°, ouvrable à chemin stable (`open knowledge/dashboard.html`) sans chercher la dernière date.
+
+- **HTML seul, jamais de `knowledge/dashboard.md`** : le hook `md-to-html` écraserait sinon le HTML bespoke par un jumeau plat. Écrire le `.html` directement ne déclenche pas le hook.
+- **Gitignored** : c'est un artefact de travail **local**. (a) En mode privé il peut contenir des PII, et `knowledge/` est versionné → un commit leakerait. (b) Un fichier unique que **toutes** les sessions réécrivent serait un aimant à conflits de merge (cf. § Étiquette git, multi-agents). Le partage PII-safe reste `--public` → `docs/status/<date>-status.html` (anonymisé, GitHub Pages).
+- À ajouter au `.gitignore` du repo (fait par `/setup`) : `knowledge/dashboard.html`.
 
 ## Convention par-bug (tickets éphémères)
 

@@ -19,6 +19,7 @@
 - Branches : voir `docs/WORKFLOW.md` § Étiquette git pour la convention complète. Résumé :
   - **Build** : `feat/<feature>` (partagée spec/code/test) · `fix/<bug-slug>` (mode bug)
   - **Découverte** : `research/<topic>` · `feedback/<person>` · `support/<client>` (une branche par sujet/contact/client, reprise à chaque session)
+  - **Backlog** : `backlog` (branche unique, reprise)
   - **Audience** : `post/<channel>/<slug>` · `article/<slug>` · `newsletter/<edition>` · `report/<network>/<date>` (une branche par pièce / par rapport daté)
 - Stage **par chemin explicite uniquement** (jamais `git add -A`) — multi-agents potentiels sur le même checkout.
 - Pas de push automatique ; chaque session sur sa branche, merge à toi.
@@ -27,13 +28,14 @@
 
 ## Workflow
 Ce repo suit le workflow décrit dans `docs/WORKFLOW.md` :
-sessions par feature (build) + découverte + audience, pipeline `spec → code → test` côté build, tickets de bug dans `bugs/<slug>/TICKET.md` (écrits par `/test` ou `/support`, lus par `/code`), filet rapide via hook.
+sessions par feature (build) + découverte + audience, pipeline `backlog → spec → code → test` côté build, tickets de bug dans `bugs/<slug>/TICKET.md` (écrits par `/test` ou `/support`, lus par `/code`), items de backlog dans `backlog/<slug>.md` (pont Découverte→Build, groomés par `/backlog`, lus par `/spec`), filet rapide via hook.
 
 Commandes :
 - **Setup / dev** : `/setup` `/spec` `/code <feature>` (ou `/code bugs/<slug>` pour fixer un ticket) `/test`
 - **Découverte** : `/research <sujet>` `/feedback <qui>` `/support <client>`
+- **Backlog** : `/backlog` (toilette/priorise les motifs en candidats à spécifier → `backlog/<slug>.md`)
 - **Audience** : `/post <channel> <sujet>` `/article <sujet>` `/newsletter <edition>` `/report <network>`
-- **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages)
+- **Transverse** : `/status` (snapshot HTML responsive 360° — `--public` pour publier sur Pages ; écrit aussi `knowledge/dashboard.html`, vue *latest* gitignored)
 
 ## Jumeaux HTML
 Tout `.md` livrable (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) obtient automatiquement un `<fichier>.html` jumeau via le hook `.claude/hooks/md-to-html.py` (`PostToolUse`). N'écris **pas** ce `.html` à la main et ne l'édite jamais (il est réécrit à chaque sauvegarde du `.md`) — édite seulement le `.md` source. Cf. `docs/WORKFLOW.md` § Jumeau HTML.

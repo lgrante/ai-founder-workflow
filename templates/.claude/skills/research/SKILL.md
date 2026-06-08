@@ -30,11 +30,12 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 2. Cadre la question avec l'utilisateur (que cherche-t-on à décider ?), puis **délègue les recherches lourdes à un subagent** : il fouille, lit les sources, et te rend une **synthèse**. Tu gardes ton contexte principal propre — ne ramène pas les pages brutes, seulement les conclusions sourcées.
 3. Sortie = un fichier de notes **daté et sourcé** dans `knowledge/market/` (ex. `knowledge/market/2026-06-02-paiement-mobile.md`). Chaque affirmation porte sa source (lien + date de consultation). Distingue **fait** (sourcé) et **hypothèse**.
 4. Si une trouvaille a une **implication produit**, ajoute une ligne à `knowledge/insights.md` (section « Pistes de features ») — c'est l'agrégat d'où émergent les idées.
+5. **Pont vers le backlog** : si le motif est **déjà nettement récurrent** (croisé avec d'autres signaux discovery, ≥ ~3 sources/contacts), tu peux proposer à l'utilisateur de déposer un item `backlog/<slug>.md` (cf. `docs/WORKFLOW.md` § Convention backlog). Sinon, **laisse le signal mûrir dans `insights.md`** — c'est `/backlog` qui le promouvra quand l'agrégat sera assez fort. Tu n'écris **jamais** de spec ici.
 
 Cas limites :
 - **Le sujet recoupe une note existante** : amende / date la note existante plutôt que d'en créer une qui la contredit en silence.
 - **Source incertaine ou non datée** : marque-la comme telle ; ne la promeus pas en fait.
-- **La recherche débouche sur une idée de feature** : ne crée pas le spec ici — pose la piste dans `insights.md`, le `/spec` viendra plus tard.
+- **La recherche débouche sur une idée de feature** : ne crée pas le spec ici — pose la piste dans `insights.md` (et, si le motif est déjà récurrent, un item `backlog/`) ; le `/spec` viendra plus tard, via le backlog.
 
 À éviter :
 - Écrire du code ou créer un dossier `features/…` — la recherche ne construit rien.

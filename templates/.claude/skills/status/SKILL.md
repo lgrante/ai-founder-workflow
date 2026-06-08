@@ -39,6 +39,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - **Build** :
      - `features/<slug>/README.md` (statut) + `features/<slug>/PLAN.md` (cases cochées vs restantes) pour chaque feature active à la racine de `features/`. Compte les sub-features actives.
      - `bugs/<slug>/TICKET.md` : tickets dont le frontmatter `statut` est `open` ou `in-progress` (skip `fixed-pending-test` et `closed`).
+     - **Backlog** (le pont Découverte→Build) : `backlog/*.md` (skip `_template.md`). Compte par `statut` (`idea` / `triaged` / `specced` / `dropped`) et liste le **top 3 des `triaged`** par `priorité` (titre + priorité + source). Ce sont les prochains candidats `/spec`.
      - Branches actives matchant `feat/*` et `fix/*` : `git branch -a | grep -E '(feat|fix)/' | head -20`.
      - Commits récents par branche dans la fenêtre.
 
@@ -64,7 +65,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
      - Sinon, lis `knowledge/architecture.md` ou `ARCHITECTURE.md` à la racine.
      - Sinon : note « Architecture non documentée dans `knowledge/` ». **N'invente pas**, ne lis pas le code applicatif.
 
-   - **Stats globales (KPIs)** : nb features actives, nb bugs ouverts, nb posts publiés (fenêtre), nb contacts actifs (fenêtre), nb commits (fenêtre).
+   - **Stats globales (KPIs)** : nb features actives, nb bugs ouverts, nb items backlog `triaged` (prêts à spécifier), nb posts publiés (fenêtre), nb contacts actifs (fenêtre), nb commits (fenêtre).
 
    Le subagent rend une **synthèse structurée JSON** (pas le HTML), avec un objet par section, prête à templater. Pas de texte verbeux : des listes structurées.
 
@@ -84,7 +85,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - **Dark theme** par défaut (cohérent avec LP). Variables CSS : `--bg`, `--bg-elev`, `--text`, `--text-soft`, `--text-muted`, `--border`, `--accent` (vert), `--blue`, `--purple`, `--pink`, `--yellow`. Palette des sections : Build = accent (vert), Discovery = blue, Audience = purple, Activity = yellow, Architecture = pink.
    - **Header** : titre du projet + date + window + 5 KPIs en chips. Animation fade-in au load.
    - **Sections empilées** dans l'ordre :
-     1. **Build** : grid de cards features (statut, étapes restantes), liste bugs ouverts avec priorité visuelle, mini-timeline commits.
+     1. **Build** : grid de cards features (statut, étapes restantes), liste bugs ouverts avec priorité visuelle, **panel Backlog** (compteurs par statut + top 3 `triaged` à spécifier, en chips priorité), mini-timeline commits.
      2. **Discovery** : insights récents (bullets), contacts (anonymisés si `--public`), themes support (avec compteur), market notes.
      3. **Audience** : posts publiés (cards avec date, channel, titre), top 3 recommandations du dernier `/report` par channel (panel coloré).
      4. **Activity** : timeline horodatée des commits, distribution par axe en barres.
@@ -95,6 +96,12 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 6. **Écris le HTML + un jumeau `.md`** (convention dual md+html du repo) :
    - **Mode privé** (default) : `.cc-scratch/status/<YYYY-MM-DD>-status.html` + `.md`. `.cc-scratch/` est gitignored. **NE COMMIT PAS.**
    - **Mode `--public`** : `docs/status/<YYYY-MM-DD>-status.html` + `.md`. Crée `docs/status/.nojekyll` s'il n'existe pas (pour servir les fichiers à plat via Pages).
+
+6 bis. **Dashboard "latest" — `knowledge/dashboard.html`** (à chaque run, quel que soit le mode) :
+   - Écris (= écrase) `knowledge/dashboard.html` avec **le même HTML bespoke** que le snapshot que tu viens de générer — c'est le **pointeur vivant** vers le dernier état, ouvrable à chemin stable (`open knowledge/dashboard.html`), sans chercher la dernière date.
+   - **HTML seul, jamais de `knowledge/dashboard.md`** : le hook `md-to-html` écraserait sinon ce HTML bespoke par un jumeau plat. Écrire le `.html` directement ne déclenche pas le hook (il n'agit que sur les `.md`).
+   - `knowledge/dashboard.html` est **gitignored** (cf. `docs/WORKFLOW.md` § Dashboard latest) : artefact de travail local, peut contenir des PII en mode privé, et un fichier unique partagé que toutes les sessions réécrivent serait un aimant à conflits de merge. Le partage PII-safe reste `--public` → `docs/status/`. **Ne le commit pas.**
+   - Ajoute un petit bandeau dans le HTML : « vue *latest* — régénérée à chaque `/status` (mode `<privé|public>`, le `<date>`) ».
 
 7. **Mode `--public` → propose le commit + push** :
    - Stage par chemin explicite : `git add docs/status/<date>-status.html docs/status/<date>-status.md docs/status/.nojekyll`.
@@ -124,6 +131,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 
 Sortie privée = `.cc-scratch/status/<date>-status.html` + `.md` (PII OK, jamais commitée).
 Sortie publique = `docs/status/<date>-status.html` + `.md` (anonymisée, prête pour GitHub Pages).
+Toujours = `knowledge/dashboard.html` (pointeur *latest*, HTML seul, gitignored — `open knowledge/dashboard.html` à tout moment).
 
 <!-- Exemple d'usage :
   /status
@@ -132,12 +140,14 @@ Sortie publique = `docs/status/<date>-status.html` + `.md` (anonymisée, prête 
   → mode = privé (default)
   → subagent aggregate :
       Build : 3 features actives (checkout-flow, inherited-org, agentforce-mon), 2 bugs open
+      Backlog : 6 items (3 idea, 2 triaged, 1 specced) — top triaged : export-async (P0), wallet-checkout (P1)
       Discovery : 5 contacts cette semaine, 3 thèmes support récurrents, 1 nouvelle note market
       Audience : 4 posts published, /report linkedin top reco = "format liste"
       Activity : 18 commits (12 feat/, 4 fix/, 2 docs)
       Architecture : "non documentée"
   → écrit .cc-scratch/status/2026-06-03-status.html + .md
-  → "Ouvre .cc-scratch/status/2026-06-03-status.html"
+  → écrit knowledge/dashboard.html (latest, gitignored) — le même HTML, à chemin stable
+  → "Ouvre .cc-scratch/status/2026-06-03-status.html (ou knowledge/dashboard.html)"
 
   /status --public --since=14d
   → branche status/2026-06-03

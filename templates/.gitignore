@@ -1,3 +1,5 @@
 # Workflow IA — à fusionner avec ton .gitignore existant
 .cc-scratch/
 CLAUDE.local.md
+# Dashboard "latest" de /status — artefact local (peut contenir des PII en mode privé)
+knowledge/dashboard.html

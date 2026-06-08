@@ -41,6 +41,7 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | `market-research-…` | Découverte | paysage marché, concurrents, tendances | `knowledge/market/` |
 | `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
 | `support-<client>` | Découverte | sift des tickets support (Jira / Zendesk / Linear / …) | `knowledge/support/clients/<client>.md` + `knowledge/support/insights.md` |
+| `backlog` | Transverse (pont Découverte→Build) | toilette/priorise les motifs récurrents en candidats à spécifier | `backlog/<slug>.md` |
 | `spec-<feature>` | Build | le **quoi** : spec + critères + jalons | `features/<feature>/SPEC.md` |
 | `code-<feature>` | Build | le **comment** : plan + code + filet rapide | `features/<feature>/PLAN.md` + code commité |
 | `test-<feature>` | Build | e2e depuis le spec + revue, au jalon | suite e2e commitée |
@@ -48,11 +49,12 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 | `article-<sujet>` | Audience | long form (blog) | `content/blog/{wip,published}/` |
 | `newsletter-<edition>` | Audience | édition assemblée à partir du reste | `content/newsletter/<edition>.md` |
 | `report-<network>` | Audience | analyse de performance via le MCP du réseau | `content/<network>/stats/` (raw) + `content/<network>/insights/` (synthèse) |
-| `status-<date>` | Transverse | snapshot 360° du projet en HTML responsive (mobile-first) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public anonymisé) |
+| `status-<date>` | Transverse | snapshot 360° du projet en HTML responsive (mobile-first) | `.cc-scratch/status/<date>-status.html` (privé) ou `docs/status/<date>-status.html` (public) + `knowledge/dashboard.html` (latest, gitignored) |
 
 - **Trois types de découverte distincts** : `market-research-` regarde le **marché** (extérieur, abstrait) ; `user-feedback-` regarde des **personnes précises** (intérieur, qualitatif, 1-à-1) ; `support-` regarde des **tickets agrégés** (intérieur, quantitatif, depuis un système Jira/Zendesk/…). Les trois alimentent `knowledge/insights.md` global, qui est la source où émergent les motifs.
 - Les skills audience (`post`, `article`, `newsletter`) **invoquent** les skills de copywriting existantes (ex. `marketing-skills:writing-linkedin-posts`) si elles sont disponibles globalement. Le kit fournit la **structure** + le **workflow** (où ranger, draft → review → publish), pas la rédaction elle-même.
 - Le skill `support` utilise en priorité le **MCP Atlassian Rovo** officiel (GA février 2026, Claude partenaire officiel) si configuré ; sinon il bascule sur l'API Jira via API token.
+- Le skill `backlog` est le **pont Découverte→Build** : il promeut les motifs récurrents de `knowledge/insights.md` + `knowledge/support/insights.md` en items priorisés `backlog/<slug>.md` (statut `idea`→`triaged`→`specced`/`dropped`), que `/spec` consomme ensuite. C'est le chaînon manquant entre « signal accumulé » et « feature spécifiée ». Les skills discovery peuvent aussi y déposer un item quand un motif est déjà nettement récurrent.
 - Le **format exact** des préfixes (séparateur, casse) est une préférence d'équipe ; seul le **préfixe par type** compte. La cohérence importe.
 
 ---
@@ -61,7 +63,8 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 
 Trois sessions, dans l'ordre. Chacune laisse un fichier que la suivante lit.
 
-- **`spec-<feature>`** — décide le **quoi**. Écrit le **spec**, les **critères d'acceptation** (= définition de « fini », dérivés **avant** le code) et les **jalons** (tranches user-facing). Les critères servent de référence à **tous** les tests. Au démarrage, le skill `/spec` lit `knowledge/insights.md` global ET `knowledge/support/insights.md` (motifs récurrents côté support) pour ne pas réinventer ou contredire silencieusement la découverte accumulée.
+- **En amont, `backlog`** — le **pont Découverte→Build**. `/backlog` toilette les motifs discovery en candidats priorisés (`backlog/<slug>.md`) et recommande le prochain `/spec`. `/spec` part du top item `triaged` et marque l'item `specced` quand la feature est lancée. *(Optionnel mais recommandé : sans lui, le passage « signal → spec » reste implicite.)*
+- **`spec-<feature>`** — décide le **quoi**. Écrit le **spec**, les **critères d'acceptation** (= définition de « fini », dérivés **avant** le code) et les **jalons** (tranches user-facing). Les critères servent de référence à **tous** les tests. Au démarrage, le skill `/spec` lit l'item `backlog/<feature>.md` s'il existe, puis `knowledge/insights.md` global ET `knowledge/support/insights.md` (motifs récurrents côté support) pour ne pas réinventer ou contredire silencieusement la découverte accumulée.
 - **`code-<feature>`** — **construit**. Lit le spec, écrit son **plan** détaillé en *plan mode* (après exploration du codebase), puis implémente **une étape à la fois**. *(Front et back d'une même feature → même session : ils partagent le contrat d'API.)* À chaque étape, **un subagent écrit le filet rapide** (voir §4) et un **hook le lance**.
 - **`test-<feature>`** — **valide indépendamment**. Session **fraîche qui n'a pas écrit le code**. Écrit la suite **e2e (+ acceptation)** depuis le **spec**, au jalon, et fait la **revue à œil neuf**.
 
@@ -227,7 +230,7 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 
 **Ce qui doit survivre, peu importe les noms :**
 
-- **Trois axes physiquement séparés** : découverte (`knowledge/`), build (`features/`), audience (`content/`).
+- **Trois axes physiquement séparés** : découverte (`knowledge/`), build (`features/`), audience (`content/`) — reliés par un **pont** : le backlog (`backlog/`), qui transforme un motif discovery en candidat à spécifier.
 - **Découverte à 3 sources distinctes** : market (extérieur), CRM contacts (intérieur qualitatif), support (intérieur quantitatif via tickets agrégés). Toutes alimentent l'agrégat `knowledge/insights.md` global.
 - Pour une feature, **SPEC et PLAN au même endroit**, dans une **structure standard reproductible** (sub-features / prototypes / qa / plans / archives) que TOUTES les features partagent.
 - **Versionnage par dossier côté build** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (« refonte majeure » : on bascule la racine entière, on n'édite pas in-place).
@@ -258,7 +261,7 @@ gh repo clone lgrante/ai-founder-workflow ~/ai-founder-workflow
 ~/ai-founder-workflow/install.sh --global
 ```
 
-Les 12 skills (`/setup /spec /code /test /research /feedback /support /post /article /newsletter /report /status`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
+Les 13 skills (`/setup /spec /code /test /research /feedback /support /backlog /post /article /newsletter /report /status`) sont alors disponibles dans **toutes** les sessions Claude Code, sur n'importe quel repo (copiés dans `~/.claude/skills/`).
 
 ### Étape 3 — Déployer le workflow dans un repo cible
 
@@ -342,7 +345,7 @@ Le kit est **agnostique** : il n'embarque aucun MCP, il les détecte si présent
 **Non-négociable (la doctrine §1–§5) :**
 - Mémoire dans les fichiers, sessions jetables, relais = artefact durable.
 - Organisation **par feature + découverte + audience**, jamais par rôle.
-- Pipeline build `spec → code → test` ; tests ancrés sur l'intention.
+- Pipeline build `backlog → spec → code → test` ; tests ancrés sur l'intention.
 - Filet rapide (étape, `code-x`) vs validation indépendante (jalon, `test-x`).
 - Gate humain au jalon côté build, et à la review côté audience.
 - 3 types de découverte distincts (market / user-feedback / support), tous alimentant l'agrégat global.

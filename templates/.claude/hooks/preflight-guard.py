@@ -31,6 +31,7 @@ GUARDED_SKILLS = frozenset({
     "/research",
     "/feedback",
     "/support",
+    "/backlog",
     "/post",
     "/article",
     "/newsletter",

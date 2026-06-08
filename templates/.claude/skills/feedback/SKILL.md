@@ -33,6 +33,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - la **fiche du contact** : contexte, besoin, historique des échanges (ligne datée), prochaine action ;
    - l'**agrégat** `knowledge/insights.md` : ce que les utilisateurs demandent / les frictions observées. Rattache le retour à un thème existant s'il y en a un (incrémente le signal) plutôt que d'empiler des lignes isolées.
 5. Les idées de features émergent de l'**agrégat** (un motif sur plusieurs contacts), **pas** d'un seul échange.
+6. **Pont vers le backlog** : si ce retour fait basculer un motif dans le **récurrent** (≥ ~3 contacts sur le même problème), tu peux proposer à l'utilisateur de déposer un item `backlog/<slug>.md` (cf. `docs/WORKFLOW.md` § Convention backlog). Sinon, laisse-le dans `insights.md` — c'est `/backlog` qui promouvra quand l'agrégat sera assez fort. Tu n'ouvres **jamais** de `/spec` ici.
 
 Cas limites :
 - **Demande de feature directe** (« il me faudrait un bouton X ») : note-la, mais creuse le **problème** derrière — c'est lui qui nourrira un bon spec.
