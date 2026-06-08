@@ -18,7 +18,8 @@
       {
         "matcher": "Write|Edit",
         "hooks": [
-          { "type": "command", "command": ".claude/hooks/md-to-html.py", "timeout": 15 }
+          { "type": "command", "command": ".claude/hooks/md-to-html.py", "timeout": 15 },
+          { "type": "command", "command": ".claude/hooks/backlog-lint.py", "timeout": 5 }
         ]
       }
     ]

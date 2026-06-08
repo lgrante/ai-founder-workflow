@@ -77,11 +77,13 @@ if [ "$MODE" = "global" ]; then
   mkdir -p "$TARGET_HOOKS"
   cp "$KIT_DIR/templates/.claude/hooks/preflight-guard.py" "$TARGET_HOOKS/preflight-guard.py"
   cp "$KIT_DIR/templates/.claude/hooks/md-to-html.py" "$TARGET_HOOKS/md-to-html.py"
-  chmod +x "$TARGET_HOOKS/preflight-guard.py" "$TARGET_HOOKS/md-to-html.py"
+  cp "$KIT_DIR/templates/.claude/hooks/backlog-lint.py" "$TARGET_HOOKS/backlog-lint.py"
+  chmod +x "$TARGET_HOOKS/preflight-guard.py" "$TARGET_HOOKS/md-to-html.py" "$TARGET_HOOKS/backlog-lint.py"
   echo
   echo "→ Installation des garde-fous déterministes (scripts)…"
   echo "  ✓ Hook copié : $TARGET_HOOKS/preflight-guard.py"
   echo "  ✓ Hook copié : $TARGET_HOOKS/md-to-html.py (jumeau HTML des livrables .md)"
+  echo "  ✓ Hook copié : $TARGET_HOOKS/backlog-lint.py (validateur des items backlog)"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
@@ -95,6 +97,12 @@ if [ "$MODE" = "global" ]; then
       "$TARGET_HOOKS/md-to-html.py" \
       15 \
       "Write|Edit"
+    python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+      "$TARGET_SETTINGS" \
+      "PostToolUse" \
+      "$TARGET_HOOKS/backlog-lint.py" \
+      5 \
+      "Write|Edit"
   else
     echo "  ⚠ python3 absent — ajoute manuellement ces entrées à $TARGET_SETTINGS :"
     cat <<EOF
@@ -107,7 +115,8 @@ if [ "$MODE" = "global" ]; then
       ],
       "PostToolUse": [
         { "matcher": "Write|Edit", "hooks": [
-            { "type": "command", "command": "$TARGET_HOOKS/md-to-html.py", "timeout": 15 }
+            { "type": "command", "command": "$TARGET_HOOKS/md-to-html.py", "timeout": 15 },
+            { "type": "command", "command": "$TARGET_HOOKS/backlog-lint.py", "timeout": 5 }
         ]}
       ]
     }
