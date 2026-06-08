@@ -14,6 +14,10 @@ oublié, style cohérent, « même contenu » garanti.
 Contrat hook : lit le JSON PostToolUse sur stdin (`tool_input.file_path`).
 Ne bloque JAMAIS l'écriture (toujours exit 0). Zéro dépendance externe (stdlib).
 
+Scope : n'agit que dans un repo où le workflow est installé (présence d'un
+`docs/WORKFLOW.md` en remontant depuis le fichier) — ainsi le hook est sûr
+même installé en GLOBAL (~/.claude/) : aucun jumeau dans les repos non-workflow.
+
 Denylist (pas de jumeau) : CLAUDE.md, README.md (déjà jumelé à la main),
 MEMORY.md, AGENTS.md, CONTRIBUTING.md, LICENSE*, et tout chemin sous
 `.cc-scratch/`, `.claude/`, `.git/`, `node_modules/`, `memory/`, `dist/`,
@@ -49,6 +53,22 @@ def should_skip(path: str) -> bool:
         return True
     parts = {p.lower() for p in path.replace("\\", "/").split("/")}
     return bool(parts & DENY_DIR_SEGMENTS)
+
+
+def in_workflow_repo(path: str) -> bool:
+    """True ssi un `docs/WORKFLOW.md` existe en remontant depuis `path`.
+
+    Scope le hook aux repos où le workflow est installé — pour qu'il soit
+    sûr en hook GLOBAL (~/.claude/) : aucun jumeau généré dans les repos
+    non-workflow. Remontée d'arborescence (pas de subprocess git).
+    """
+    d = os.path.dirname(os.path.abspath(path))
+    prev = None
+    while d and d != prev:
+        if os.path.isfile(os.path.join(d, "docs", "WORKFLOW.md")):
+            return True
+        prev, d = d, os.path.dirname(d)
+    return False
 
 
 # ─────────────────────────────────────────────────────────────────────────
@@ -476,6 +496,8 @@ def main() -> int:
         return 0
     if not os.path.isfile(path):
         return 0
+    if not in_workflow_repo(path):
+        return 0  # hors d'un repo workflow — sûr en hook global
 
     try:
         with open(path, encoding="utf-8") as f:
