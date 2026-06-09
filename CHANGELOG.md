@@ -8,6 +8,43 @@ Format : [SemVer](https://semver.org/lang/fr/). `MAJEUR` = changement de
 structure imposant une migration manuelle ; `MINEUR` = nouveau skill / hook /
 capacité rétro-compatible ; `CORRECTIF` = corrections sans nouvelle surface.
 
+## 2.0.0 — 2026-06-08
+
+Refonte du classement de `knowledge/` (axe Découverte). **MAJEUR** : la
+structure change → migration manuelle des repos déjà installés (cf. `MIGRATION.md`).
+
+### Principe directeur
+- **Un objet = un dossier. Un acte = un fichier daté.** La découverte se range
+  désormais par **objet stable** (5), plus par dossiers thématiques qui
+  mélangeaient trois axes (par personne / par conversation / par sujet).
+
+### Changé (structure `knowledge/`)
+- **`people/`** (nouveau) — une fiche **par personne**, interne **ou** externe,
+  évolutive. Absorbe `crm/contacts/`. L'équipe interne (boss, collègues) a enfin
+  une place.
+- **`conversations/`** (nouveau) — un fichier **par échange daté**, pointe vers
+  `people/`. Format **5 champs** (citation brute, pain, solution actuelle, notes,
+  liens).
+- **`research/`** (renommé depuis `market/`) — une note **par sujet exploré**.
+- **`competitors/`** (nouveau) — un dossier **par concurrent** (split de `market/`).
+- **`community/`** (nouveau) — canaux de **veille passive** (split de `market/`).
+- **Disparaissent** : `crm/contacts/` (→ `people/`), `market/` (→ `research/` +
+  `competitors/` + `community/`). **Inchangés** : `support/`, `content/`,
+  `insights.md`.
+
+### Skills
+- **`/feedback`** écrit maintenant **deux objets** : la conversation datée
+  (`conversations/`) **et** la fiche personne (`people/`), + l'agrégat `insights.md`.
+- **`/research`** sort dans `research/` par défaut (+ `competitors/`, `community/`).
+- **`/support`** inchangé (dossier `support/` conservé) — renvois alignés.
+- `/spec`, `/backlog`, `/status`, `/post`, `/article`, `/setup` : chemins et
+  vocabulaire mis à jour.
+
+### Ajouté
+- **`MIGRATION.md`** — checklist de migration manuelle en 3 vagues (création
+  structure → migration `git mv` → ajout au fil de l'eau). Pas de script auto.
+- Templates `knowledge/people/_template.md` et `knowledge/conversations/_template.md`.
+
 ## 1.0.0 — 2026-06-08
 
 Première version **versionnée** du kit (introduit la propagation propre).
