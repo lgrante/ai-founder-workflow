@@ -34,7 +34,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - **Sub-feature** (composant atomique d'une feature existante) : range-la dans `features/<parent>/sub-features/$ARGUMENTS/` avec la même structure récursive (SPEC, PLAN, archives…).
 4. Si pertinents, lis les sources de découverte qui alimentent le spec :
    - **`backlog/$ARGUMENTS.md` s'il existe** (cf. `docs/WORKFLOW.md` § Convention backlog) : c'est le point de départ idéal — l'item porte déjà le problème, le signal (preuve agrégée) et la priorité, groomés par `/backlog`. Pars de là plutôt que de repartir de zéro.
-   - `knowledge/insights.md` (agrégat global des 3 axes discovery) et `knowledge/market/` (recherche marché)
+   - `knowledge/insights.md` (agrégat global des 3 axes discovery) et `knowledge/research/` (sujets marché explorés ; + `knowledge/competitors/`, `knowledge/community/`)
    - `knowledge/support/insights.md` (motifs cross-clients depuis les tickets) — souvent les signaux les plus directs sur ce qui manque ou casse
    - `knowledge/support/clients/<client>.md` si la feature concerne un client spécifique nommé
    - Les `archives/v{N}/SPEC.md` éventuels pour avoir l'historique de la feature (utile pour ne pas réinventer ou contredire silencieusement).

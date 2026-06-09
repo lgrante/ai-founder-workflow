@@ -77,7 +77,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 - **Stocker des PII brutes** (noms, emails, téléphones de contacts client) dans `knowledge/support/clients/<client>.md` versionné. **Anonymise** ou réfère aux IDs Jira (`PROJ-1234`).
 - **Écraser l'historique** : `knowledge/support/clients/<client>.md` est **cumulatif**. Les sections datées s'ajoutent, ne remplacent pas.
 - **Décider d'une feature** ici — c'est le rôle de `/spec`, déclenché plus tard quand un motif a émergé de l'agrégat.
-- **Confondre avec `/feedback`** (échange direct, 1 personne, qualitatif) ou `/research` (marché abstrait, sources externes).
+- **Confondre avec `/feedback`** (échange direct daté avec 1 personne → `knowledge/conversations/` + fiche `knowledge/people/`) ou `/research` (marché abstrait → `knowledge/research/`, `competitors/`, `community/`). Le support reste sur **son** dossier inchangé : `knowledge/support/`.
 - **Charger tous les tickets bruts dans ta session** — toujours déléguer le sift à un subagent et ne ramener que la synthèse.
 
 ## Format du fichier client (référence)

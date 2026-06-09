@@ -45,8 +45,8 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 
    - **Discovery** :
      - `knowledge/insights.md` : 5 derniers signaux / motifs (sections datées récentes).
-     - `knowledge/market/*.md` : titres + dates des notes dans la fenêtre.
-     - `knowledge/crm/contacts/*.md` : contacts mis à jour dans la fenêtre (mtime fichier + sections datées). **PII gérée selon mode.**
+     - `knowledge/research/*.md` : titres + dates des notes de sujet dans la fenêtre. (+ `knowledge/competitors/*/` modifiés, `knowledge/community/*.md` mis à jour.)
+     - `knowledge/conversations/*.md` : conversations datées dans la fenêtre (`date` du frontmatter) + `knowledge/people/*.md` : fiches dont `dernier_contact` tombe dans la fenêtre. **PII gérée selon mode.**
      - `knowledge/support/insights.md` : motifs cross-clients récents.
      - `knowledge/support/clients/<client>.md` : statut des thèmes ouverts.
 
