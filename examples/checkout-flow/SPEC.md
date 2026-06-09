@@ -14,7 +14,7 @@ Aujourd'hui le panier existe mais il n'y a pas de tunnel de commande.
 - création de compte / authentification (déjà en place) ;
 - gestion des promotions et codes promo ;
 - facturation comptable / export ;
-- moyens de paiement autres que carte (wallets → voir `knowledge/market/`, feature ultérieure).
+- moyens de paiement autres que carte (wallets → voir `knowledge/research/`, feature ultérieure).
 
 ## Critères d'acceptation
 Définition de « fini ». Observables sans connaître l'implémentation. Référence de **tous** les tests.
