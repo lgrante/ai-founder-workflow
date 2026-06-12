@@ -240,7 +240,7 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 - **Versionnage par dossier côté build** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (« refonte majeure » : on bascule la racine entière, on n'édite pas in-place).
 - **Sub-features récursives** : un composant atomique d'une version active vit dans `sub-features/<sub>/` avec la même structure.
 - **Drafts/scheduled/posted séparés côté audience** : un draft se relit, un post publié n'a plus à être modifié. Les channels sont des sous-dossiers de `content/`, eux-mêmes avec une structure standard.
-- **Brand book partagé** : `knowledge/content/brand-book.md` est la source de tonalité, lue par tous les skills audience pour la cohérence.
+- **Brand book partagé** : `knowledge/brand/brand-book.md` est la source de tonalité, lue par tous les skills audience pour la cohérence.
 - **Support cumulatif** : `knowledge/support/clients/<client>.md` est **append-only** (sections datées par session). L'historique des motifs est lisible directement dans le fichier.
 - **Tickets de bug isolés** : `bugs/<slug>/TICKET.md` est une mini-spec à 1-2 critères, écrite par `/test` ou `/support`, lue par `/code bugs/<slug>`. Pas un 4e axe — c'est un dossier d'artefacts qui réutilise le pipeline de build.
 - Commandes + savoir de domaine dans `.claude/skills/` (chargés à la demande), pas dans un `CLAUDE.md` obèse.
