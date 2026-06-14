@@ -1,0 +1,15 @@
+{
+  "//": "Typecheck éditeur uniquement. Le runtime utilise le type-stripping natif de Node (--experimental-strip-types), donc aucune compilation n'est requise pour lancer/tester.",
+  "compilerOptions": {
+    "target": "es2023",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "verbatimModuleSyntax": true,
+    "lib": ["es2023", "dom"]
+  },
+  "include": ["src", "test"]
+}

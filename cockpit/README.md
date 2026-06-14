@@ -15,5 +15,23 @@ Cockpit local de pilotage des sessions Claude Code, au-dessus du workflow ai-fou
 ## Documents
 - [`ARCHITECTURE.md`](./ARCHITECTURE.md) — le plan complet : composants, modèle de données (lu vs stocké), contrat UI↔runner, mécanique des portes humaines, git/worktree, jalons.
 
-## État
-Plan validé conceptuellement. Implémentation pas encore démarrée — premier jalon prévu : **J1 lecture seule** (board lu depuis un repo setupé, sans lancer de session).
+## État — J1 (lecture seule) livré ✅
+Premier jalon implémenté : board **lu** depuis un repo setupé, **sans lancer aucune session**.
+
+- **Repo Registry** (`src/repoRegistry.ts`) — détecte la pilotabilité via `docs/WORKFLOW.md`.
+- **State Reader** (`src/stateReader.ts`) — dérive le `BoardModel` (features + avancement PLAN, backlog, content, discovery) en lecture seule.
+- **Daemon** (`src/server.ts`) — API `/api/repos`, `/api/board` + UI statique, bind `127.0.0.1`.
+- **UI** (`ui/index.html`) — board thème sombre : colonnes build / backlog / content / discovery.
+- **Tests** (`test/`) — 8 tests sur fixture, zéro dépendance.
+
+Reste à faire : **J2** (lancer une session simple via le SDK) → **J3** (portes humaines) → **J4** (worktrees concurrents) → **J5** (reprise). Cf. `ARCHITECTURE.md §10`.
+
+## Pré-requis & lancement
+Node ≥ 22.18 (type-stripping natif, **aucune dépendance à installer**).
+
+```bash
+cd cockpit
+npm test                                    # 8 tests sur la fixture
+npm run board -- /chemin/vers/un/repo        # imprime le board en CLI
+COCKPIT_REPOS=/chemin/repoA:/chemin/repoB npm start   # daemon → http://127.0.0.1:4317
+```

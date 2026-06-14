@@ -1,0 +1,15 @@
+{
+  "name": "ai-founder-cockpit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Cockpit local de pilotage des sessions Claude Code (workflow ai-founder-workflow). J1 = lecture seule.",
+  "engines": {
+    "node": ">=22.18"
+  },
+  "scripts": {
+    "start": "node --experimental-strip-types src/server.ts",
+    "board": "node --experimental-strip-types src/cli.ts",
+    "test": "node --experimental-strip-types --test test/*.test.ts"
+  }
+}

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Cockpit — sessions Claude Code</title>
+  <style>
+    :root {
+      --bg: #0e1116; --panel: #161b22; --border: #283040; --fg: #e6edf3;
+      --muted: #8b949e; --accent: #58a6ff; --good: #3fb950; --warn: #d29922;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; background: var(--bg); color: var(--fg);
+      font: 15px/1.5 system-ui, -apple-system, Segoe UI, Roboto, sans-serif; }
+    header { padding: 16px 20px; border-bottom: 1px solid var(--border);
+      display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+    header h1 { font-size: 16px; margin: 0; font-weight: 600; }
+    .muted { color: var(--muted); }
+    select, button { background: var(--panel); color: var(--fg);
+      border: 1px solid var(--border); border-radius: 6px; padding: 6px 10px; font: inherit; }
+    button { cursor: pointer; }
+    main { padding: 20px; display: grid; gap: 20px;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); align-items: start; }
+    .col { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 14px 16px; }
+    .col h2 { font-size: 12px; letter-spacing: .08em; text-transform: uppercase;
+      color: var(--muted); margin: 0 0 12px; }
+    .card { border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; margin-bottom: 10px; }
+    .card:last-child { margin-bottom: 0; }
+    .card .title { font-weight: 600; }
+    .bar { height: 6px; background: #21262d; border-radius: 3px; overflow: hidden; margin: 8px 0 4px; }
+    .bar > i { display: block; height: 100%; background: var(--good); }
+    .row { display: flex; justify-content: space-between; gap: 8px; align-items: center; }
+    .tag { font-size: 11px; padding: 1px 7px; border-radius: 99px; border: 1px solid var(--border); color: var(--muted); }
+    .tag.P0 { color: #ff7b72; border-color: #ff7b7244; }
+    .tag.P1 { color: var(--warn); border-color: #d2992244; }
+    .small { font-size: 12px; color: var(--muted); }
+    .ms { font-size: 12px; color: var(--muted); margin-top: 4px; }
+    .empty { color: var(--muted); font-style: italic; }
+    .err { color: #ff7b72; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Cockpit <span class="muted">· sessions Claude Code</span></h1>
+    <select id="repo" title="repo cible"></select>
+    <button id="refresh">↻ rafraîchir</button>
+    <span id="status" class="muted small"></span>
+  </header>
+  <main id="board"><p class="muted">chargement…</p></main>
+
+  <script type="module">
+    const $ = (s) => document.querySelector(s);
+    const board = $("#board"), repoSel = $("#repo"), statusEl = $("#status");
+
+    async function loadRepos() {
+      const r = await fetch("/api/repos").then((x) => x.json()).catch(() => ({ repos: [] }));
+      repoSel.innerHTML = "";
+      for (const repo of r.repos ?? []) {
+        const o = document.createElement("option");
+        o.value = repo.path;
+        o.textContent = repo.path.split("/").pop() + (repo.pilotable ? "" : " ⚠");
+        repoSel.appendChild(o);
+      }
+      if (!repoSel.options.length) {
+        const o = document.createElement("option");
+        o.textContent = "(aucun repo — env COCKPIT_REPOS)";
+        repoSel.appendChild(o);
+      }
+    }
+
+    function pct(s) { return s.total ? Math.round((s.done / s.total) * 100) : 0; }
+    function el(html) { const d = document.createElement("div"); d.innerHTML = html; return d.firstElementChild; }
+
+    function render(b) {
+      if (!b.pilotable) {
+        board.innerHTML = `<p class="err">Non pilotable : ${b.reason ?? "?"}</p>`;
+        return;
+      }
+      board.innerHTML = "";
+
+      // BUILD
+      const build = el(`<section class="col"><h2>Build · par feature</h2></section>`);
+      if (!b.features.length) build.appendChild(el(`<p class="empty">aucune feature</p>`));
+      for (const f of b.features) {
+        const ms = f.milestones.map((m) => `<div class="ms">${m.title} — ${m.steps.done}/${m.steps.total}</div>`).join("");
+        build.appendChild(el(`<div class="card">
+          <div class="row"><span class="title">${f.slug}</span><span class="small">${f.steps.done}/${f.steps.total}</span></div>
+          <div class="bar"><i style="width:${pct(f.steps)}%"></i></div>
+          <div class="small">${pct(f.steps)}% · ${f.hasSpec ? "spec" : "—"} ${f.hasPlan ? "+ plan" : ""}</div>
+          ${ms}
+        </div>`));
+      }
+      board.appendChild(build);
+
+      // BACKLOG
+      const bl = el(`<section class="col"><h2>Backlog</h2></section>`);
+      if (!b.backlog.length) bl.appendChild(el(`<p class="empty">vide</p>`));
+      for (const it of b.backlog) {
+        bl.appendChild(el(`<div class="card">
+          <div class="row"><span class="title">${it.titre}</span><span class="tag ${it.priorite}">${it.priorite}</span></div>
+          <div class="small">${it.statut} · source: ${it.source}</div>
+        </div>`));
+      }
+      board.appendChild(bl);
+
+      // CONTENT
+      const ct = el(`<section class="col"><h2>Content · par sujet</h2></section>`);
+      if (!b.content.length) ct.appendChild(el(`<p class="empty">aucun channel</p>`));
+      for (const c of b.content) {
+        const parts = Object.entries(c.counts).map(([s, n]) => `${s}: ${n}`).join(" · ");
+        ct.appendChild(el(`<div class="card">
+          <div class="title">${c.channel}</div><div class="small">${parts || "vide"}</div>
+        </div>`));
+      }
+      board.appendChild(ct);
+
+      // DISCOVERY
+      const d = b.discovery;
+      board.appendChild(el(`<section class="col"><h2>Discovery</h2>
+        <div class="card small">
+          marché : ${d.hasMarket ? "oui" : "non"}<br/>
+          insights : ${d.hasInsights ? "oui" : "non"}<br/>
+          clients support : ${d.supportClients.length}<br/>
+          contacts feedback : ${d.feedbackContacts}
+        </div></section>`));
+    }
+
+    async function loadBoard() {
+      const repo = repoSel.value;
+      statusEl.textContent = "lecture…";
+      try {
+        const url = repo ? `/api/board?repo=${encodeURIComponent(repo)}` : "/api/board";
+        const b = await fetch(url).then((x) => x.json());
+        render(b);
+        statusEl.textContent = "à jour · " + new Date().toLocaleTimeString();
+      } catch (e) {
+        board.innerHTML = `<p class="err">erreur : ${e.message}</p>`;
+        statusEl.textContent = "";
+      }
+    }
+
+    $("#refresh").addEventListener("click", loadBoard);
+    repoSel.addEventListener("change", loadBoard);
+    await loadRepos();
+    await loadBoard();
+  </script>
+</body>
+</html>
