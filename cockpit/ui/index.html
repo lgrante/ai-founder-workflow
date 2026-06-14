@@ -37,6 +37,25 @@
     .ms { font-size: 12px; color: var(--muted); margin-top: 4px; }
     .empty { color: var(--muted); font-style: italic; }
     .err { color: #ff7b72; }
+    .launch { display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+      padding: 10px 20px; border-bottom: 1px solid var(--border); background: #11161d; }
+    .launch input { background: var(--panel); color: var(--fg); border: 1px solid var(--border);
+      border-radius: 6px; padding: 6px 10px; font: inherit; min-width: 160px; }
+    #stream { position: fixed; right: 0; top: 0; bottom: 0; width: min(440px, 92vw);
+      background: var(--panel); border-left: 1px solid var(--border); transform: translateX(100%);
+      transition: transform .2s; display: flex; flex-direction: column; z-index: 10; }
+    #stream.open { transform: none; }
+    #stream header { border-bottom: 1px solid var(--border); }
+    #log { flex: 1; overflow: auto; padding: 12px 16px; font: 13px/1.5 ui-monospace, Menlo, monospace; }
+    .ev { margin-bottom: 6px; }
+    .ev .k { color: var(--accent); }
+    .ev.tool .k { color: var(--warn); }
+    .ev.result .k { color: var(--good); }
+    .ev.error .k { color: #ff7b72; }
+    .pill { font-size: 11px; padding: 1px 8px; border-radius: 99px; border: 1px solid var(--border); }
+    .pill.running { color: var(--warn); border-color: #d2992244; }
+    .pill.done { color: var(--good); border-color: #3fb95044; }
+    .pill.error { color: #ff7b72; border-color: #ff7b7244; }
   </style>
 </head>
 <body>
@@ -46,7 +65,23 @@
     <button id="refresh">↻ rafraîchir</button>
     <span id="status" class="muted small"></span>
   </header>
+  <div class="launch">
+    <span class="small muted">Lancer&nbsp;:</span>
+    <select id="type" title="type de session"></select>
+    <input id="slug" placeholder="sujet / feature (slug)" />
+    <button id="launch">▶ lancer</button>
+    <span id="launchMsg" class="small muted"></span>
+  </div>
   <main id="board"><p class="muted">chargement…</p></main>
+
+  <aside id="stream">
+    <header>
+      <h1 id="streamTitle">session</h1>
+      <span id="streamState" class="pill"></span>
+      <button id="closeStream" style="margin-left:auto">✕</button>
+    </header>
+    <div id="log"></div>
+  </aside>
 
   <script type="module">
     const $ = (s) => document.querySelector(s);
@@ -139,8 +174,76 @@
       }
     }
 
+    // --- lancement de session (J2) ---
+    const typeSel = $("#type"), slugInput = $("#slug"), launchMsg = $("#launchMsg");
+    const streamEl = $("#stream"), logEl = $("#log"), streamState = $("#streamState"), streamTitle = $("#streamTitle");
+    let es = null;
+
+    async function loadTypes() {
+      const r = await fetch("/api/types").then((x) => x.json()).catch(() => ({ types: [] }));
+      for (const t of r.types ?? []) {
+        const o = document.createElement("option");
+        o.value = t.type;
+        o.textContent = `${t.skill} (${t.axe})`;
+        typeSel.appendChild(o);
+      }
+    }
+
+    function setState(s) {
+      streamState.textContent = s;
+      streamState.className = "pill " + s;
+    }
+
+    function logEvent(ev) {
+      const text = ev.text ?? ev.message ?? ("tool" in ev ? ev.tool : "");
+      const cls = ev.kind === "tool_use" ? "tool" : ev.kind === "result" ? "result" : ev.kind === "error" ? "error" : "";
+      const div = document.createElement("div");
+      div.className = "ev " + cls;
+      div.innerHTML = `<span class="k">${ev.kind}</span> ${text ?? ""}`;
+      logEl.appendChild(div);
+      logEl.scrollTop = logEl.scrollHeight;
+    }
+
+    function openStream(session) {
+      if (es) es.close();
+      logEl.innerHTML = "";
+      streamTitle.textContent = `${session.type} · ${session.slug}`;
+      setState(session.runtime_state || "running");
+      streamEl.classList.add("open");
+      es = new EventSource(`/api/sessions/${session.id}/events`);
+      es.onmessage = (m) => {
+        const ev = JSON.parse(m.data);
+        logEvent(ev);
+        if (ev.kind === "result") setState("done");
+        if (ev.kind === "error") setState("error");
+      };
+      es.addEventListener("end", (m) => {
+        setState(m.data);
+        es.close();
+        loadBoard(); // l'artefact a pu apparaître
+      });
+    }
+
+    $("#launch").addEventListener("click", async () => {
+      const repo = repoSel.value, type = typeSel.value, slug = slugInput.value.trim();
+      if (!slug) { launchMsg.textContent = "slug requis"; return; }
+      launchMsg.textContent = "lancement…";
+      try {
+        const r = await fetch("/api/sessions", {
+          method: "POST", headers: { "content-type": "application/json" },
+          body: JSON.stringify({ repo, type, slug }),
+        });
+        const data = await r.json();
+        if (!r.ok) { launchMsg.textContent = "✗ " + (data.error ?? r.status); return; }
+        launchMsg.textContent = "";
+        openStream(data.session);
+      } catch (e) { launchMsg.textContent = "✗ " + e.message; }
+    });
+    $("#closeStream").addEventListener("click", () => { es?.close(); streamEl.classList.remove("open"); });
+
     $("#refresh").addEventListener("click", loadBoard);
     repoSel.addEventListener("change", loadBoard);
+    await loadTypes();
     await loadRepos();
     await loadBoard();
   </script>

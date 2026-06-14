@@ -181,8 +181,8 @@ Le tout vit sous `cockpit/` : `cockpit/runner/`, `cockpit/ui/`, `cockpit/shared/
 
 ## 10. Jalons (livrables vérifiables)
 
-- **J1 — Lecture seule** : Repo Registry + State Reader + UI board. *Critère* : j'enregistre un repo setupé, je vois ses features (avec % d'avancement lu depuis PLAN), son backlog, son contenu. **Aucune** session lancée. (Valide tout le socle « lit n'importe quel repo » sans risque.)
-- **J2 — Lancer une session simple** : Session Runner + Event Bus + Git Mgr pour un skill **sans porte** (`/research <sujet>`). *Critère* : je clique « lancer research », une branche `research/<topic>` est créée, la session streame dans l'UI, l'artefact apparaît dans `knowledge/`, la carte passe `done`.
+- **J1 — Lecture seule** ✅ *livré* : Repo Registry + State Reader + UI board. *Critère* : j'enregistre un repo setupé, je vois ses features (avec % d'avancement lu depuis PLAN), son backlog, son contenu. **Aucune** session lancée. (Valide tout le socle « lit n'importe quel repo » sans risque.)
+- **J2 — Lancer une session simple** ✅ *livré* : Session Runner + Event Bus + Git Mgr + Store pour un skill **sans porte** (`/research <sujet>`). *Critère* : je clique « lancer research », une branche `research/<topic>` est créée, la session streame dans l'UI (SSE), la carte passe `done`. *(Pipeline prouvé par tests via FakeRunner + faux binaire `claude` ; run LLM réel câblé, non exécuté en sandbox.)*
 - **J3 — Portes humaines** : Gate Broker + `/code` avec plan mode. *Critère* : `/code <feature>` s'arrête à la porte PLAN, une carte cliquable apparaît, mon clic « Validé » reprend la session jusqu'au prochain gate.
 - **J4 — Concurrence worktrees** : 2+ sessions en parallèle sur le même repo dans des worktrees distincts sans collision. *Critère* : `/code` A et `/article` B tournent ensemble, `git worktree list` montre 2 worktrees, aucun stage croisé.
 - **J5 — Reprise** : `--resume` d'une session via son `sdk_session_id`. *Critère* : je ferme le daemon, je le relance, je reprends une session `waiting-gate` là où elle était.
