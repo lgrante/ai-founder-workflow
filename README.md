@@ -375,6 +375,24 @@ git clone https://github.com/kkoppenhaver/cc-nano-banana ~/.claude/skills/nano-b
 
 **Flux dans `/post`** : la skill génère dans `./nanobanana-output/` du cwd ; on `mv` ensuite vers le dossier du post (`content/<channel>/<status>/<slug>/hero.png`). Si pas installé : skip silencieux, le post est créé sans image.
 
+### Stack anti-tokens — Serena (code-graph) + chop (console)
+
+Pour réduire la consommation de tokens, le kit propage une stack sur chaque repo (cf. `docs/WORKFLOW.md` § Économie de tokens) :
+
+- **Serena (code-graph MCP)** — navigation symbolique (`find_symbol`, `find_referencing_symbols`, overview) au lieu de lire des fichiers entiers. `templates/.mcp.json` déclare le serveur `serena` ; `templates/.serena/project.yml` fixe les **langages par défaut** (`typescript` couvrant JS/TS/JSX/TSX, `python`, `php` — les plus utilisés ; ajouter un langage = un LSP requis, ex. `go`→`gopls`). C'est la **seule exception** au principe d'agnosticisme MCP ci-dessous : Serena est embarqué par défaut car transverse — **désactivable** en supprimant `.mcp.json`.
+
+  ```bash
+  uv tool install serena-agent   # binaire `serena` sur le PATH ; le MCP connecte au lancement de Claude Code
+  ```
+
+- **chop (compresseur console)** — tronque/compresse les sorties verbeuses avant qu'elles ne polluent le contexte. `install.sh` et `/setup` lancent `chop init` si le binaire est présent (sinon astuce). chop gère son propre hook.
+
+  ```bash
+  curl -fsSL https://raw.githubusercontent.com/AgusRdz/chop/main/install.sh | sh  &&  chop init
+  ```
+
+Les deux dégradent proprement si absents (aucun blocage).
+
 ### MCP par réseau social — pour `/report` et la lecture d'insights
 
 `/report <network>` (et `/post`, `/article`, `/newsletter` pour lire les insights produits) détectent automatiquement le MCP du réseau visé via le préfixe d'outils :
@@ -384,7 +402,7 @@ git clone https://github.com/kkoppenhaver/cc-nano-banana ~/.claude/skills/nano-b
 - Blog → MCP analytics (Plausible, GA via wrapper, …)
 - Newsletter → MCP de l'outil mailing (Substack, Beehiiv, ConvertKit…)
 
-Le kit est **agnostique** : il n'embarque aucun MCP, il les détecte si présents. Sans MCP, `/report` propose un fallback export manuel (CSV/JSON collé par l'utilisateur).
+Le kit est **agnostique** sur les MCP réseau : il n'en embarque aucun, il les détecte si présents. Sans MCP, `/report` propose un fallback export manuel (CSV/JSON collé par l'utilisateur). *(Unique exception embarquée : le code-graph Serena ci-dessus, transverse et désactivable.)*
 
 ## 8. Non-négociable vs adaptable
 

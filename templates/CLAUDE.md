@@ -41,6 +41,11 @@ Commandes :
 ## Jumeaux HTML
 Tout `.md` livrable (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) obtient automatiquement un `<fichier>.html` jumeau via le hook `.claude/hooks/md-to-html.py` (`PostToolUse`). N'écris **pas** ce `.html` à la main et ne l'édite jamais (il est réécrit à chaque sauvegarde du `.md`) — édite seulement le `.md` source. Cf. `docs/WORKFLOW.md` § Jumeau HTML.
 
+## Économie de tokens
+- **Navigation symbolique d'abord.** Le code-graph Serena (MCP, `.mcp.json` du repo) est branché : utilise `find_symbol` / `find_referencing_symbols` / overview pour explorer l'architecture **avant** de lire un fichier entier en brut.
+- **Plan avant code (bloquant).** Aucune écriture de code sans plan validé : porte `PLAN.md` côté `/code` (cf. `docs/WORKFLOW.md` § Économie de tokens). Exception : correction triviale d'une ligne explicitement demandée.
+- **Console compressée.** `chop` tronque/compresse les sorties verbeuses (git, npm, docker…) — n'ajoute pas de `| head`/`| tail` manuels sauf besoin précis.
+
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.
 Jeter le bruit des échecs déjà résolus.

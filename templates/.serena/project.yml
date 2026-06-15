@@ -1,0 +1,16 @@
+# Serena (code-graph MCP) — configuration projet.
+# Langages indexés par défaut sur ce repo (les plus utilisés ici).
+# `typescript` couvre JS/TS/JSX/TSX. Serena auto-provisionne ces language servers.
+# Le nom du projet est dérivé du dossier (project_name omis volontairement).
+#
+# Ajouter un langage = ajouter sa ligne ci-dessous (un LSP par langage requis).
+# Attention : un LSP manquant fait échouer l'init Serena pour tout le repo.
+#   - go      → nécessite `gopls`         (go install golang.org/x/tools/gopls@latest)
+#   - rust    → nécessite `rust-analyzer`
+#   - java    → nécessite `jdtls`
+#   - ruby    → nécessite `solargraph` / `ruby-lsp`
+#   - csharp  → nécessite le LSP C#
+languages:
+- typescript
+- python
+- php

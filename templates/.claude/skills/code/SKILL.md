@@ -35,7 +35,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - Mode feature → `features/$ARGUMENTS/SPEC.md` (description + critères C1, C2… + jalons).
    - Si absent ou trop flou pour planifier → **stoppe** et renvoie vers `/spec` (mode feature) ou vers la session qui a ouvert le ticket (mode bug).
 
-4. **PLAN.md — porte de validation 1/2.** En **plan mode**, explore le codebase (conventions, modules concernés, setup de test réel) **avant** d'écrire le plan. Puis écris `<dossier-artefact>/PLAN.md` :
+4. **PLAN.md — porte de validation 1/2.** En **plan mode**, explore le codebase (conventions, modules concernés, setup de test réel) **avant** d'écrire le plan. **Privilégie la navigation symbolique Serena** (`find_symbol`, `find_referencing_symbols`, overview — via le MCP `.mcp.json`) pour cartographier l'architecture sans lire des fichiers entiers en brut ; ne lis en entier que ce que le code-graph désigne (cf. `docs/WORKFLOW.md` § Économie de tokens). Puis écris `<dossier-artefact>/PLAN.md` :
    - étapes techniques ordonnées, fichiers touchés, dépendances entre étapes ;
    - **chaque étape rattachée à un ou plusieurs critères** de l'artefact (référence par numéro : « Étape 3 → C2 ») ;
    - en mode feature : regroupe les étapes par jalon. En mode bug : pas de jalon (le fix est sa propre tranche), mais distingue **fix** et **test de régression** comme deux étapes minimum.
