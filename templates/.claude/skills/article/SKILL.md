@@ -29,7 +29,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 
 2. Charge le contexte :
    - `knowledge/insights.md` (les pain points / motifs)
-   - `knowledge/content/brand-book.md` ou équivalent
+   - `knowledge/brand/brand-book.md` ou équivalent
    - `knowledge/market/` (concurrents, sources, SEO)
    - `content/blog/published/` récents (cohérence éditoriale et SEO interne)
    - **`content/blog/insights/` — le dernier rapport `/report blog`** s'il existe : tu y trouves les motifs (angle qui convertit, longueur optimale, SEO qui ranke, sujets qui n'ont pas pris). Cite-le dans tes choix de plan.

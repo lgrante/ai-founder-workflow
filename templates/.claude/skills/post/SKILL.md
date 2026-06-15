@@ -32,7 +32,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 
 3. Charge le contexte :
    - `knowledge/insights.md` (les pain points / verbatims / motifs récurrents)
-   - `knowledge/content/brand-book.md` ou équivalent (tonalité, style, voice)
+   - `knowledge/brand/brand-book.md` ou équivalent (tonalité, style, voice)
    - `knowledge/market/` (si le sujet est lié à un thème marché)
    - `content/<channel>/posted/` récents (éviter répétitions de format/sujet)
    - **`content/<channel>/insights/` — le dernier rapport `/report`** s'il existe : tu y trouves ce qui marche sur ce réseau (format gagnant, trade-offs, recommandations en cours). Cite-le explicitement dans tes choix éditoriaux (ex. « le rapport du 03/06 a recommandé liste numérotée → j'applique »). Si pas de rapport, signale-le et propose à l'utilisateur de lancer `/report <channel>` avant.
@@ -50,7 +50,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 9. **À la validation** : déplace dans `content/<channel>/scheduled/` (avec date prévue dans le frontmatter) OU `content/<channel>/posted/` (si publié immédiatement). L'utilisateur décide. Si le post est en dossier, déplace tout le dossier d'un coup.
 
 Cas limites :
-- **Pas de brand book** : signale-le et propose d'écrire un placeholder dans `knowledge/content/brand-book.md` avant de rédiger (sinon ton incohérent dans le temps).
+- **Pas de brand book** : signale-le et propose d'écrire un placeholder dans `knowledge/brand/brand-book.md` avant de rédiger (sinon ton incohérent dans le temps).
 - **Pas de rapport `/report`** : tu rédiges sans data sur ce qui marche — propose à l'utilisateur de lancer `/report <channel>` d'abord, mais ne le force pas (il peut être tôt dans la phase de publication).
 - **Aucune skill marketing globale** dispo : rédige toi-même, mais délègue à un **subagent** pour ne pas saturer le contexte principal.
 - **Channel non supporté** : demande à l'utilisateur, scaffold un nouveau dossier `content/<channel>/{drafts,scheduled,posted,stats,insights}/` si nécessaire.

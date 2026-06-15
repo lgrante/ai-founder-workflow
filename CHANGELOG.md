@@ -8,6 +8,21 @@ Format : [SemVer](https://semver.org/lang/fr/). `MAJEUR` = changement de
 structure imposant une migration manuelle ; `MINEUR` = nouveau skill / hook /
 capacité rétro-compatible ; `CORRECTIF` = corrections sans nouvelle surface.
 
+## 2.0.0 — 2026-06-12
+
+### Modifié
+- **`knowledge/content/` → `knowledge/brand/`** — le dossier marque & positionnement
+  (brand-book, marketing-context, structure de landing, pitch-kit, assets) change de
+  nom : `knowledge/content/` entrait en collision avec `content/` racine (axe
+  audience) — deux significations de « content » dans le même repo, piège permanent
+  pour les agents. Touche les skills `/post`, `/article`, `/report`, `/setup` et le
+  README.
+
+### Migration (repos déjà installés)
+- `git mv knowledge/content knowledge/brand` puis mettre à jour les références
+  locales (READMEs, strategy, CLAUDE.md…). Fait sur `org-lookup` le 2026-06-12
+  (commit `ff20a7d`).
+
 ## 1.0.0 — 2026-06-08
 
 Première version **versionnée** du kit (introduit la propagation propre).

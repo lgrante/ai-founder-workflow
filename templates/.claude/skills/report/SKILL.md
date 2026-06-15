@@ -63,7 +63,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
    - **Actions** : 4-6 recommandations concrètes avec **priorité** (haute / moyenne / basse) et **horizon** (cette semaine / ce mois / trimestre).
    - Frontmatter : `network`, `date_pull`, `window_start`, `window_end`, `total_posts`, `source` (mcp/manual).
 
-6. **Stop** : ta session est finie. Pas de décision de publication ici, pas de nouveau spec. Les insights alimentent les prochaines sessions `/post`, `/article`, `/newsletter` du réseau (qui les liront au démarrage). **Si un motif structurant émerge sur 3+ rapports successifs**, propose à l'utilisateur d'en faire une règle dans `knowledge/content/brand-book.md` (ex. « toujours finir par une question miroir »).
+6. **Stop** : ta session est finie. Pas de décision de publication ici, pas de nouveau spec. Les insights alimentent les prochaines sessions `/post`, `/article`, `/newsletter` du réseau (qui les liront au démarrage). **Si un motif structurant émerge sur 3+ rapports successifs**, propose à l'utilisateur d'en faire une règle dans `knowledge/brand/brand-book.md` (ex. « toujours finir par une question miroir »).
 
 ## Cas limites
 
