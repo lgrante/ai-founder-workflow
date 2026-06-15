@@ -3,3 +3,7 @@
 CLAUDE.local.md
 # Dashboard "latest" de /status — artefact local (peut contenir des PII en mode privé)
 knowledge/dashboard.html
+# Serena (code-graph MCP) — on versionne .serena/project.yml (langages par défaut),
+# on ignore le cache/logs générés (par-machine, volumineux)
+.serena/cache/
+.serena/logs/

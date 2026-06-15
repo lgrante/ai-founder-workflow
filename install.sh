@@ -130,6 +130,21 @@ EOF
   echo "  2. Le skill /setup pose le workflow complet (CLAUDE.md, docs/WORKFLOW.md,"
   echo "     hooks per-repo dont test-gate.sh et preflight-guard.py local)."
   echo
+  echo "→ Stack anti-tokens (globale) :"
+  if command -v serena >/dev/null 2>&1; then
+    echo "  ✓ serena détecté (navigation symbolique). Le .mcp.json est posé per-repo par /setup."
+  else
+    echo "  ⚠ serena absent — installe-le : uv tool install serena-agent"
+  fi
+  if command -v chop >/dev/null 2>&1; then
+    chop init --global >/dev/null 2>&1 && echo "  ✓ chop init --global exécuté (console compressée partout)." \
+      || echo "  ⚠ chop présent mais 'chop init --global' a échoué — lance-le manuellement."
+  else
+    echo "  ⚠ chop absent — installe-le puis 'chop init --global' :"
+    echo "    curl -fsSL https://raw.githubusercontent.com/AgusRdz/chop/main/install.sh | sh"
+  fi
+
+  echo
   echo "Garde-fou actif : si tu tapes /spec /code … sur un repo sans docs/WORKFLOW.md,"
   echo "le hook global bloque et te demande de lancer /setup d'abord."
   exit 0
@@ -170,6 +185,23 @@ grep -qxF '.cc-scratch/' "$TARGET/.gitignore" || echo '.cc-scratch/' >> "$TARGET
 grep -qxF 'CLAUDE.local.md' "$TARGET/.gitignore" || echo 'CLAUDE.local.md' >> "$TARGET/.gitignore"
 
 chmod +x "$TARGET/.claude/hooks/"*.sh "$TARGET/.claude/hooks/"*.py "$TARGET/.claude/statusline.sh" 2>/dev/null || true
+
+# ── Stack anti-tokens : Serena (code-graph MCP) + chop (compresseur console) ──
+echo
+echo "→ Stack anti-tokens (Économie de tokens) :"
+if command -v serena >/dev/null 2>&1; then
+  echo "  ✓ serena détecté — .mcp.json (code-graph) actif au prochain lancement de Claude Code."
+else
+  echo "  ⚠ serena absent — installe-le pour la navigation symbolique : uv tool install serena-agent"
+  echo "    (.mcp.json est en place ; le MCP connectera dès que le binaire sera sur le PATH)"
+fi
+if command -v chop >/dev/null 2>&1; then
+  chop init >/dev/null 2>&1 && echo "  ✓ chop init exécuté (compression des sorties console)." \
+    || echo "  ⚠ chop présent mais 'chop init' a échoué — lance-le manuellement."
+else
+  echo "  ⚠ chop absent — installe-le pour compresser la console :"
+  echo "    curl -fsSL https://raw.githubusercontent.com/AgusRdz/chop/main/install.sh | sh  &&  chop init"
+fi
 
 echo
 echo "✓ Fichiers en place. Étapes suivantes :"
