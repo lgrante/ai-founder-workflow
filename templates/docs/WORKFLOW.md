@@ -120,6 +120,13 @@ Règles : tests ancrés sur l'**intention** (jamais sur le code qu'on vient d'é
 - `/clear` ou nouvelle session entre sujets sans rapport.
 - Le **moment** du clear/compact est un geste humain ; ce qui s'automatise via hooks, c'est ce qui **survit**.
 
+## Économie de tokens (navigation, plan, console)
+Trois leviers, propagés par le kit sur chaque repo installé. Le moins de tokens lus = le plus de contexte utile.
+
+- **Navigation symbolique — Serena (code-graph MCP).** `.mcp.json` (racine du repo) déclare le serveur `serena` (`start-mcp-server --context claude-code --project-from-cwd`). Au lieu de lire des fichiers entiers en brut, explore via `find_symbol` / `find_referencing_symbols` / overview. **Prérequis** : binaire `serena` sur le PATH (`uv tool install serena-agent`). Absent → le serveur MCP ne connecte pas, c'est non bloquant (on retombe sur la lecture brute). Désactivable en supprimant `.mcp.json`.
+- **Plan avant code (doctrine bloquante).** Aucune écriture de code sans plan validé. Côté build, c'est la **porte `PLAN.md`** de `/code` (cf. § Porte de validation) ; côté transverse, c'est la règle dans `CLAUDE.md` § Économie de tokens. Exception : correction triviale d'une ligne explicitement demandée.
+- **Console compressée — chop.** `chop` compresse/tronque les sorties verbeuses (git, npm, docker…) avant qu'elles ne polluent le contexte. Câblé via son propre hook : `chop init` (per-repo, lancé par `/setup` / `install.sh` si le binaire est présent) ou `chop init --global`. **Prérequis** : binaire `chop` (`curl -fsSL https://raw.githubusercontent.com/AgusRdz/chop/main/install.sh | sh`). Absent → aucun hook posé, non bloquant.
+
 ## Hook
 `Stop` hook (`.claude/hooks/test-gate.sh`) : lance les tests rapides, bloque la fin du tour via `{"decision":"block","reason":...}` (sortie sur stdout, `exit 0`) tant que rouge. Garde anti-boucle `stop_hook_active` obligatoire.
 
@@ -149,6 +156,8 @@ C'est **déterministe**, pas une consigne au LLM (même doctrine que `preflight-
 - **Item de backlog** — `backlog/<slug>.md`, un motif discovery **promu, formulé et priorisé** comme candidat à spécifier (le pont Découverte→Build). Statut `idea`→`triaged`→`specced`/`dropped`. Groomé par `/backlog`, lu par `/spec`. Distinct du *bug* (valeur à construire vs défaut à réparer) et du *motif* brut (signal agrégé non encore promu dans `knowledge/insights.md`). Cf. § Convention backlog.
 - **Dashboard latest** — `knowledge/dashboard.html`, le pointeur vivant (HTML seul, gitignored) vers le dernier snapshot `/status`, à chemin stable. Cf. § Dashboard latest.
 - **Propagation** — faire arriver les améliorations du kit sur un repo déjà installé. Outil : le skill `/update` (clone auto du kit + `kit-manifest.json`). Cf. § Propagation & mise à jour.
+- **Serena** — indexeur sémantique (code-graph, LSP) exposé en MCP via `.mcp.json`. Permet la navigation symbolique (`find_symbol`, `find_referencing_symbols`, overview) au lieu de lire des fichiers entiers. Cf. § Économie de tokens.
+- **chop** — compresseur de sortie console (binaire externe), câblé via son propre hook (`chop init`). Tronque les sorties verbeuses avant qu'elles ne polluent le contexte. Cf. § Économie de tokens.
 - **kit-manifest.json** — fichier (racine du kit) qui décrit, **par fichier**, la politique de propagation (`overwrite` / `overwrite-confirm` / `merge-preserve` / `register` / `append` / `create-if-missing` / `suggest-only`). Rend `/update` déterministe : le kit se décrit lui-même.
 - **`.kit-version`** — marqueur per-repo (`.claude/.kit-version`) de la version du kit installée. Comparé à `KIT_VERSION` du kit pour calculer le delta. Absent → repo pré-versioning (`0.0.0`).
 - **Stats (audience)** — raw dump horodaté du MCP réseau dans `content/<network>/stats/<date>-snapshot.<ext>`. Preuve brute, append-only, sert de traçabilité aux insights.
@@ -445,7 +454,7 @@ Ces signaux = sur-design. Préfère la **violation consciente** notée à la cat
 | `register` | hooks → `settings.json` | enregistre idempotemment (`register-hook.py`) |
 | `append` | `.gitignore` | ajoute les lignes manquantes |
 | `create-if-missing` | scaffolds (`backlog/`, …) | ne touche jamais l'existant |
-| `suggest-only` | `CLAUDE.md` (repo-spécifique) | ne jamais écraser, ajouts chirurgicaux avec OK |
+| `suggest-only` | `CLAUDE.md` (repo-spécifique), `.mcp.json` (serveur Serena) | ne jamais écraser, ajouts chirurgicaux avec OK |
 
 Le manifest rend la propagation **déterministe** : le kit se décrit lui-même, `/update` n'a aucune règle hardcodée. Branche dédiée `update`, commits par catégorie, **jamais de push** (geste humain). `/setup` sur un repo déjà installé **délègue à `/update`** plutôt que de ré-installer.
 
