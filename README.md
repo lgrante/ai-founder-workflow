@@ -38,8 +38,8 @@ Chaque session porte un **préfixe selon son type**, ce qui permet de les retrou
 
 | Préfixe | Axe | Pour quoi | Écrit dans |
 |---|---|---|---|
-| `market-research-…` | Découverte | paysage marché, concurrents, tendances | `knowledge/market/` |
-| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
+| `market-research-…` | Découverte | sujet marché / concurrents / tendances exploré | `knowledge/research/` (+ `competitors/`, `community/`) |
+| `user-feedback-…` | Découverte | échange daté avec une personne réelle (incl. discovery sales) | `knowledge/conversations/<date>-<slug>.md` + fiche `knowledge/people/<slug>.md` + `knowledge/insights.md` |
 | `support-<client>` | Découverte | sift des tickets support (Jira / Zendesk / Linear / …) | `knowledge/support/clients/<client>.md` + `knowledge/support/insights.md` |
 | `backlog` | Transverse (pont Découverte→Build) | toilette/priorise les motifs récurrents en candidats à spécifier | `backlog/<slug>.md` |
 | `spec-<feature>` | Build | le **quoi** : spec + critères + jalons | `features/<feature>/SPEC.md` |
@@ -196,12 +196,15 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 │       ├── post/ article/ newsletter/                     # cœur audience
 │       └── <skills de domaine>                            # conventions front, back/API — À ADAPTER
 ├── docs/WORKFLOW.md          # cette doctrine + conventions de nommage
-├── knowledge/                # axe DÉCOUVERTE (continu, jamais par feature)
-│   ├── market/               # recherche marché
+├── knowledge/                # axe DÉCOUVERTE — un objet = un dossier, un acte = un fichier daté
+│   ├── people/               # une fiche par personne (interne+externe) — PII : repo privé OU gitignored
+│   ├── conversations/        # un fichier par échange daté (pointe vers people/) — PII idem
+│   ├── research/             # une note par sujet exploré (datée, sourcée)
+│   ├── competitors/          # un dossier par concurrent (features, user-feedbacks)
+│   ├── community/            # canaux de veille passive (Reddit, Slack, Discord…)
 │   ├── insights.md           # agrégat global (features ET contenu)
 │   ├── content/brand-book.md # tonalité, style, voice (lu par /post /article /newsletter)
-│   ├── crm/contacts/         # données perso (user-feedback) — repo privé séparé OU gitignored
-│   └── support/              # sift des tickets clients (4e type discovery)
+│   └── support/              # sift des tickets clients (4e type discovery) — INCHANGÉ
 │       ├── clients/<client>.md  # résumé cumulatif daté par client
 │       └── insights.md          # agrégat motifs cross-clients support
 ├── features/                 # axe BUILD (par feature) — structure standard pour CHAQUE feature
@@ -235,7 +238,7 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 **Ce qui doit survivre, peu importe les noms :**
 
 - **Trois axes physiquement séparés** : découverte (`knowledge/`), build (`features/`), audience (`content/`) — reliés par un **pont** : le backlog (`backlog/`), qui transforme un motif discovery en candidat à spécifier.
-- **Découverte à 3 sources distinctes** : market (extérieur), CRM contacts (intérieur qualitatif), support (intérieur quantitatif via tickets agrégés). Toutes alimentent l'agrégat `knowledge/insights.md` global.
+- **Découverte rangée par objet, pas par axe mélangé** : `people/` (qui), `conversations/` (quand — un échange daté), `research/` (quoi — sujet exploré), `competitors/` (concurrents), `community/` (veille passive), `support/` (tickets agrégés). Une conversation pointe vers une personne ; un sujet de research cite des conversations. Toutes alimentent l'agrégat `knowledge/insights.md` global. Cf. § Principe directeur découverte ci-dessous.
 - Pour une feature, **SPEC et PLAN au même endroit**, dans une **structure standard reproductible** (sub-features / prototypes / qa / plans / archives) que TOUTES les features partagent.
 - **Versionnage par dossier côté build** : la racine du feature dir = version active ; les versions périmées vont dans `archives/v{N}/` (« refonte majeure » : on bascule la racine entière, on n'édite pas in-place).
 - **Sub-features récursives** : un composant atomique d'une version active vit dans `sub-features/<sub>/` avec la même structure.
@@ -246,6 +249,45 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 - Commandes + savoir de domaine dans `.claude/skills/` (chargés à la demande), pas dans un `CLAUDE.md` obèse.
 - Le **statut** d'avancement à **un seul endroit** (les cases du PLAN pour le build, le sous-dossier `drafts/`/`published/` pour le contenu) ; les résultats de tests sont du **scratch** gitignored.
 - Le `CLAUDE.md` reste **court** : pour chaque ligne, « la retirer ferait-elle faire une erreur à Claude ? » Sinon, on la coupe.
+
+### Principe directeur découverte (le classement de `knowledge/`)
+
+> **Un objet = un dossier. Un acte = un fichier daté.**
+
+Le piège d'un `knowledge/` qui vieillit mal : empiler **trois axes de classement** dans les mêmes dossiers thématiques —
+
+- **par personne** (qui) → éclatée entre plusieurs dossiers,
+- **par conversation** (quand) → jamais matérialisée, fondue dans les fiches,
+- **par sujet** (quoi) → diluée entre « market » et « research ».
+
+Résultat : impossible de suivre un contact dans le temps, l'équipe interne n'a pas de place, « research » devient un fourre-tout. La parade est de ranger par **objet stable**, avec des relations explicites — **cinq objets** :
+
+| Dossier | Objet | Qui écrit |
+|---|---|---|
+| `knowledge/people/` | une fiche **par personne** (interne **ou** externe), évolutive dans le temps | `/feedback` |
+| `knowledge/conversations/` | un fichier **par échange daté** (call, DM, meeting, event), pointe vers `people/` | `/feedback` |
+| `knowledge/research/` | une note **par sujet exploré** (datée, sourcée), cite les conversations | `/research` |
+| `knowledge/competitors/` | un dossier **par concurrent** (`features.md`, `user-feedbacks.md`) | `/research` / manuel |
+| `knowledge/community/` | un fichier **par canal de veille passive** (Reddit, Slack, Discord…) | `/research` / manuel |
+
+Une *conversation* référence une *personne* ; un sujet de *research* cite plusieurs *conversations*. On suit ainsi une **personne** dans le temps (sa fiche s'enrichit) **ou** un **sujet** dans le temps (les conversations s'accumulent). **Inchangés** : `knowledge/support/`, `knowledge/content/`, `knowledge/insights.md` (+ `strategy/`, `demos/`, `doc/` selon le repo). Les fiches `people/`/`conversations/` portent des PII → repo privé séparé ou gitignored.
+
+### Migration de la structure `knowledge/` (v1 → v2)
+
+Les repos installés **avant la v2 du kit** ont l'ancienne structure (`knowledge/market/`, `knowledge/crm/contacts/`, parfois `knowledge/feedback/`). La migration est **manuelle, par projet, à ton rythme** — aucun script automatique (le `/update` ne touche pas l'existant : `scaffold/` est en `create-if-missing`, il ajoute seulement les dossiers/templates manquants).
+
+**Mapping ancien → nouveau :**
+
+| Ancien | Nouveau | Note |
+|---|---|---|
+| `knowledge/crm/contacts/<x>.md` | `knowledge/people/<x>.md` | fiche personne, stable et évolutive |
+| `knowledge/feedback/<x>.md` (si présent) | `knowledge/people/<x>.md` **+** `knowledge/conversations/<date>-<x>.md` | split : la fiche stable d'un côté, chaque échange daté de l'autre |
+| `knowledge/market/<date>-<sujet>.md` | `knowledge/research/<date>-<sujet>.md` | note de sujet |
+| `knowledge/market/competitor-*/` | `knowledge/competitors/<nom>/` | un dossier par concurrent |
+| `knowledge/market/` (threads Reddit/Slack/Discord, veille) | `knowledge/community/<canal>.md` | canaux passifs |
+| `knowledge/crm/contacts/_template.md` | absorbé dans `knowledge/people/_template.md` | l'ancien gabarit CRM disparaît |
+
+Checklist actionnable en **3 vagues** : voir [MIGRATION.md](MIGRATION.md). Résumé : (1) créer la structure cible vide + templates, (2) migrer le contenu existant par `git mv` (people → conversations → research/competitors/community), (3) ajouter les objets manquants au fil de l'eau (fiches équipe interne, conversations à venir). Les anciens dossiers ne disparaissent qu'une fois vidés.
 
 ---
 

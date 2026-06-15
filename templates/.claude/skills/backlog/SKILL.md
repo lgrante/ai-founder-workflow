@@ -73,7 +73,7 @@ maj: 2026-06-08
 
 ## Signal (preuve)
 - 3 contacts sur 5 le citent (`knowledge/insights.md` § Friction paiement)
-- 3 concurrents sur 4 le proposent (`knowledge/market/2026-06-02-paiement-mobile.md`)
+- 3 concurrents sur 4 le proposent (`knowledge/research/2026-06-02-paiement-mobile.md`)
 - Pain point support récurrent (`knowledge/support/insights.md`)
 
 ## Impact estimé / hypothèse de valeur

@@ -1,5 +1,5 @@
 {
-  "kit_version": "1.0.0",
+  "kit_version": "2.0.0",
   "marker": ".claude/.kit-version",
   "_comment": "Politique de propagation par fichier. Lu par /update depuis le kit cloné. Chemins 'source' relatifs à la racine du kit ; 'target' relatifs à la racine du repo cible. Politiques : overwrite (kit-owned, écraser sans état d'âme) | overwrite-confirm (canonique, montrer le diff + OK) | merge-preserve (préserver des lignes locales) | register (enregistrer dans settings.json via register-hook.py, idempotent) | append (ajouter lignes manquantes) | create-if-missing (ne jamais toucher l'existant) | suggest-only (ne jamais écraser, proposer des ajouts chirurgicaux).",
 

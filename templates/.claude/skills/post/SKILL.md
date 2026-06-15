@@ -33,7 +33,7 @@ Avant d'exécuter ce skill, vérifie que `docs/WORKFLOW.md` existe à la racine 
 3. Charge le contexte :
    - `knowledge/insights.md` (les pain points / verbatims / motifs récurrents)
    - `knowledge/content/brand-book.md` ou équivalent (tonalité, style, voice)
-   - `knowledge/market/` (si le sujet est lié à un thème marché)
+   - `knowledge/research/` (si le sujet est lié à un thème marché ; + `knowledge/competitors/` pour les angles concurrentiels)
    - `content/<channel>/posted/` récents (éviter répétitions de format/sujet)
    - **`content/<channel>/insights/` — le dernier rapport `/report`** s'il existe : tu y trouves ce qui marche sur ce réseau (format gagnant, trade-offs, recommandations en cours). Cite-le explicitement dans tes choix éditoriaux (ex. « le rapport du 03/06 a recommandé liste numérotée → j'applique »). Si pas de rapport, signale-le et propose à l'utilisateur de lancer `/report <channel>` avant.
 4. **Si une skill spécialisée existe** (ex. `marketing-skills:writing-linkedin-posts`, ou autre skill globale de copywriting), **invoque-la** pour la rédaction. Notre rôle est la **STRUCTURE** et le **WORKFLOW**, pas le copywriting.

@@ -95,13 +95,18 @@ Aucun fichier perdu (les déplacements via `git mv` sont récupérables via le r
 │   ├── hooks/test-gate.sh    # filet rapide (anti-boucle stop_hook_active obligatoire)
 │   ├── statusline.sh         # OPTIONNEL — % contexte
 │   └── skills/               # 14 skills : setup, spec, code, test (dev) + research, feedback, support (découverte) + backlog (pont) + post, article, newsletter, report (audience) + status, update (transverse)
-├── knowledge/                # axe DÉCOUVERTE (continu, jamais par feature)
-│   ├── market/               # recherche marché
+├── knowledge/                # axe DÉCOUVERTE (un objet = un dossier, un acte = un fichier daté)
+│   ├── people/               # une fiche par personne (interne+externe) — PII : gitignored OU repo séparé
+│   │   └── _template.md      # fiche évolutive
+│   ├── conversations/        # un fichier par échange daté (pointe vers people/) — PII idem
+│   │   └── _template.md      # 5 champs (citation, pain, solution, notes, liens)
+│   ├── research/             # une note par sujet exploré (datée, sourcée)
+│   ├── competitors/          # un dossier par concurrent (features, user-feedbacks)
+│   ├── community/            # canaux de veille passive (Reddit, Slack, Discord…)
 │   ├── dashboard.html        # vue "latest" écrite par /status — GITIGNORED (local, PII en mode privé)
 │   ├── insights.md           # agrégat global (features ET contenu — alimenté par les 3 types discovery)
 │   ├── content/brand-book.md # tonalité, style, voice (lu par /post /article /newsletter)
-│   ├── crm/contacts/         # données perso (user-feedback) — gitignored OU repo séparé
-│   └── support/              # 4e type découverte : tickets clients (Jira/Zendesk/…)
+│   └── support/              # 4e type découverte : tickets clients (Jira/Zendesk/…) — INCHANGÉ
 │       ├── clients/<client>.md  # résumé cumulatif daté par client
 │       └── insights.md          # agrégat motifs cross-clients support
 ├── features/<feature>/       # axe BUILD — racine = version active
@@ -172,11 +177,11 @@ Détail complet : `templates/docs/WORKFLOW.md` du kit (Convention par-feature + 
 
    **2.5. Carte de migration `old → new`** : produit la carte explicite (chaque fichier/dossier impacté → action `move` / `merge` / `keep` / `archive` / `delete`+raison / **`recover`** pour les artefacts retrouvés).
 
-   **2.6. Questions stratégiques** via `AskUserQuestion` : périmètre (code applicatif KEEP ?), sort des dossiers par-rôle, setup de test, CRM (versionné ici ou repo séparé ?), préfixes de session, sous-repos formalisés en submodules ou pas, worktrees morts à supprimer ?, channels audience à scaffolder (LinkedIn, Twitter/X, blog, newsletter, autres ?), **système de support utilisé** (Jira / Zendesk / autre / aucun) ?
+   **2.6. Questions stratégiques** via `AskUserQuestion` : périmètre (code applicatif KEEP ?), sort des dossiers par-rôle, setup de test, **données personnelles** (`knowledge/people/` + `knowledge/conversations/` versionnés ici ou repo séparé / gitignored ?), préfixes de session, sous-repos formalisés en submodules ou pas, worktrees morts à supprimer ?, channels audience à scaffolder (LinkedIn, Twitter/X, blog, newsletter, autres ?), **système de support utilisé** (Jira / Zendesk / autre / aucun) ?
 
    - **Attends la validation complète (plan + carte + questions + artefacts retrouvés) AVANT toute action.**
 
-3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `backlog/`, `bugs/`, `content/<channels>/{drafts,posted,stats,insights,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). Copie `scaffold/backlog/_template.md` dans `backlog/`. **Important** : pour chaque channel audience scaffold-é (linkedin, twitter-x, blog, newsletter…), créer aussi `stats/` (raw dumps MCP/exports, archives append-only) et `insights/` (rapports synthétisés par `/report`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
+3. **Phase 1 — Restructuration** : annonce le batch de `git mv`. Crée l'ossature (`mkdir -p _archive/`, `knowledge/`, `knowledge/people/`, `knowledge/conversations/`, `knowledge/research/`, `knowledge/competitors/`, `knowledge/community/`, `knowledge/content/`, `knowledge/support/clients/`, `features/`, `backlog/`, `bugs/`, `content/<channels>/{drafts,posted,stats,insights,...}/`, `.cc-scratch/`, `.claude/skills/`, `docs/`). Copie `scaffold/backlog/_template.md` dans `backlog/`, ainsi que `scaffold/knowledge/people/_template.md` et `scaffold/knowledge/conversations/_template.md` dans leurs dossiers respectifs. **Important** : pour chaque channel audience scaffold-é (linkedin, twitter-x, blog, newsletter…), créer aussi `stats/` (raw dumps MCP/exports, archives append-only) et `insights/` (rapports synthétisés par `/report`). Exécute les `git mv` validés (incl. déplacement de drafts/posts préexistants vers `content/<channel>/posted/`). **Récupère les artefacts d'archéologie** validés en Phase 0 (étape 2.3) : pour chaque artefact, copie le contenu depuis le transcript original vers son emplacement cible (avec frontmatter `recovered_from: <session_id>` + `recovered_at: <timestamp>`). Archive READMEs obsolètes. Supprime worktrees morts (autorisation explicite). **Commit Phase 1.**
 
 4. **Phase 2 — Doctrine** : crée `CLAUDE.md` (court, rempli avec specs du repo, **infusé des décisions tirées des memory files**), copie `docs/WORKFLOW.md` depuis `templates/docs/WORKFLOW.md` du kit, crée READMEs racine + `knowledge/` + `features/` + `content/`, crée `knowledge/insights.md` squelette, crée `knowledge/content/brand-book.md` placeholder si absent, crée `knowledge/support/insights.md` squelette. **Commit Phase 2.**
 

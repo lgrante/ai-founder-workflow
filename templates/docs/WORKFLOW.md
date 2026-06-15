@@ -54,11 +54,33 @@ Puis `AskUserQuestion` — oui → invoque `/setup` et STOP ; non → STOP.
 - **Build** — par feature, en pipeline `spec → code → test`. Sort dans `features/`.
 - **Audience** — continu, par output (réseaux, blog, newsletter). Sort dans `content/`.
 
+## Principe directeur découverte (`knowledge/`)
+
+> **Un objet = un dossier. Un acte = un fichier daté.**
+
+La découverte se range par **objet stable**, pas par axe de classement mélangé. Le piège à éviter : empiler trois axes (par personne / par conversation / par sujet) dans les mêmes dossiers thématiques — on ne peut alors plus suivre ni une personne ni un sujet dans le temps. D'où **cinq objets** avec des relations explicites :
+
+| Dossier | Objet | Qui écrit | Format |
+|---|---|---|---|
+| `knowledge/people/` | une fiche **par personne** (interne **ou** externe), évolutive | `/feedback` | `people/_template.md` |
+| `knowledge/conversations/` | un fichier **par échange daté** (call, DM, meeting, event) | `/feedback` | `conversations/_template.md` (5 champs) |
+| `knowledge/research/` | une note **par sujet exploré** (datée, sourcée), cite les conversations | `/research` | note libre datée |
+| `knowledge/competitors/` | un dossier **par concurrent** (`features.md`, `user-feedbacks.md`) | `/research` / manuel | libre |
+| `knowledge/community/` | un fichier **par canal de veille passive** (Reddit, Slack, Discord…) | `/research` / manuel | libre |
+
+**Relations** : une *conversation* référence une *personne* (frontmatter `personne:`). Un sujet de *research* cite plusieurs *conversations*. C'est relationnel — on suit une **personne** dans le temps (sa fiche s'enrichit) ou un **sujet** dans le temps (les conversations qui l'éclairent s'accumulent).
+
+**Inchangés** (mêmes dossiers, même rôle) : `knowledge/support/`, `knowledge/content/`, `knowledge/insights.md` — plus `knowledge/strategy/`, `knowledge/demos/`, `knowledge/doc/` quand le repo les utilise.
+
+**Les features émergent de l'intersection** des axes (research + people/conversations + competitors + support), jamais d'un seul échange. `insights.md` reste l'agrégat manuel qui fait remonter les motifs récurrents.
+
+*(Repo installé avant cette structure — `knowledge/market/`, `knowledge/crm/contacts/` ? Voir le mapping ancien → nouveau et la checklist de migration en 3 vagues dans le README du kit, § Migration de la structure `knowledge/`.)*
+
 ### Nomenclature
 | Préfixe | Axe | Pour quoi | Écrit dans |
 |---|---|---|---|
-| `market-research-…` | Découverte | marché, concurrents, tendances | `knowledge/market/` |
-| `user-feedback-…` | Découverte | échanges avec de vrais utilisateurs (incl. discovery sales) | `knowledge/crm/contacts/` + `knowledge/insights.md` |
+| `market-research-…` | Découverte | sujet marché / concurrents / tendances exploré | `knowledge/research/` (+ `knowledge/competitors/`, `knowledge/community/`) |
+| `user-feedback-…` | Découverte | échange daté avec une personne réelle (incl. discovery sales) | `knowledge/conversations/<date>-<slug>.md` + fiche `knowledge/people/<slug>.md` + `knowledge/insights.md` |
 | `support-<client>` | Découverte | sift des tickets support (Jira / Zendesk / …) | `knowledge/support/clients/<client>.md` + `knowledge/support/insights.md` |
 | `backlog` | Transverse (pont Découverte→Build) | toilette/priorise les motifs en candidats à spécifier | `backlog/<slug>.md` |
 | `spec-<feature>` | Build | le quoi : spec + critères + jalons | `features/<feature>/SPEC.md` |
