@@ -8,6 +8,30 @@ Format : [SemVer](https://semver.org/lang/fr/). `MAJEUR` = changement de
 structure imposant une migration manuelle ; `MINEUR` = nouveau skill / hook /
 capacité rétro-compatible ; `CORRECTIF` = corrections sans nouvelle surface.
 
+## 2.1.0 — 2026-06-15
+
+Stack **anti-tokens** propagée à chaque repo installé. **MINEUR** : ajouts
+rétro-compatibles, dégradation propre si les binaires externes sont absents.
+
+### Ajouté
+- **Serena (code-graph MCP)** — `templates/.mcp.json` déclare le serveur `serena`
+  (navigation symbolique `find_symbol`/`find_referencing_symbols`/overview au lieu
+  de lire des fichiers entiers). Prérequis : `uv tool install serena-agent`.
+  Propagation `suggest-only` (n'écrase pas un `.mcp.json` existant).
+- **Langages Serena par défaut** — `templates/.serena/project.yml` :
+  `typescript` (JS/TS/JSX/TSX), `python`, `php` (les plus utilisés). Auto-provisionnés
+  par Serena. `go` & co. en opt-in commenté (LSP requis). Propagation `create-if-missing`.
+- **chop (compresseur console)** — `install.sh` et `/setup` lancent `chop init`
+  (per-repo) / `chop init --global` si le binaire est présent, sinon astuce d'install.
+  chop gère son propre hook (rien réinventé).
+
+### Changé
+- **Doctrine « Économie de tokens »** dans `templates/CLAUDE.md` et
+  `templates/docs/WORKFLOW.md` (navigation symbolique d'abord, plan avant code,
+  console compressée). `/code` renvoie vers Serena à l'étape exploration.
+- **`.gitignore`** : versionne `.serena/project.yml`, ignore `.serena/cache/` et
+  `.serena/logs/`.
+
 ## 2.0.0 — 2026-06-08
 
 Refonte du classement de `knowledge/` (axe Découverte). **MAJEUR** : la
