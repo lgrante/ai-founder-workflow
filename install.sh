@@ -78,12 +78,24 @@ if [ "$MODE" = "global" ]; then
   cp "$KIT_DIR/templates/.claude/hooks/preflight-guard.py" "$TARGET_HOOKS/preflight-guard.py"
   cp "$KIT_DIR/templates/.claude/hooks/md-to-html.py" "$TARGET_HOOKS/md-to-html.py"
   cp "$KIT_DIR/templates/.claude/hooks/backlog-lint.py" "$TARGET_HOOKS/backlog-lint.py"
-  chmod +x "$TARGET_HOOKS/preflight-guard.py" "$TARGET_HOOKS/md-to-html.py" "$TARGET_HOOKS/backlog-lint.py"
+  cp "$KIT_DIR/templates/.claude/hooks/context-restore.sh" "$TARGET_HOOKS/context-restore.sh"
+  cp "$KIT_DIR/templates/.claude/hooks/context-handoff.sh" "$TARGET_HOOKS/context-handoff.sh"
+  chmod +x "$TARGET_HOOKS/preflight-guard.py" "$TARGET_HOOKS/md-to-html.py" "$TARGET_HOOKS/backlog-lint.py" \
+           "$TARGET_HOOKS/context-restore.sh" "$TARGET_HOOKS/context-handoff.sh"
+
+  # Output style « founder » (contrat de réponse) — déployé globalement.
+  TARGET_OUTPUT_STYLES="$HOME/.claude/output-styles"
+  mkdir -p "$TARGET_OUTPUT_STYLES"
+  cp "$KIT_DIR/templates/.claude/output-styles/founder.md" "$TARGET_OUTPUT_STYLES/founder.md"
+
   echo
   echo "→ Installation des garde-fous déterministes (scripts)…"
   echo "  ✓ Hook copié : $TARGET_HOOKS/preflight-guard.py"
   echo "  ✓ Hook copié : $TARGET_HOOKS/md-to-html.py (jumeau HTML des livrables .md)"
   echo "  ✓ Hook copié : $TARGET_HOOKS/backlog-lint.py (validateur des items backlog)"
+  echo "  ✓ Hook copié : $TARGET_HOOKS/context-restore.sh (bandeau de reprise — SessionStart)"
+  echo "  ✓ Hook copié : $TARGET_HOOKS/context-handoff.sh (filet de compaction — PreCompact)"
+  echo "  ✓ Output style copié : $TARGET_OUTPUT_STYLES/founder.md (contrat de réponse)"
 
   if command -v python3 >/dev/null 2>&1; then
     python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
@@ -103,10 +115,22 @@ if [ "$MODE" = "global" ]; then
       "$TARGET_HOOKS/backlog-lint.py" \
       5 \
       "Write|Edit"
+    for m in startup resume compact; do
+      python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+        "$TARGET_SETTINGS" "SessionStart" "$TARGET_HOOKS/context-restore.sh" 5 "$m"
+    done
+    for m in auto manual; do
+      python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+        "$TARGET_SETTINGS" "PreCompact" "$TARGET_HOOKS/context-handoff.sh" 10 "$m"
+    done
+    # Contrat de réponse : pose outputStyle: founder (set-if-absent, ne clobber pas un choix existant).
+    python3 "$KIT_DIR/templates/.claude/hooks/register-hook.py" \
+      --ensure-setting "$TARGET_SETTINGS" outputStyle founder
   else
     echo "  ⚠ python3 absent — ajoute manuellement ces entrées à $TARGET_SETTINGS :"
     cat <<EOF
   {
+    "outputStyle": "founder",
     "hooks": {
       "UserPromptSubmit": [
         { "hooks": [
@@ -118,6 +142,15 @@ if [ "$MODE" = "global" ]; then
             { "type": "command", "command": "$TARGET_HOOKS/md-to-html.py", "timeout": 15 },
             { "type": "command", "command": "$TARGET_HOOKS/backlog-lint.py", "timeout": 5 }
         ]}
+      ],
+      "SessionStart": [
+        { "matcher": "startup", "hooks": [ { "type": "command", "command": "$TARGET_HOOKS/context-restore.sh", "timeout": 5 } ]},
+        { "matcher": "resume",  "hooks": [ { "type": "command", "command": "$TARGET_HOOKS/context-restore.sh", "timeout": 5 } ]},
+        { "matcher": "compact", "hooks": [ { "type": "command", "command": "$TARGET_HOOKS/context-restore.sh", "timeout": 5 } ]}
+      ],
+      "PreCompact": [
+        { "matcher": "auto",   "hooks": [ { "type": "command", "command": "$TARGET_HOOKS/context-handoff.sh", "timeout": 10 } ]},
+        { "matcher": "manual", "hooks": [ { "type": "command", "command": "$TARGET_HOOKS/context-handoff.sh", "timeout": 10 } ]}
       ]
     }
   }

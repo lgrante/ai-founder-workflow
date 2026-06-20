@@ -1,5 +1,5 @@
 {
-  "kit_version": "2.0.0",
+  "kit_version": "2.1.0",
   "marker": ".claude/.kit-version",
   "_comment": "Politique de propagation par fichier. Lu par /update depuis le kit cloné. Chemins 'source' relatifs à la racine du kit ; 'target' relatifs à la racine du repo cible. Politiques : overwrite (kit-owned, écraser sans état d'âme) | overwrite-confirm (canonique, montrer le diff + OK) | merge-preserve (préserver des lignes locales) | register (enregistrer dans settings.json via register-hook.py, idempotent) | append (ajouter lignes manquantes) | create-if-missing (ne jamais toucher l'existant) | suggest-only (ne jamais écraser, proposer des ajouts chirurgicaux).",
 
@@ -49,15 +49,20 @@
       "source": "templates/.claude/hooks/context-handoff.sh",
       "target": ".claude/hooks/context-handoff.sh",
       "policy": "overwrite",
-      "kind": "hook",
-      "optional": true
+      "kind": "hook"
     },
     {
       "source": "templates/.claude/hooks/context-restore.sh",
       "target": ".claude/hooks/context-restore.sh",
       "policy": "overwrite",
-      "kind": "hook",
-      "optional": true
+      "kind": "hook"
+    },
+    {
+      "source": "templates/.claude/output-styles/founder.md",
+      "target": ".claude/output-styles/founder.md",
+      "policy": "overwrite",
+      "kind": "output-style",
+      "note": "Contrat de réponse (structure + verbosité adaptative + footer récap). Activé par défaut via la clé settings_defaults.outputStyle. En mode global, déployé dans ~/.claude/output-styles/ par install.sh --global."
     },
     {
       "source": "templates/.claude/statusline.sh",
@@ -97,11 +102,21 @@
   ],
 
   "hooks_registration": [
+    { "event": "SessionStart", "matcher": "startup", "command": ".claude/hooks/context-restore.sh", "timeout": 5 },
+    { "event": "SessionStart", "matcher": "resume", "command": ".claude/hooks/context-restore.sh", "timeout": 5 },
+    { "event": "SessionStart", "matcher": "compact", "command": ".claude/hooks/context-restore.sh", "timeout": 5 },
     { "event": "UserPromptSubmit", "command": ".claude/hooks/preflight-guard.py", "timeout": 5 },
     { "event": "Stop", "command": ".claude/hooks/test-gate.sh", "timeout": 120 },
     { "event": "PostToolUse", "matcher": "Write|Edit", "command": ".claude/hooks/md-to-html.py", "timeout": 15 },
-    { "event": "PostToolUse", "matcher": "Write|Edit", "command": ".claude/hooks/backlog-lint.py", "timeout": 5 }
+    { "event": "PostToolUse", "matcher": "Write|Edit", "command": ".claude/hooks/backlog-lint.py", "timeout": 5 },
+    { "event": "PreCompact", "matcher": "auto", "command": ".claude/hooks/context-handoff.sh", "timeout": 10 },
+    { "event": "PreCompact", "matcher": "manual", "command": ".claude/hooks/context-handoff.sh", "timeout": 10 }
   ],
+
+  "settings_defaults": {
+    "_comment": "Clés top-level (non-hook) de settings.json posées set-if-absent par /update via register-hook.py --ensure-setting (jamais d'écrasement d'un choix utilisateur). En fresh install, /setup copie le settings.json template qui les contient déjà.",
+    "outputStyle": "founder"
+  },
 
   "gitignore_lines": [
     ".cc-scratch/",
