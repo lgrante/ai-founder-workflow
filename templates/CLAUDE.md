@@ -41,6 +41,9 @@ Commandes :
 ## Jumeaux HTML
 Tout `.md` livrable (SPEC, PLAN, ARCHITECTURE, TICKET, research, content, reports…) obtient automatiquement un `<fichier>.html` jumeau via le hook `.claude/hooks/md-to-html.py` (`PostToolUse`). N'écris **pas** ce `.html` à la main et ne l'édite jamais (il est réécrit à chaque sauvegarde du `.md`) — édite seulement le `.md` source. Cf. `docs/WORKFLOW.md` § Jumeau HTML.
 
+## Format de réponse
+Output style `founder` actif par défaut (`.claude/output-styles/founder.md`) : réponses structurées, verbosité adaptée au type de session, footer 🎯/✅/➡️ en fin de tâche. Le hook `SessionStart` (`context-restore.sh`) injecte un bandeau de reprise au démarrage. Cf. `docs/WORKFLOW.md` § Format de réponse & bandeau de reprise.
+
 ## À la compaction
 Toujours préserver : l'état du PLAN en cours, les fichiers modifiés, les critères d'acceptation.
 Jeter le bruit des échecs déjà résolus.

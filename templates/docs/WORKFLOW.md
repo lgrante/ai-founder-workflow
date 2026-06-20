@@ -439,7 +439,7 @@ Ces signaux = sur-design. Préfère la **violation consciente** notée à la cat
 
 | Politique | Pour | Comportement |
 |---|---|---|
-| `overwrite` | kit-owned (skills, hooks, statusline) | écrase sans état d'âme |
+| `overwrite` | kit-owned (skills, hooks, statusline, output style) | écrase sans état d'âme |
 | `overwrite-confirm` | `docs/WORKFLOW.md` (doctrine) | diff + OK (l'utilisateur a pu l'éditer) |
 | `merge-preserve` | `test-gate.sh` | préserve `TEST_CMD`, met à jour le reste |
 | `register` | hooks → `settings.json` | enregistre idempotemment (`register-hook.py`) |
@@ -449,11 +449,16 @@ Ces signaux = sur-design. Préfère la **violation consciente** notée à la cat
 
 Le manifest rend la propagation **déterministe** : le kit se décrit lui-même, `/update` n'a aucune règle hardcodée. Branche dédiée `update`, commits par catégorie, **jamais de push** (geste humain). `/setup` sur un repo déjà installé **délègue à `/update`** plutôt que de ré-installer.
 
-## Optionnel : hooks de contexte & statusline
-Filets pour les **longues** sessions `code-`. **Non activés par défaut** — à brancher toi-même dans `.claude/settings.json` si tu en veux. Les artefacts durables (PLAN/SPEC/code commité) restent le vrai relais ; ceci ne fait qu'aider la reprise.
+## Format de réponse & bandeau de reprise
 
-- **`hooks/context-handoff.sh`** (événement `PreCompact`) — `PreCompact` est **notification-only** : il ne peut **pas** préserver le contexte lui-même. Le script se contente d'écrire un filet (`.cc-scratch/handoff.md` + sauvegarde du transcript) avant la compaction.
-- **`hooks/context-restore.sh`** (événement `SessionStart`, matchers `compact`/`resume`) — réinjecte un rappel via `hookSpecificOutput.additionalContext` : « relis `PLAN.md`, le SPEC et `.cc-scratch/handoff.md` ».
-- **`statusline.sh`** (clé `statusLine`, type `command`) — affiche le % de contexte utilisé (lu depuis le JSON passé au statusLine ; parsing défensif avec repli selon la version de Claude Code).
+Tu jongles souvent entre plusieurs sessions en parallèle : deux mécanismes **activés par défaut** t'évitent d'en perdre le fil. La mémoire vit toujours **dans les fichiers** (SPEC/PLAN/commits), jamais dans la conversation — ceci ne fait qu'aider la reprise et la lisibilité.
 
-Pour activer : ajoute les blocs `PreCompact`, `SessionStart` et `statusLine` à `settings.json` (exemples en tête de chaque script). Tu peux aussi abaisser le seuil d'auto-compact (~0,85). Vérifie les noms de champs JSON contre `code.claude.com/docs` pour ta version.
+- **Contrat de réponse — output style « founder »** (`.claude/output-styles/founder.md`, activé par la clé `outputStyle: founder` de `settings.json`). Il modifie le system prompt — donc **prioritaire sur `CLAUDE.md`** — tout en **augmentant** Claude Code (`keep-coding-instructions: true` : la rigueur ingénierie est conservée). Il impose : réponses **structurées** (sections, puces, refs fichiers cliquables), **verbosité adaptée au type de session** (laconique en `feat/`/`fix/`/`code`/`test` ; plus développé en `spec`/`research`/`report`/`article`/…), et un **footer de récap** en fin de tâche — 🎯 Tâche / ✅ Fait / ➡️ Prochaine.
+- **Boucle d'état (reprise entre sessions)** : le footer **persiste** sa ligne « ➡️ Prochaine » dans `.cc-scratch/state/<branche>.md` (slug avec `/`→`--`, gitignored via `.cc-scratch/`). Au démarrage suivant, le hook **`hooks/context-restore.sh`** (`SessionStart`, matchers `startup`/`resume`/`compact`) lit la branche, en **déduit le type de session**, repère les artefacts (SPEC/PLAN/TICKET) et **réinjecte un bandeau** via `hookSpecificOutput.additionalContext` : « Reprise — branche `X` (type Y) · artefacts · dernière note ». Tu repars au bon endroit sans relire toute la conversation.
+- **Filet de compaction** : **`hooks/context-handoff.sh`** (`PreCompact`, matchers `auto`/`manual`) écrit un repère (`.cc-scratch/handoff.md` + sauvegarde du transcript) avant une compaction. `PreCompact` est **notification-only** : il ne préserve pas le contexte lui-même, le vrai relais reste les artefacts durables.
+
+Ces trois éléments sont **kit-owned** (`overwrite`) et propagés par `/setup` (fresh) et `/update` (existant) ; `outputStyle` est posé **set-if-absent** (un choix de style utilisateur n'est jamais écrasé).
+
+## Optionnel : statusline
+
+- **`statusline.sh`** (clé `statusLine`, type `command`) — affiche le % de contexte utilisé (parsing défensif avec repli selon la version de Claude Code). **Non activée par défaut** : ajoute le bloc `statusLine` à `settings.json` (exemple en tête du script). Tu peux aussi abaisser le seuil d'auto-compact (~0,85). Vérifie les noms de champs JSON contre `code.claude.com/docs` pour ta version.
