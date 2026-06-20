@@ -165,7 +165,8 @@ La ligne de partage côté build n'est **pas** « unitaire vs le reste ». C'est
 - **`Stop` hook** (ou `PostToolUse` sur `Edit|Write`) : lance les tests rapides et **bloque la fin du tour** tant que ce n'est pas vert → `code-x` corrige et relance **seule**.
 - **Anti-boucle obligatoire** : flag `stop_hook_active` dans le hook.
 - **Jumeau HTML déterministe** : `PostToolUse` (`Write|Edit`) → `md-to-html.py` régénère un `<fichier>.html` au contenu identique pour **chaque `.md` livrable** (thème sombre responsive, offline, zéro dépendance). Le `.md` reste la source ; le `.html` est dérivé. Denylist : `CLAUDE.md`, `README.md`, `.cc-scratch/`, `.claude/`, `memory/`… Cf. `docs/WORKFLOW.md` § Jumeau HTML.
-- (Optionnel) **statusline** affichant le % de contexte, **seuil d'auto-compact abaissé** (~0,85), et un **PreCompact → fichier + SessionStart → restore** comme filet sur les longues sessions.
+- **Contrat de réponse + bandeau de reprise** (activés par défaut) : l'output style `founder` (clé `outputStyle`, system prompt → prioritaire sur `CLAUDE.md`, `keep-coding-instructions: true`) structure les réponses — **verbosité adaptée au type de session** + footer 🎯 Tâche / ✅ Fait / ➡️ Prochaine. Le footer persiste l'état dans `.cc-scratch/state/<branche>.md` ; au démarrage, `SessionStart → context-restore.sh` injecte un **bandeau de reprise** (branche, type, artefacts, dernière note) ; `PreCompact → context-handoff.sh` écrit un filet avant compaction. Cf. `docs/WORKFLOW.md` § Format de réponse & bandeau de reprise.
+- (Optionnel) **statusline** affichant le % de contexte, **seuil d'auto-compact abaissé** (~0,85).
 
 ---
 
@@ -188,8 +189,9 @@ C'est un **point de départ**, pas un dogme : chaque équipe l'adapte à son rep
 ├── CLAUDE.md                 # racine, versionné — COURT (commandes, conventions, étiquette)
 ├── CLAUDE.local.md           # gitignored — notes perso
 ├── .claude/
-│   ├── settings.json         # hooks (Stop / PostToolUse / UserPromptSubmit)
-│   ├── hooks/                # scripts : test-gate (Stop), preflight-guard + md-to-html (jumeau HTML des livrables)
+│   ├── settings.json         # hooks (Stop / PostToolUse / UserPromptSubmit / SessionStart / PreCompact) + outputStyle: founder
+│   ├── hooks/                # scripts : test-gate (Stop), preflight-guard + md-to-html (jumeau HTML), context-restore (bandeau reprise), context-handoff (filet compaction)
+│   ├── output-styles/founder.md # contrat de réponse (structure + verbosité adaptative + footer récap)
 │   └── skills/               # savoir de domaine + commandes de session (/<nom>)
 │       ├── setup/ spec/ code/ test/                       # cœur dev (4 + setup)
 │       ├── research/ feedback/ support/                   # découverte (3 types)

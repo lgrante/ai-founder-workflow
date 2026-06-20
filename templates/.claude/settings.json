@@ -1,5 +1,26 @@
 {
+  "outputStyle": "founder",
   "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/context-restore.sh", "timeout": 5 }
+        ]
+      },
+      {
+        "matcher": "resume",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/context-restore.sh", "timeout": 5 }
+        ]
+      },
+      {
+        "matcher": "compact",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/context-restore.sh", "timeout": 5 }
+        ]
+      }
+    ],
     "UserPromptSubmit": [
       {
         "hooks": [
@@ -20,6 +41,20 @@
         "hooks": [
           { "type": "command", "command": ".claude/hooks/md-to-html.py", "timeout": 15 },
           { "type": "command", "command": ".claude/hooks/backlog-lint.py", "timeout": 5 }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "matcher": "auto",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/context-handoff.sh", "timeout": 10 }
+        ]
+      },
+      {
+        "matcher": "manual",
+        "hooks": [
+          { "type": "command", "command": ".claude/hooks/context-handoff.sh", "timeout": 10 }
         ]
       }
     ]

@@ -8,6 +8,47 @@ Format : [SemVer](https://semver.org/lang/fr/). `MAJEUR` = changement de
 structure imposant une migration manuelle ; `MINEUR` = nouveau skill / hook /
 capacité rétro-compatible ; `CORRECTIF` = corrections sans nouvelle surface.
 
+## 2.1.0 — 2026-06-20
+
+Contrat de réponse + bandeau de reprise entre sessions. **MINEUR** : nouvelle
+surface (output style + 2 hooks), rétro-compatible, propagée par `/update`.
+
+### Ajouté
+- **Output style `founder`** (`.claude/output-styles/founder.md`, activé par
+  `outputStyle: founder` dans `settings.json`) — contrat de réponse : structure,
+  **verbosité adaptée au type de session**, et footer de récap en fin de tâche
+  (🎯 Tâche / ✅ Fait / ➡️ Prochaine). `keep-coding-instructions: true` : il
+  **augmente** Claude Code (rigueur ingénierie conservée), il ne le remplace pas.
+- **Bandeau de reprise** — `hooks/context-restore.sh` (`SessionStart`, matchers
+  `startup`/`resume`/`compact`) calcule branche + type de session + artefacts
+  présents et lit la dernière note d'état, puis réinjecte un bandeau « où on en
+  est » via `hookSpecificOutput.additionalContext`.
+- **Boucle d'état** — le footer persiste sa ligne « ➡️ Prochaine » dans
+  `.cc-scratch/state/<branche>.md` (gitignored), relue au démarrage suivant.
+
+### Activé par défaut (était opt-in)
+- `context-restore.sh` (`SessionStart`) et `context-handoff.sh` (`PreCompact`,
+  filet de compaction) sont désormais enregistrés par défaut. `statusline.sh`
+  reste opt-in.
+
+### Hooks / outillage
+- **`register-hook.py`** : nouveau mode `--ensure-setting <clé> <valeur>`
+  (set-if-absent, idempotent, backup `.bak`) — pose une clé top-level de
+  `settings.json` sans écraser un choix utilisateur (sert à `outputStyle`).
+- **`kit-manifest.json`** : entrée `output-styles/founder.md` (`overwrite`),
+  enregistrements `SessionStart`/`PreCompact`, et bloc `settings_defaults`
+  (`outputStyle: founder`, appliqué set-if-absent par `/update`).
+
+### Propagation
+- `/setup` (Phase 3) déploie l'output style + enregistre les nouveaux hooks ;
+  `/update` (politiques `register` + `settings_defaults`) les propage aux repos
+  existants ; `install.sh --global` les pose dans `~/.claude/`.
+
+### Doctrine
+- `docs/WORKFLOW.md` § **Format de réponse & bandeau de reprise** (remplace
+  l'ancien « Optionnel : hooks de contexte »). `CLAUDE.md` (template) : pointeur
+  court. `README.md` + `README.html` mis à jour.
+
 ## 2.0.0 — 2026-06-08
 
 Refonte du classement de `knowledge/` (axe Découverte). **MAJEUR** : la
